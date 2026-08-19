@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cipher Auto Lab — Mobile Auto Detailing | New Haven County &amp; Central CT</title>
+<meta name="description" content="Mobile auto detailing across New Haven County and central Connecticut. We come to your driveway or office. Ceramic coating, paint correction, full interior and exterior detailing. New Haven, Hamden, Shelton, Ansonia, Waterbury, Meriden, Hartford and surrounding towns.">
+<style>
+:root{
+  --bg:#08090B; --panel:#0F1216; --panel2:#141920; --line:#212831;
+  --ink:#F0F4F8; --mute:#8B96A4; --dim:#5E6975;
+  --acc:#22D3EE; --acc-dk:#0E7490;
+  --max:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+a{color:inherit}
+img{max-width:100%}
+
+/* ---------- HEADER ---------- */
+header{
+  position:sticky;top:0;z-index:50;background:rgba(8,9,11,.86);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+}
+.hdr{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand svg{width:34px;height:34px;color:var(--acc);flex:none}
+.bn{font-size:15px;font-weight:800;letter-spacing:.13em;line-height:1}
+.bs{font-size:8px;letter-spacing:.34em;color:var(--mute);margin-top:4px;line-height:1}
+.hdr-r{display:flex;align-items:center;gap:10px}
+.navlink{display:none;font-size:13.5px;color:var(--mute);text-decoration:none;margin-right:8px}
+.navlink:hover{color:var(--ink)}
+@media(min-width:900px){.navlink{display:inline}}
+/* sticky bottom bar already offers Call on small screens */
+@media(max-width:759px){.hdr-r .btn-o{display:none}}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:6px;font-size:14px;font-weight:650;
+  text-decoration:none;border:1px solid transparent;cursor:pointer;
+  font-family:inherit;transition:.16s;white-space:nowrap;
+}
+.btn-p{background:var(--acc);color:#04252B}
+.btn-p:hover{background:#67E3F5}
+.btn-o{border-color:#2B3540;color:var(--ink);background:transparent}
+.btn-o:hover{border-color:var(--acc);color:var(--acc)}
+.btn-sm{padding:9px 15px;font-size:13px}
+.btn-lg{padding:15px 28px;font-size:15.5px}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:88px 0 72px;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;top:-260px;left:50%;transform:translateX(-50%);
+  width:900px;height:620px;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(34,211,238,.13),transparent 66%);
+}
+.hero-in{position:relative;max-width:760px;z-index:2}
+.heroimg{
+  position:absolute;top:0;right:0;width:46%;height:100%;pointer-events:none;
+  background-image:url("img/tlx-hero.jpg");background-size:cover;background-position:38% 42%;
+  -webkit-mask-image:linear-gradient(96deg,transparent 0%,rgba(0,0,0,.12) 22%,rgba(0,0,0,.55) 52%,rgba(0,0,0,.9) 80%,#000 100%);
+  mask-image:linear-gradient(96deg,transparent 0%,rgba(0,0,0,.12) 22%,rgba(0,0,0,.55) 52%,rgba(0,0,0,.9) 80%,#000 100%);
+  opacity:.58;
+}
+@media(max-width:1000px){.heroimg{display:none}}
+.tag{
+  display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--acc);border:1px solid rgba(34,211,238,.28);
+  background:rgba(34,211,238,.07);padding:6px 13px;border-radius:100px;margin-bottom:22px;
+}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--acc)}
+h1{font-size:clamp(34px,6.4vw,60px);line-height:1.05;letter-spacing:-.025em;font-weight:800}
+h1 em{font-style:normal;color:var(--acc)}
+.sub{font-size:clamp(16px,2.2vw,19px);color:#AEB9C5;margin-top:20px;max-width:56ch}
+.cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
+.hnote{font-size:13px;color:var(--dim);margin-top:16px}
+
+.trust{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:8px;
+  margin-top:52px;overflow:hidden;
+}
+.ti{background:var(--panel);padding:18px 20px}
+.ti b{display:block;font-size:clamp(15px,4vw,19px);letter-spacing:-.02em;line-height:1.25}
+.ti span{font-size:12px;color:var(--mute)}
+@media(max-width:520px){.ti{padding:14px 15px}}
+
+/* ---------- SECTIONS ---------- */
+section{padding:78px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:13px}
+h2{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:800}
+.lede{color:var(--mute);margin-top:14px;max-width:58ch;font-size:16px}
+.shead{margin-bottom:44px}
+
+/* ---------- WORK ---------- */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:640px){.ba{grid-template-columns:1fr}}
+.ba figure{margin:0;position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
+.ba img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:4/5;max-height:540px}
+.ba figcaption{
+  position:absolute;top:12px;left:12px;font-size:10px;font-weight:750;letter-spacing:.18em;
+  text-transform:uppercase;padding:5px 11px;border-radius:100px;backdrop-filter:blur(6px);
+}
+.ba .b figcaption{background:rgba(10,12,15,.82);color:#E4EAF0;border:1px solid rgba(255,255,255,.18)}
+.ba .a figcaption{background:rgba(34,211,238,.92);color:#04252B}
+.bacap{font-size:13px;color:var(--mute);margin-bottom:34px;padding-left:14px;border-left:2px solid var(--acc)}
+.bacap b{color:var(--ink)}
+
+.work{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.shot{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:3/4}
+.shot.wide{grid-column:span 2}
+.shot.wide img{aspect-ratio:4/3}
+@media(max-width:640px){.shot.wide{grid-column:span 1}}
+.shot span{
+  position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;font-size:12px;color:#E4EAF0;
+  background:linear-gradient(transparent,rgba(6,8,10,.9));line-height:1.35;
+}
+
+/* ---------- OWNER / TRUST ---------- */
+.owner{display:grid;grid-template-columns:1fr;gap:34px;align-items:start}
+@media(min-width:900px){.owner{grid-template-columns:300px 1fr;gap:48px}}
+.face{
+  border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#11161C;
+  aspect-ratio:4/5;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;text-align:center;padding:24px;
+}
+.face svg{width:30px;height:30px;color:#38434F}
+.face .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#4A5563}
+.face p{font-size:12px;color:var(--dim);line-height:1.45}
+.oname{font-size:23px;font-weight:800;letter-spacing:-.015em}
+.orole{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-top:5px}
+.obio{font-size:15.5px;color:#B7C1CC;margin-top:18px;max-width:58ch}
+.obio + .obio{margin-top:13px}
+
+.creds{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:28px}
+.cred{background:var(--panel);padding:17px 19px;display:flex;gap:12px;align-items:flex-start}
+.cred svg{width:16px;height:16px;color:var(--acc);flex:none;margin-top:3px}
+.cred b{display:block;font-size:14px;margin-bottom:2px}
+.cred span{font-size:12.5px;color:var(--mute);line-height:1.45}
+
+.pledge{
+  margin-top:26px;background:linear-gradient(180deg,#111A20,#0D1116);
+  border:1px solid rgba(34,211,238,.3);border-radius:10px;padding:26px 28px;
+}
+.pledge h3{font-size:18px;font-weight:800;margin-bottom:10px}
+.pledge p{font-size:14.5px;color:#B7C1CC;max-width:60ch}
+.pledge p + p{margin-top:11px}
+.pledge b{color:var(--ink)}
+
+.newnote{margin-top:26px;padding-left:16px;border-left:2px solid #333E4A}
+.newnote h4{font-size:14.5px;margin-bottom:7px}
+.newnote p{font-size:13.5px;color:var(--mute);max-width:62ch}
+
+/* ---------- PACKAGES ---------- */
+.pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;align-items:start}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:28px 26px;position:relative;height:100%;
+}
+.card.feat{border-color:rgba(34,211,238,.42);background:linear-gradient(180deg,#111A20,#0E1216)}
+.flag{
+  position:absolute;top:-11px;left:26px;background:var(--acc);color:#04252B;
+  font-size:10px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 11px;border-radius:100px;
+}
+.pname{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.price{font-size:38px;font-weight:800;letter-spacing:-.03em;margin:12px 0 2px;line-height:1}
+.price small{font-size:14px;font-weight:500;color:var(--mute);letter-spacing:0}
+.pfor{font-size:13.5px;color:#A9B4C0;min-height:42px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+ul.feats{list-style:none;font-size:14px;color:#B7C1CC}
+ul.feats li{padding:7px 0 7px 25px;position:relative}
+ul.feats li::before{
+  content:"";position:absolute;left:0;top:14px;width:11px;height:2px;background:var(--acc);
+}
+.card .btn{width:100%;margin-top:24px}
+
+/* ---------- STEPS ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;counter-reset:s}
+.step{padding-top:22px;border-top:2px solid var(--line);position:relative}
+.step::before{
+  counter-increment:s;content:"0" counter(s);
+  font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--acc);
+  letter-spacing:.1em;display:block;margin-bottom:10px;
+}
+.step h3{font-size:17px;margin-bottom:7px;font-weight:700}
+.step p{font-size:14px;color:var(--mute)}
+
+/* ---------- AREA ---------- */
+.area{display:grid;grid-template-columns:1fr;gap:36px}
+@media(min-width:860px){.area{grid-template-columns:1fr 1.15fr;gap:56px}}
+.towns{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.town{
+  font-size:13px;color:#AEB9C5;background:var(--panel);border:1px solid var(--line);
+  padding:7px 13px;border-radius:5px;
+}
+.town.hub{border-color:rgba(34,211,238,.35);color:var(--acc)}
+.areahead{flex-basis:100%;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mute);margin:14px 0 2px}
+.areahead:first-child{margin-top:0}
+
+/* ---------- TINT ---------- */
+.tint{
+  background:linear-gradient(100deg,#0D1418,#0A0D10);
+  border:1px solid rgba(34,211,238,.22);border-radius:11px;padding:34px 32px;
+  display:flex;gap:28px;align-items:center;flex-wrap:wrap;
+}
+.tint .txt{flex:1;min-width:250px}
+.tint h3{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:9px}
+.tint p{font-size:14.5px;color:var(--mute);max-width:52ch}
+.fade{display:flex;flex-direction:column;gap:6px;flex:none}
+.fade i{display:block;width:112px;height:12px;border-radius:3px;background:var(--acc)}
+
+/* ---------- FORM ---------- */
+.formwrap{display:grid;grid-template-columns:1fr;gap:40px}
+@media(min-width:900px){.formwrap{grid-template-columns:.85fr 1.15fr;gap:60px}}
+form{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:30px 28px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+.fld{margin-bottom:16px}
+label{display:block;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--mute);margin-bottom:7px}
+input,select,textarea{
+  width:100%;background:#0A0D11;border:1px solid #242C36;border-radius:6px;
+  padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);background:#0C1116}
+textarea{resize:vertical;min-height:92px}
+select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%238B96A4' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.fine{font-size:12px;color:var(--dim);margin-top:14px;line-height:1.5}
+.ok{display:none;background:rgba(34,211,238,.09);border:1px solid rgba(34,211,238,.35);
+  color:var(--acc);padding:13px 15px;border-radius:6px;font-size:14px;margin-bottom:16px}
+
+.contact-side h3{font-size:19px;margin-bottom:8px}
+.cl{display:flex;gap:13px;padding:17px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.cl svg{width:17px;height:17px;color:var(--acc);flex:none;margin-top:3px}
+.cl b{display:block;font-size:14.5px}
+.cl span{font-size:13px;color:var(--mute)}
+.cl a{color:var(--acc);text-decoration:none}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:760px}
+details{border-bottom:1px solid var(--line);padding:19px 0}
+summary{cursor:pointer;font-size:16px;font-weight:650;list-style:none;display:flex;justify-content:space-between;gap:20px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--acc);font-size:20px;font-weight:400;flex:none}
+details[open] summary::after{content:"–"}
+details p{font-size:14.5px;color:var(--mute);margin-top:12px;max-width:62ch}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--line);padding:44px 0 40px}
+.fgrid{display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.fnote{font-size:12.5px;color:var(--dim);max-width:44ch;margin-top:14px}
+.fmeta{font-size:12.5px;color:var(--dim);text-align:right}
+@media(max-width:640px){.fmeta{text-align:left}}
+
+.stickybar{
+  position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;gap:10px;
+  padding:11px 14px;background:rgba(10,12,15,.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+}
+.stickybar .btn{flex:1}
+@media(min-width:760px){.stickybar{display:none}}
+@media(max-width:759px){body{padding-bottom:70px}}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGO SYMBOL ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="bead" viewBox="0 0 100 100">
+    <path d="M50 5 L88 27 L88 71 L50 93 L12 71 L12 27 Z" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linejoin="round"/>
+    <path d="M34.5 65 C27.5 49 37 32 50 32 C63 32 72.5 49 65.5 65 Z" fill="currentColor"/>
+    <rect x="24" y="66.5" width="52" height="4" rx="1" fill="currentColor"/>
+    <g fill="currentColor">
+      <rect x="30" y="73" width="3.2" height="6" rx="1"/>
+      <rect x="42" y="73" width="3.2" height="6" rx="1"/>
+      <rect x="54" y="73" width="3.2" height="6" rx="1"/>
+      <rect x="66" y="73" width="3.2" height="6" rx="1"/>
+    </g>
+  </symbol>
+</defs></svg>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="wrap hdr">
+    <a class="brand" href="#top">
+      <svg><use href="#bead"/></svg>
+      <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
+    </a>
+    <div class="hdr-r">
+      <a class="navlink" href="#owner">About</a>
+      <a class="navlink" href="#packages">Packages</a>
+      <a class="navlink" href="#how">How it works</a>
+      <a class="navlink" href="#area">Service area</a>
+      <a class="btn btn-o btn-sm" href="tel:+12035929589">(203) 592-9589</a>
+      <a class="btn btn-p btn-sm" href="#quote">Get a quote</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<div id="top" class="hero">
+  <div class="heroimg" role="img" aria-label="Blue Acura TLX being washed"></div>
+  <div class="wrap hero-in">
+    <div class="tag mono"><span class="dot"></span> Mobile service · New Haven County &amp; central CT</div>
+    <h1>Your car gets the <em>lab treatment</em>. In your own driveway.</h1>
+    <p class="sub">Fully mobile detailing and ceramic coating from New Haven and the Valley up through central Connecticut. We bring the water, the power, and a documented process — you don't move the car or lose your Saturday.</p>
+    <div class="cta">
+      <a class="btn btn-p btn-lg" href="#quote">Get a free quote</a>
+      <a class="btn btn-o btn-lg" href="sms:+12035929589">Text us a photo</a>
+    </div>
+    <p class="hnote">Owner-operated · Connecticut LLC, insured · No deposit to book · 30+ towns covered</p>
+
+    <div class="trust">
+      <div class="ti"><b>100%</b><span>Mobile — we come to you</span></div>
+      <div class="ti"><b>LLC &amp; insured</b><span>Certificate on request</span></div>
+      <div class="ti"><b>Self&#8209;contained</b><span>Own water &amp; power</span></div>
+      <div class="ti"><b>Tint soon</b><span>Launching 2026</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WORK ===== -->
+<section id="work">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Recent work</div>
+      <h2>We'd rather show you than tell you.</h2>
+      <p class="lede">Real customer vehicles, shot on a phone in real driveways. No stock photos, no borrowed cars.</p>
+    </div>
+
+    <div class="ba">
+      <figure class="b"><img src="img/volvo-before.jpg" alt="Volvo interior before detailing — trash and debris throughout the cabin" loading="lazy"><figcaption>Before</figcaption></figure>
+      <figure class="a"><img src="img/volvo-after.jpg" alt="Same Volvo interior after a full detail — debris removed, carpets vacuumed, console and dash cleaned" loading="lazy"><figcaption>After</figcaption></figure>
+    </div>
+    <p class="bacap"><b>Volvo, full interior.</b> Same seat, same angle, one afternoon apart. Every piece of debris out of the cabin, carpets vacuumed down to the nap, console and dash cleaned.</p>
+
+    <div class="work">
+      <div class="shot wide">
+        <img src="img/sonata-canopy.jpg" alt="Hyundai Sonata N-Line detailed in a residential driveway under a pop-up canopy" loading="lazy">
+        <span>Sonata N-Line — finished in the client's own driveway, canopy up.</span>
+      </div>
+      <div class="shot">
+        <img src="img/civic-foam.jpg" alt="Snow foam dwelling on the rear of a white Honda Civic" loading="lazy">
+        <span>Snow foam pre-soak lifting grit before anything touches the paint.</span>
+      </div>
+      <div class="shot">
+        <img src="img/ilx-mat.jpg" alt="Clean Acura ILX floor mat and parchment leather seat after detailing" loading="lazy">
+        <span>Acura ILX — mats and parchment leather, finished.</span>
+      </div>
+      <div class="shot">
+        <img src="img/tlx-profile.jpg" alt="Blue Acura TLX A-Spec fully detailed, parked outdoors" loading="lazy">
+        <span>Acura TLX A-Spec — decontaminated, sealed, dressed.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OWNER ===== -->
+<section id="owner">
+  <div class="wrap owner">
+    <div class="face">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17h1l2-7h12l2 7h1"/><path d="M5 17h14v3H5z"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>
+      <p class="lbl mono">Photo slot</p>
+      <p>The setup — canopy, van, or gear laid out on a job. No faces needed. Vertical, 1200&times;1500.</p>
+    </div>
+    <div>
+      <div class="eyebrow mono">How we work</div>
+      <div class="oname">One operator. Every car.</div>
+      <div class="orole mono">Owner-operated · no subcontractors</div>
+      <p class="obio">Cipher Auto Lab is deliberately small. The same trained hands do every vehicle — no rotating crew, no day labour, nobody learning on your paint. That's the only honest way to promise you'll get the same result in March that you got in July.</p>
+      <p class="obio">Most detailing is sold on adjectives. Supreme. Superior. Premium. None of it tells you anything, because anyone can type it. So we document the work instead and let you judge the difference yourself.</p>
+
+      <div class="creds">
+        <div class="cred">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div><b>Connecticut LLC</b><span>Cipher Auto Lab LLC, registered in CT</span></div>
+        </div>
+        <div class="cred">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+          <div><b>Insured</b><span>Ask and we'll send the certificate before you book</span></div>
+        </div>
+        <div class="cred">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          <div><b>No deposit</b><span>You pay after the walk-around, not before</span></div>
+        </div>
+      </div>
+
+      <div class="pledge">
+        <h3>The walk-around promise</h3>
+        <p>We don't take payment until we've walked around the car together and you've told us you're happy. <b>If something isn't right, it gets fixed while we're still standing there.</b> Not a callback, not a next-time — on the spot.</p>
+        <p>If we damage anything, you'll hear it from us before you spot it yourself, and our insurance covers it. That's the whole reason we carry it.</p>
+      </div>
+
+      <div class="newnote">
+        <h4>And one honest thing</h4>
+        <p>Cipher Auto Lab is new, so there's no wall of five-star reviews to point at yet — better to say that plainly than pad the page. What we offer instead is the work itself: matched before-and-after photos on every job, a fixed price agreed up front, and payment only once you've approved it. Reviews will come from customers who meant them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PACKAGES ===== -->
+<section id="packages">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Packages</div>
+      <h2>Straightforward pricing.</h2>
+      <p class="lede">Prices start where most cars land. Oversized vehicles, heavy pet hair, and serious neglect cost more — we'll tell you before we start, never after.</p>
+    </div>
+    <div class="pk">
+
+      <div class="card">
+        <div class="pname mono">Refresh</div>
+        <div class="price">$149<small> &nbsp;starting</small></div>
+        <p class="pfor">For a clean car that needs to stay that way. Every 4–8 weeks.</p>
+        <ul class="feats">
+          <li>Hand wash, wheels &amp; tires</li>
+          <li>Chemical decontamination</li>
+          <li>6-month spray sealant</li>
+          <li>Interior vacuum &amp; wipe-down</li>
+          <li>Glass inside and out</li>
+          <li>Roughly 2 hours</li>
+        </ul>
+        <a class="btn btn-o" href="#quote">Book Refresh</a>
+      </div>
+
+      <div class="card feat">
+        <div class="flag">Most booked</div>
+        <div class="pname mono">Full Detail</div>
+        <div class="price">$279<small> &nbsp;starting</small></div>
+        <p class="pfor">The reset. Everything inside and out, back to as-good-as-it-gets.</p>
+        <ul class="feats">
+          <li>Everything in Refresh</li>
+          <li>Clay bar &amp; iron decontamination</li>
+          <li>One-step machine polish</li>
+          <li>Shampoo &amp; hot-water extraction</li>
+          <li>Leather clean &amp; condition</li>
+          <li>Engine bay detail</li>
+          <li>Roughly 5 hours</li>
+        </ul>
+        <a class="btn btn-p" href="#quote">Book Full Detail</a>
+      </div>
+
+      <div class="card">
+        <div class="pname mono">Ceramic</div>
+        <div class="price">$749<small> &nbsp;starting</small></div>
+        <p class="pfor">Paint correction plus a coating that lasts years, not weeks.</p>
+        <ul class="feats">
+          <li>Everything in Full Detail</li>
+          <li>Multi-stage paint correction</li>
+          <li>3–5 year ceramic coating</li>
+          <li>Coated wheels &amp; glass</li>
+          <li>Written care instructions</li>
+          <li>Free 6-month check-up</li>
+          <li>Two days, by appointment</li>
+        </ul>
+        <a class="btn btn-o" href="#quote">Ask about Ceramic</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW ===== -->
+<section id="how">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">How it works</div>
+      <h2>Four steps, no surprises.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3>Send a few photos</h3>
+        <p>Text or upload shots of your vehicle. We quote off what we can actually see, not a guess.</p>
+      </div>
+      <div class="step">
+        <h3>Get a fixed price</h3>
+        <p>A firm number and a time window, usually within the hour. If the car needs more than quoted, you approve it first.</p>
+      </div>
+      <div class="step">
+        <h3>We come to you</h3>
+        <p>Home or office. We carry our own water and power, so all we need is about 15 feet around the car.</p>
+      </div>
+      <div class="step">
+        <h3>Walk-around before we go</h3>
+        <p>We hand the car back together and go panel by panel. Not happy with something? It gets fixed on the spot.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== AREA ===== -->
+<section id="area">
+  <div class="wrap area">
+    <div>
+      <div class="eyebrow mono">Service area</div>
+      <h2>New Haven County, the Valley, and central CT.</h2>
+      <p class="lede">Fully mobile from the shoreline up through Hartford County. Not on the list? Ask anyway — if you're close to the edge of it, we'll usually make it work.</p>
+    </div>
+    <div class="towns">
+      <span class="areahead mono">New Haven County</span>
+      <span class="town hub">New Haven</span><span class="town hub">Hamden</span><span class="town hub">Milford</span>
+      <span class="town">West Haven</span><span class="town">East Haven</span><span class="town">North Haven</span>
+      <span class="town">Branford</span><span class="town">Guilford</span><span class="town">Orange</span>
+      <span class="town">Woodbridge</span><span class="town">Cheshire</span><span class="town">Wallingford</span>
+      <span class="town">Meriden</span>
+      <span class="areahead mono">Naugatuck Valley</span>
+      <span class="town hub">Shelton</span><span class="town hub">Ansonia</span>
+      <span class="town">Derby</span><span class="town">Seymour</span><span class="town">Oxford</span>
+      <span class="town">Beacon Falls</span><span class="town">Naugatuck</span><span class="town">Waterbury</span>
+      <span class="areahead mono">Central &amp; Hartford County</span>
+      <span class="town hub">Hartford</span>
+      <span class="town">West Hartford</span><span class="town">New Britain</span><span class="town">Berlin</span>
+      <span class="town">Southington</span><span class="town">Plainville</span><span class="town">Newington</span>
+      <span class="town">Wethersfield</span><span class="town">Rocky Hill</span><span class="town">Cromwell</span>
+      <span class="town">Middletown</span><span class="town">Farmington</span><span class="town">Glastonbury</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TINT ===== -->
+<section>
+  <div class="wrap">
+    <div class="tint">
+      <div class="txt">
+        <div class="eyebrow mono">Coming soon</div>
+        <h3>Window tinting joins the lab.</h3>
+        <p>Ceramic window film is landing at Cipher Auto Lab later this year — same mobile service, same driveway. Ask us to add you to the early list when you book.</p>
+      </div>
+      <div class="fade">
+        <i style="opacity:1"></i><i style="opacity:.78"></i><i style="opacity:.56"></i><i style="opacity:.34"></i><i style="opacity:.16"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUOTE ===== -->
+<section id="quote">
+  <div class="wrap formwrap">
+    <div class="contact-side">
+      <div class="eyebrow mono">Get a quote</div>
+      <h2>Tell us about the car.</h2>
+      <p class="lede">The more you tell us, the tighter the number. Photos help most of all.</p>
+
+      <div style="margin-top:26px">
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.4 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>
+          <div><b>Call or text</b><span><a href="tel:+12035929589">(203) 592-9589</a></span></div>
+        </div>
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+          <div><b>Email</b><span><a href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a></span></div>
+        </div>
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <div><b>Hours</b><span>Mon–Sat, 8am–6pm · Sunday by request</span></div>
+        </div>
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><b>Where we work</b><span>New Haven County, the Valley &amp; central CT</span></div>
+        </div>
+      </div>
+    </div>
+
+    <form id="qf" novalidate>
+      <div class="ok" id="ok">Thanks — your email app should be opening with the details filled in. If it didn't, just text us at (203) 592-9589.</div>
+      <div class="row">
+        <div class="fld"><label for="n">Your name</label><input id="n" name="name" required placeholder="First and last name"></div>
+        <div class="fld"><label for="p">Phone</label><input id="p" name="phone" type="tel" required placeholder="(203) 555-0100"></div>
+      </div>
+      <div class="row">
+        <div class="fld"><label for="e">Email</label><input id="e" name="email" type="email" placeholder="you@email.com"></div>
+        <div class="fld"><label for="t">Town</label><input id="t" name="town" required placeholder="Shelton"></div>
+      </div>
+      <div class="fld"><label for="v">Vehicle — year, make, model</label><input id="v" name="vehicle" required placeholder="2021 Honda Accord"></div>
+      <div class="fld"><label for="s">Package you're interested in</label>
+        <select id="s" name="service">
+          <option>Not sure yet — help me pick</option>
+          <option>Refresh — from $149</option>
+          <option>Full Detail — from $279</option>
+          <option>Ceramic — from $749</option>
+          <option>Window tint — add me to the early list</option>
+        </select>
+      </div>
+      <div class="fld"><label for="m">Anything we should know?</label><textarea id="m" name="notes" placeholder="Pet hair, spilled coffee, hasn't been washed since the Biden administration — all useful."></textarea></div>
+      <button class="btn btn-p btn-lg" type="submit" style="width:100%">Send my quote request</button>
+      <p class="fine">No deposit, no obligation, and no mailing list — this goes straight to us and nowhere else. If you'd rather just text, that works too.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Questions</div>
+      <h2>The things people ask first.</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>Do you need my water or electricity?</summary>
+        <p>No. The van carries its own water tank and power, so we can work at an apartment complex or an office lot the same as a house. If a spigot is handy we'll happily use it, but nothing depends on it.</p></details>
+      <details><summary>How much space do you need?</summary>
+        <p>About 15 feet around the vehicle — roughly a standard driveway or two parking spaces. Covered parking is a bonus in bad weather but not required.</p></details>
+      <details><summary>What happens if it rains?</summary>
+        <p>Light rain is usually fine for interior work. For exterior polishing or ceramic coating we'll reschedule, at no charge, to protect the result. We'll call you the morning of if the forecast turns.</p></details>
+      <details><summary>Do I need to be home?</summary>
+        <p>Not necessarily. Plenty of clients leave the keys and go to work. We'll send photos when we start and when we finish, and the walk-around can happen by video if you'd rather.</p></details>
+      <details><summary>Why is it "starting at"?</summary>
+        <p>A three-row SUV takes longer than a Civic, and a car with heavy pet hair or ground-in salt takes longer still. We quote the real number up front once we've seen photos, so the price you agree to is the price you pay.</p></details>
+      <details><summary>You're new — why should I trust you with my car?</summary>
+        <p>Fair question, and the honest answer is that you shouldn't take our word for it. So it's set up so you don't have to: the price is fixed before we start, you pay nothing up front, and you don't pay at all until you've inspected the car with us. Cipher Auto Lab is a registered Connecticut LLC and fully insured — ask and we'll send the certificate before you book. If we damage something, it's covered and you'll hear it from us first.</p></details>
+      <details><summary>What if a stain won't come out?</summary>
+        <p>Some won't. Dye transfer, old bleach spots, sun-cracked leather and ground-in salt damage are sometimes permanent, and no amount of product changes that. If it's visible going in you'll be told before the quote, and if it turns up mid-job we stop and talk to you rather than quietly charge for a result we can't deliver.</p></details>
+      <details><summary>When does window tinting start?</summary>
+        <p>We're targeting later this year. Mention it when you book and we'll add you to the early list — that group gets first appointments and launch pricing.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <a class="brand" href="#top">
+        <svg><use href="#bead"/></svg>
+        <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
+      </a>
+      <p class="fnote">Owner-operated mobile auto detailing and ceramic coating serving New Haven County, the Naugatuck Valley and central Connecticut. Window tinting coming soon.</p>
+    </div>
+    <div class="fmeta">
+      <p><a href="tel:+12035929589" style="text-decoration:none">(203) 592-9589</a></p>
+      <p><a href="mailto:hello@cipherautolab.com" style="text-decoration:none">hello@cipherautolab.com</a></p>
+      <p style="margin-top:12px">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
+    </div>
+  </div>
+</footer>
+
+<div class="stickybar">
+  <a class="btn btn-o" href="tel:+12035929589">Call</a>
+  <a class="btn btn-p" href="#quote">Get a quote</a>
+</div>
+
+<script>
+document.getElementById('qf').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var f = ev.target;
+  var need = ['n','p','t','v'];
+  for (var i=0;i<need.length;i++){
+    var el = document.getElementById(need[i]);
+    if(!el.value.trim()){ el.focus(); el.style.borderColor='#F87171'; return; }
+    el.style.borderColor='';
+  }
+  var body =
+    'Name: '    + document.getElementById('n').value + '\n' +
+    'Phone: '   + document.getElementById('p').value + '\n' +
+    'Email: '   + document.getElementById('e').value + '\n' +
+    'Town: '    + document.getElementById('t').value + '\n' +
+    'Vehicle: ' + document.getElementById('v').value + '\n' +
+    'Package: ' + document.getElementById('s').value + '\n\n' +
+    'Notes:\n'  + document.getElementById('m').value + '\n';
+  document.getElementById('ok').style.display = 'block';
+  window.location.href = 'mailto:hello@cipherautolab.com'
+    + '?subject=' + encodeURIComponent('Quote request — ' + document.getElementById('v').value)
+    + '&body='    + encodeURIComponent(body);
+});
+</script>
+</body>
+</html>
