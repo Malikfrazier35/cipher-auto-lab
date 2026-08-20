@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cipher Auto Lab — Mobile Auto Detailing | New Haven County &amp; Central CT</title>
+<meta name="description" content="Mobile auto detailing across New Haven County and central Connecticut. We come to your driveway or office. Ceramic coating, paint correction, full interior and exterior detailing. New Haven, Hamden, Shelton, Ansonia, Waterbury, Meriden, Hartford and surrounding towns.">
+<style>
+:root{
+  --bg:#08090B; --panel:#0F1216; --panel2:#141920; --line:#212831;
+  --ink:#F0F4F8; --mute:#8B96A4; --dim:#5E6975;
+  --acc:#A3E635; --acc-dk:#047857;
+  --max:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+a{color:inherit}
+img{max-width:100%}
+
+/* ---------- HEADER ---------- */
+header{
+  position:sticky;top:0;z-index:50;background:rgba(8,9,11,.86);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+}
+.hdr{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand svg{width:34px;height:34px;color:var(--acc);flex:none}
+.bn{font-size:15px;font-weight:800;letter-spacing:.13em;line-height:1}
+.bs{font-size:8px;letter-spacing:.34em;color:var(--mute);margin-top:4px;line-height:1}
+.hdr-r{display:flex;align-items:center;gap:10px}
+.navlink{display:none;font-size:13.5px;color:var(--mute);text-decoration:none;margin-right:8px}
+.navlink:hover{color:var(--ink)}
+@media(min-width:900px){.navlink{display:inline}}
+/* sticky bottom bar already offers Call on small screens */
+@media(max-width:759px){.hdr-r .btn-o{display:none}}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:6px;font-size:14px;font-weight:650;
+  text-decoration:none;border:1px solid transparent;cursor:pointer;
+  font-family:inherit;transition:.16s;white-space:nowrap;
+}
+.btn-p{background:var(--acc);color:#14300A}
+.btn-p:hover{background:#BEF264}
+.btn-o{border-color:#2B3540;color:var(--ink);background:transparent}
+.btn-o:hover{border-color:var(--acc);color:var(--acc)}
+.btn-sm{padding:9px 15px;font-size:13px}
+.btn-lg{padding:15px 28px;font-size:15.5px}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:88px 0 72px;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;top:-260px;left:50%;transform:translateX(-50%);
+  width:900px;height:620px;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(163,230,53,.13),transparent 66%);
+}
+.hero-in{position:relative;max-width:760px;z-index:2}
+.heroimg{
+  position:absolute;top:0;right:0;width:46%;height:100%;pointer-events:none;
+  background-image:url("img/sonata-canopy.webp");background-size:cover;background-position:52% 48%;
+  -webkit-mask-image:linear-gradient(96deg,transparent 0%,rgba(0,0,0,.12) 22%,rgba(0,0,0,.55) 52%,rgba(0,0,0,.9) 80%,#000 100%);
+  mask-image:linear-gradient(96deg,transparent 0%,rgba(0,0,0,.12) 22%,rgba(0,0,0,.55) 52%,rgba(0,0,0,.9) 80%,#000 100%);
+  opacity:.58;
+}
+@media(max-width:1000px){.heroimg{display:none}}
+.tag{
+  display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--acc);border:1px solid rgba(163,230,53,.28);
+  background:rgba(163,230,53,.07);padding:6px 13px;border-radius:100px;margin-bottom:22px;
+}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--acc)}
+h1{font-size:clamp(34px,6.4vw,60px);line-height:1.05;letter-spacing:-.025em;font-weight:800}
+h1 em{font-style:normal;color:var(--acc)}
+.sub{font-size:clamp(16px,2.2vw,19px);color:#AEB9C5;margin-top:20px;max-width:56ch}
+.cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
+.hnote{font-size:13px;color:var(--dim);margin-top:16px}
+
+.trust{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:8px;
+  margin-top:52px;overflow:hidden;
+}
+.ti{background:var(--panel);padding:18px 20px}
+.ti b{display:block;font-size:clamp(15px,4vw,19px);letter-spacing:-.02em;line-height:1.25}
+.ti span{font-size:12px;color:var(--mute)}
+@media(max-width:520px){.ti{padding:14px 15px}}
+
+/* ---------- SECTIONS ---------- */
+section{padding:78px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:13px}
+h2{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:800}
+.lede{color:var(--mute);margin-top:14px;max-width:58ch;font-size:16px}
+.shead{margin-bottom:44px}
+
+/* ---------- WORK ---------- */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:640px){.ba{grid-template-columns:1fr}}
+.ba figure{margin:0;position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
+.ba img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:4/5;max-height:540px}
+.ba figcaption{
+  position:absolute;top:12px;left:12px;font-size:10px;font-weight:750;letter-spacing:.18em;
+  text-transform:uppercase;padding:5px 11px;border-radius:100px;backdrop-filter:blur(6px);
+}
+.ba .b figcaption{background:rgba(10,12,15,.82);color:#E4EAF0;border:1px solid rgba(255,255,255,.18)}
+.ba .a figcaption{background:rgba(163,230,53,.92);color:#14300A}
+.bacap{font-size:13px;color:var(--mute);margin-bottom:34px;padding-left:14px;border-left:2px solid var(--acc)}
+.bacap b{color:var(--ink)}
+
+.work{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.shot{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:3/4}
+.shot.wide{grid-column:span 2}
+.shot.wide img{aspect-ratio:4/3}
+@media(max-width:640px){.shot.wide{grid-column:span 1}}
+.shot span{
+  position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;font-size:12px;color:#E4EAF0;
+  background:linear-gradient(transparent,rgba(6,8,10,.9));line-height:1.35;
+}
+
+/* ---------- PACKAGES ---------- */
+.pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;align-items:start}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:28px 26px;position:relative;height:100%;
+}
+.card.feat{border-color:rgba(163,230,53,.42);background:linear-gradient(180deg,#101A14,#0E1310)}
+.flag{
+  position:absolute;top:-11px;left:26px;background:var(--acc);color:#14300A;
+  font-size:10px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 11px;border-radius:100px;
+}
+.pname{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.price{font-size:38px;font-weight:800;letter-spacing:-.03em;margin:12px 0 2px;line-height:1}
+.price small{font-size:14px;font-weight:500;color:var(--mute);letter-spacing:0}
+.pfor{font-size:13.5px;color:#A9B4C0;min-height:42px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+ul.feats{list-style:none;font-size:14px;color:#B7C1CC}
+ul.feats li{padding:7px 0 7px 25px;position:relative}
+ul.feats li::before{
+  content:"";position:absolute;left:0;top:14px;width:11px;height:2px;background:var(--acc);
+}
+.card .btn{width:100%;margin-top:24px}
+
+.rest{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.rcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 24px;position:relative}
+.rcard.feat{border-color:rgba(163,230,53,.42);background:linear-gradient(180deg,#101A14,#0D1210)}
+.rsize{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute);gap:10px;flex-wrap:wrap}
+.rsize b{color:var(--ink);font-family:ui-monospace,Menlo,monospace}
+.addon{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:16px}
+.ao{background:var(--panel);padding:18px 20px}
+.ao b{display:block;font-size:15px;margin-bottom:3px}
+.ao .p{font-size:20px;font-weight:800;color:var(--acc);letter-spacing:-.02em;margin:6px 0 4px}
+.ao span{font-size:12.5px;color:var(--mute);line-height:1.45;display:block}
+.nope{border-color:rgba(248,113,113,.24)}
+.nope .p{color:#F87171;font-size:16px}
+/* ---------- STEPS ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;counter-reset:s}
+.step{padding-top:22px;border-top:2px solid var(--line);position:relative}
+.step::before{
+  counter-increment:s;content:"0" counter(s);
+  font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--acc);
+  letter-spacing:.1em;display:block;margin-bottom:10px;
+}
+.step h3{font-size:17px;margin-bottom:7px;font-weight:700}
+.step p{font-size:14px;color:var(--mute)}
+
+/* ---------- AREA ---------- */
+.area{display:grid;grid-template-columns:1fr;gap:36px}
+@media(min-width:860px){.area{grid-template-columns:1fr 1.15fr;gap:56px}}
+.towns{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.town{
+  font-size:13px;color:#AEB9C5;background:var(--panel);border:1px solid var(--line);
+  padding:7px 13px;border-radius:5px;
+}
+.town.hub{border-color:rgba(163,230,53,.35);color:var(--acc)}
+.areahead{flex-basis:100%;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mute);margin:14px 0 2px}
+.areahead:first-child{margin-top:0}
+
+/* ---------- TINT ---------- */
+.tint{
+  background:linear-gradient(100deg,#0C1511,#0A0D0B);
+  border:1px solid rgba(163,230,53,.22);border-radius:11px;padding:34px 32px;
+  display:flex;gap:28px;align-items:center;flex-wrap:wrap;
+}
+.tint .txt{flex:1;min-width:250px}
+.tint h3{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:9px}
+.tint p{font-size:14.5px;color:var(--mute);max-width:52ch}
+.fade{display:flex;flex-direction:column;gap:6px;flex:none}
+.fade i{display:block;width:112px;height:12px;border-radius:3px;background:var(--acc)}
+
+/* ---------- BOOKING ---------- */
+.bk{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.steps-bar{display:flex;border-bottom:1px solid var(--line);background:#0B0E12}
+.sb{flex:1;padding:14px 10px;text-align:center;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:#4E5967;border-right:1px solid var(--line);position:relative}
+.sb:last-child{border-right:none}
+.sb.on{color:var(--acc);background:rgba(163,230,53,.06)}
+.sb.done{color:#7C8998}
+.sb i{display:block;font-style:normal;font-size:15px;font-weight:800;margin-bottom:2px;
+  font-family:ui-monospace,Menlo,monospace}
+.bkbody{padding:30px 28px}
+@media(max-width:560px){.bkbody{padding:24px 18px}}
+.pane{display:none} .pane.on{display:block}
+.qh{font-size:19px;font-weight:750;letter-spacing:-.01em;margin-bottom:5px}
+.qs{font-size:13.5px;color:var(--mute);margin-bottom:20px}
+
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px}
+.opt{background:#0B0E12;border:1px solid #242C36;border-radius:9px;padding:16px 17px;cursor:pointer;
+  transition:.14s;text-align:left;font-family:inherit;color:var(--ink);display:block;width:100%}
+.opt:hover{border-color:#38434F}
+.opt.sel{border-color:var(--acc);background:rgba(163,230,53,.07)}
+.opt b{display:block;font-size:15px;margin-bottom:3px}
+.opt span{font-size:12.5px;color:var(--mute);display:block;line-height:1.4}
+.opt .pz{font-size:13px;color:var(--acc);font-weight:650;margin-top:7px;display:block;
+  font-family:ui-monospace,Menlo,monospace}
+
+.dates{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:9px;max-height:230px;overflow-y:auto;padding-right:4px}
+.dt{background:#0B0E12;border:1px solid #242C36;border-radius:8px;padding:11px 6px;text-align:center;
+  cursor:pointer;font-family:inherit;color:var(--ink);transition:.14s}
+.dt:hover{border-color:#38434F}
+.dt.sel{border-color:var(--acc);background:rgba(163,230,53,.09)}
+.dt em{display:block;font-style:normal;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.dt b{display:block;font-size:17px;font-weight:750;margin:2px 0 1px}
+.dt i{display:block;font-style:normal;font-size:10px;color:var(--dim)}
+.dt.sel em,.dt.sel i{color:#D9F99D}
+
+.estimate{margin-top:22px;padding:17px 19px;background:linear-gradient(180deg,#101A14,#0D1210);
+  border:1px solid rgba(163,230,53,.28);border-radius:9px;display:flex;justify-content:space-between;
+  align-items:center;gap:16px;flex-wrap:wrap}
+.estimate .el{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.estimate .ev{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.estimate .en{font-size:12px;color:var(--mute);max-width:32ch;text-align:right}
+@media(max-width:520px){.estimate .en{text-align:left}}
+
+.navrow{display:flex;gap:11px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.navrow .btn{flex:1}
+.ghost{background:transparent;border:1px solid #2B3540;color:var(--mute)}
+.ghost:hover{color:var(--ink);border-color:#3B4653}
+
+.sumrow{display:flex;justify-content:space-between;gap:16px;padding:11px 0;
+  border-bottom:1px solid var(--line);font-size:14px}
+.sumrow:last-of-type{border-bottom:none}
+.sumrow span{color:var(--mute)} .sumrow b{text-align:right}
+.confirm{text-align:center;padding:14px 0 4px}
+.confirm .tick{width:52px;height:52px;border-radius:50%;background:rgba(163,230,53,.13);
+  border:1px solid rgba(163,230,53,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.confirm .tick svg{width:24px;height:24px;color:var(--acc)}
+.confirm h3{font-size:21px;font-weight:800;margin-bottom:9px}
+.confirm p{font-size:14px;color:#B7C1CC;max-width:46ch;margin:0 auto 6px}
+.sendrow{display:flex;gap:11px;margin-top:22px;flex-wrap:wrap;justify-content:center}
+.err{color:#F87171;font-size:12.5px;margin-top:10px;display:none}
+
+.terms{background:#0B0E12;border:1px solid var(--line);border-radius:9px;padding:20px 21px;margin-bottom:16px}
+.terms h4{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:13px}
+.terms li{list-style:none;font-size:13.5px;color:#B7C1CC;padding:7px 0 7px 010px;position:relative;padding-left:20px;line-height:1.5}
+.terms li::before{content:"";position:absolute;left:0;top:14px;width:9px;height:2px;background:var(--acc)}
+.terms li b{color:var(--ink)}
+.terms.warn{border-color:#3A3320;background:#12100A}
+.terms.warn h4{color:#E9B949}
+.terms.warn li::before{background:#E9B949}
+
+.depbox{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  background:linear-gradient(180deg,#101A14,#0D1210);border:1px solid rgba(163,230,53,.3);
+  border-radius:10px;padding:19px 21px;margin-bottom:16px}
+.depbox .dl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.depbox .dv{font-size:29px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.depbox .dn{font-size:12.5px;color:var(--mute);max-width:34ch;text-align:right}
+@media(max-width:520px){.depbox .dn{text-align:left}}
+
+.agree{text-transform:none;letter-spacing:normal;display:flex;gap:12px;align-items:flex-start;background:#0B0E12;border:1px solid #242C36;
+  border-radius:9px;padding:16px 17px;cursor:pointer;transition:.14s}
+.agree.bad{border-color:#F87171}
+.agree input{width:19px;height:19px;flex:none;margin-top:1px;accent-color:#A3E635;cursor:pointer}
+.agree span{font-size:13.5px;color:#B7C1CC;line-height:1.5;text-transform:none;letter-spacing:normal}
+.agree b{color:var(--ink)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.ref{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--acc);
+  background:rgba(163,230,53,.09);border:1px solid rgba(163,230,53,.28);border-radius:6px;
+  padding:7px 13px;display:inline-block;margin-top:4px}
+.lock{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mute);margin-top:14px}
+.lock svg{width:13px;height:13px;color:var(--acc)}
+.payhead{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:18px 20px;background:linear-gradient(180deg,#101A14,#0D1210);
+  border:1px solid rgba(163,230,53,.3);border-radius:10px;margin-bottom:18px}
+.payhead .pl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.payhead .pv{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.payhead .pn{font-size:12.5px;color:var(--mute);text-align:right;max-width:30ch}
+#payment-element{background:#0B0E12;border:1px solid #242C36;border-radius:9px;padding:18px;min-height:220px}
+.paywait{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--mute);padding:24px 4px}
+.spin{width:15px;height:15px;border:2px solid #2A333D;border-top-color:var(--acc);border-radius:50%;
+  animation:sp .7s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.paysafe{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:var(--mute);margin-top:14px;line-height:1.5}
+.paysafe svg{width:13px;height:13px;color:var(--acc);flex:none;margin-top:2px}
+/* ---------- FORM ---------- */
+.formwrap{display:grid;grid-template-columns:1fr;gap:40px}
+@media(min-width:900px){.formwrap{grid-template-columns:.85fr 1.15fr;gap:60px}}
+form{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:30px 28px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+.fld{margin-bottom:16px}
+label{display:block;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--mute);margin-bottom:7px}
+input,select,textarea{
+  width:100%;background:#0A0D11;border:1px solid #242C36;border-radius:6px;
+  padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);background:#0C1116}
+textarea{resize:vertical;min-height:92px}
+select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%238B96A4' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.fine{font-size:12px;color:var(--dim);margin-top:14px;line-height:1.5}
+.ok{display:none;background:rgba(163,230,53,.09);border:1px solid rgba(163,230,53,.35);
+  color:var(--acc);padding:13px 15px;border-radius:6px;font-size:14px;margin-bottom:16px}
+
+.contact-side h3{font-size:19px;margin-bottom:8px}
+.cl{display:flex;gap:13px;padding:17px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.cl svg{width:17px;height:17px;color:var(--acc);flex:none;margin-top:3px}
+.cl b{display:block;font-size:14.5px}
+.cl span{font-size:13px;color:var(--mute)}
+.cl a{color:var(--acc);text-decoration:none}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:760px}
+details{border-bottom:1px solid var(--line);padding:19px 0}
+summary{cursor:pointer;font-size:16px;font-weight:650;list-style:none;display:flex;justify-content:space-between;gap:20px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--acc);font-size:20px;font-weight:400;flex:none}
+details[open] summary::after{content:"–"}
+details p{font-size:14.5px;color:var(--mute);margin-top:12px;max-width:62ch}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--line);padding:44px 0 40px}
+.fgrid{display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.fnote{font-size:12.5px;color:var(--dim);max-width:44ch;margin-top:14px}
+.fmeta{font-size:12.5px;color:var(--dim);text-align:right}
+@media(max-width:640px){.fmeta{text-align:left}}
+
+.stickybar{
+  position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;gap:10px;
+  padding:11px 14px;background:rgba(10,12,15,.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+}
+.stickybar .btn{flex:1}
+@media(min-width:760px){.stickybar{display:none}}
+@media(max-width:759px){body{padding-bottom:70px}}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGO SYMBOL ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="bgrad" x1="10%" y1="0%" x2="90%" y2="100%">
+    <stop offset="0%" stop-color="#D9F99D"/><stop offset="45%" stop-color="#65D98A"/>
+    <stop offset="100%" stop-color="#059669"/>
+  </linearGradient>
+  <radialGradient id="bhi" cx="34%" cy="26%" r="58%">
+    <stop offset="0%" stop-color="#fff" stop-opacity=".9"/>
+    <stop offset="42%" stop-color="#fff" stop-opacity=".2"/>
+    <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+  </radialGradient>
+  <symbol id="bead" viewBox="0 0 100 100">
+    <path d="M50 5 L88 27 L88 71 L50 93 L12 71 L12 27 Z" fill="none" stroke="url(#bgrad)" stroke-width="5.5" stroke-linejoin="round"/>
+    <path d="M34.5 65 C27.5 49 37 32 50 32 C63 32 72.5 49 65.5 65 Z" fill="url(#bgrad)"/>
+    <path d="M34.5 65 C27.5 49 37 32 50 32 C63 32 72.5 49 65.5 65 Z" fill="url(#bhi)"/>
+    <rect x="24" y="66.5" width="52" height="4" rx="1" fill="url(#bgrad)"/>
+    <g fill="url(#bgrad)">
+      <rect x="30" y="73" width="3.2" height="6" rx="1"/><rect x="42" y="73" width="3.2" height="6" rx="1"/>
+      <rect x="54" y="73" width="3.2" height="6" rx="1"/><rect x="66" y="73" width="3.2" height="6" rx="1"/>
+    </g>
+  </symbol>
+</defs></svg>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="wrap hdr">
+    <a class="brand" href="#top">
+      <svg><use href="#bead"/></svg>
+      <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
+    </a>
+    <div class="hdr-r">
+      <a class="navlink" href="#packages">Packages</a>
+      <a class="navlink" href="#restoration">Restoration</a>
+      <a class="navlink" href="#how">How it works</a>
+      <a class="navlink" href="#area">Service area</a>
+      <a class="btn btn-o btn-sm" href="tel:+12035929589">(203) 592-9589</a>
+      <a class="btn btn-p btn-sm" href="#quote">Get a quote</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<div id="top" class="hero">
+  <div class="heroimg" role="img" aria-label="Hyundai Sonata detailed in a driveway under a canopy"></div>
+  <div class="wrap hero-in">
+    <div class="tag mono"><span class="dot"></span> Mobile service · New Haven County &amp; central CT</div>
+    <h1>Your car gets the <em>lab treatment</em>. In your own driveway.</h1>
+    <p class="sub">Fully mobile detailing and ceramic coating from New Haven and the Valley up through central Connecticut. We bring the water, the power, and a documented process — you don't move the car or lose your Saturday.</p>
+    <div class="cta">
+      <a class="btn btn-p btn-lg" href="#quote">Get a free quote</a>
+      <a class="btn btn-o btn-lg" href="sms:+12035929589">Text us a photo</a>
+    </div>
+    <p class="hnote">Owner-operated · Connecticut LLC, insured · Fixed price agreed before we start · 30+ towns covered</p>
+
+    <div class="trust">
+      <div class="ti"><b>100%</b><span>Mobile — we come to you</span></div>
+      <div class="ti"><b>LLC &amp; insured</b><span>Certificate on request</span></div>
+      <div class="ti"><b>Self&#8209;contained</b><span>Own water &amp; power</span></div>
+      <div class="ti"><b>Tint soon</b><span>Launching 2026</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WORK ===== -->
+<section id="work">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Recent work</div>
+      <h2>We'd rather show you than tell you.</h2>
+      <p class="lede">Real customer vehicles, shot on a phone in real driveways. No stock photos, no borrowed cars.</p>
+    </div>
+
+    <div class="ba">
+      <figure class="b"><img src="img/volvo-before.webp" alt="Volvo interior before detailing — trash and debris throughout the cabin" loading="lazy"><figcaption>Before</figcaption></figure>
+      <figure class="a"><img src="img/volvo-after.webp" alt="Same Volvo interior after a full detail — debris removed, carpets vacuumed, console and dash cleaned" loading="lazy"><figcaption>After</figcaption></figure>
+    </div>
+    <p class="bacap"><b>Volvo, full interior.</b> Same seat, same angle, one afternoon apart. Every piece of debris out of the cabin, carpets vacuumed down to the nap, console and dash cleaned.</p>
+
+    <div class="work">
+      <div class="shot wide">
+        <img src="img/tlx-hero.webp" alt="Blue Acura TLX being washed, snow foam running off the front bumper" loading="lazy">
+        <span>Acura TLX A-Spec — mid-wash, foam still lifting grit off the bumper.</span>
+      </div>
+      <div class="shot">
+        <img src="img/civic-foam.webp" alt="Snow foam dwelling on the rear of a white Honda Civic" loading="lazy">
+        <span>Snow foam pre-soak lifting grit before anything touches the paint.</span>
+      </div>
+      <div class="shot">
+        <img src="img/ilx-mat.webp" alt="Clean Acura ILX floor mat and parchment leather seat after detailing" loading="lazy">
+        <span>Acura ILX — mats and parchment leather, finished.</span>
+      </div>
+      <div class="shot">
+        <img src="img/tlx-profile.webp" alt="Blue Acura TLX A-Spec fully detailed, parked outdoors" loading="lazy">
+        <span>Acura TLX A-Spec — decontaminated, sealed, dressed.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PACKAGES ===== -->
+<section id="packages">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Packages</div>
+      <h2>Straightforward pricing.</h2>
+      <p class="lede">Prices start where most cars land. Oversized vehicles, heavy pet hair, and serious neglect cost more — we'll tell you before we start, never after. Every booking holds with a refundable $25–$75 deposit that comes off the total.</p>
+    </div>
+    <div class="pk">
+
+      <div class="card">
+        <div class="pname mono">Refresh</div>
+        <div class="price">$149<small> &nbsp;starting</small></div>
+        <p class="pfor">For a clean car that needs to stay that way. Every 4–8 weeks.</p>
+        <ul class="feats">
+          <li>Hand wash, wheels &amp; tires</li>
+          <li>Chemical decontamination</li>
+          <li>6-month spray sealant</li>
+          <li>Interior vacuum &amp; wipe-down</li>
+          <li>Glass inside and out</li>
+          <li>Roughly 2 hours</li>
+        </ul>
+        <a class="btn btn-o" href="#quote">Book Refresh</a>
+      </div>
+
+      <div class="card feat">
+        <div class="flag">Most booked</div>
+        <div class="pname mono">Full Detail</div>
+        <div class="price">$279<small> &nbsp;starting</small></div>
+        <p class="pfor">The reset. Everything inside and out, back to as-good-as-it-gets.</p>
+        <ul class="feats">
+          <li>Everything in Refresh</li>
+          <li>Clay bar &amp; iron decontamination</li>
+          <li>One-step machine polish</li>
+          <li>Shampoo &amp; hot-water extraction</li>
+          <li>Leather clean &amp; condition</li>
+          <li>Engine bay detail</li>
+          <li>Roughly 5 hours</li>
+        </ul>
+        <a class="btn btn-p" href="#quote">Book Full Detail</a>
+      </div>
+
+      <div class="card">
+        <div class="pname mono">Ceramic</div>
+        <div class="price">$749<small> &nbsp;starting</small></div>
+        <p class="pfor">Paint correction plus a coating that lasts years, not weeks.</p>
+        <ul class="feats">
+          <li>Everything in Full Detail</li>
+          <li>Multi-stage paint correction</li>
+          <li>3–5 year ceramic coating</li>
+          <li>Coated wheels &amp; glass</li>
+          <li>Written care instructions</li>
+          <li>Free 6-month check-up</li>
+          <li>Two days, by appointment</li>
+        </ul>
+        <a class="btn btn-o" href="#quote">Ask about Ceramic</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESTORATION ===== -->
+<section id="restoration">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Restoration menu</div>
+      <h2>When cleaning isn't enough.</h2>
+      <p class="lede">Detailing makes a car clean. Correction makes the paint <em>right</em> — it removes the swirls and haze that washing can't touch. Different job, different menu. Every correction starts with a test panel we photograph and show you before quoting.</p>
+    </div>
+
+    <div class="rest">
+      <div class="rcard">
+        <div class="pname mono">Gloss Enhancement</div>
+        <div class="price">$349<small> &nbsp;from</small></div>
+        <p class="pfor">One machine step. For paint that looks dull rather than damaged.</p>
+        <ul class="feats">
+          <li>Wash, iron decon, clay</li>
+          <li>Single-stage machine polish</li>
+          <li>Removes 50–60% of swirls</li>
+          <li>6-month sealant included</li>
+          <li>Roughly 4 hours</li>
+        </ul>
+        <div class="rsize"><span>SUV <b>$399</b></span><span>Truck / 3-row <b>$449</b></span></div>
+        <a class="btn btn-o" href="#quote">Book Gloss</a>
+      </div>
+
+      <div class="rcard feat">
+        <div class="flag">Best value</div>
+        <div class="pname mono">Paint Correction</div>
+        <div class="price">$749<small> &nbsp;from</small></div>
+        <p class="pfor">Two stages — compound then refine. Removes most of what you can actually see.</p>
+        <ul class="feats">
+          <li>Everything in Gloss Enhancement</li>
+          <li>Compound + polish stages</li>
+          <li>80–90% defect removal</li>
+          <li>Paint depth measured and recorded</li>
+          <li>6–8 hours</li>
+        </ul>
+        <div class="rsize"><span>SUV <b>$849</b></span><span>Truck / 3-row <b>$949</b></span></div>
+        <a class="btn btn-p" href="#quote">Book Correction</a>
+      </div>
+
+      <div class="rcard">
+        <div class="pname mono">Show Finish</div>
+        <div class="price">$1,299<small> &nbsp;from</small></div>
+        <p class="pfor">Three or more stages. Quoted per vehicle after inspection — never sold sight-unseen.</p>
+        <ul class="feats">
+          <li>Multi-stage cut and refine</li>
+          <li>95%+ correction</li>
+          <li>Documented test panel</li>
+          <li>Two days</li>
+        </ul>
+        <div class="rsize"><span>By quote only</span></div>
+        <a class="btn btn-o" href="#quote">Request a quote</a>
+      </div>
+    </div>
+
+    <div class="shead" style="margin-top:56px;margin-bottom:20px">
+      <div class="eyebrow mono">Protection</div>
+      <h2 style="font-size:clamp(21px,3vw,27px)">Coatings, priced separately.</h2>
+      <p class="lede">A coating locks in whatever is underneath it. We won't put one on uncorrected paint — you'd be sealing the swirls in for five years.</p>
+    </div>
+    <div class="addon">
+      <div class="ao"><b>6-month sealant</b><div class="p">Included</div>
+        <span>Baseline protection on every correction.</span></div>
+      <div class="ao"><b>1–2 year coating</b><div class="p">+$349</div>
+        <span>The sensible step up once the paint is right.</span></div>
+      <div class="ao"><b>3–5 year ceramic</b><div class="p">+$599</div>
+        <span>Correction + ceramic bundled: <b style="color:#A3E635">$1,249</b>.</span></div>
+    </div>
+
+    <div class="shead" style="margin-top:56px;margin-bottom:20px">
+      <div class="eyebrow mono">Headlights</div>
+      <h2 style="font-size:clamp(21px,3vw,27px)">Yellow to clear, in about an hour.</h2>
+      <p class="lede">Wet-sanded through the grits, polished back to clarity, then sealed. The sealing is the part that matters — it's the difference between a fix and a delay.</p>
+    </div>
+    <div class="addon">
+      <div class="ao"><b>Headlight Restoration</b><div class="p">$139 / pair</div>
+        <span>Wet sand, polish, UV sealant. <b style="color:#E4EAF0">12-month clarity warranty.</b><br>Single lens $89 · with any detail <b style="color:#A3E635">$99</b></span></div>
+      <div class="ao"><b>+ Ceramic topper</b><div class="p">$189 / pair</div>
+        <span>Ceramic UV layer instead of sealant. <b style="color:#E4EAF0">24-month warranty.</b><br>With any detail <b style="color:#A3E635">$149</b></span></div>
+      <div class="ao nope"><b>Polish only</b><div class="p">Not offered</div>
+        <span>Without a UV seal it hazes back within months. We'd rather lose the sale than sell you that.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW ===== -->
+<section id="how">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">How it works</div>
+      <h2>Four steps, no surprises.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3>Send a few photos</h3>
+        <p>Text or upload shots of your vehicle. We quote off what we can actually see, not a guess.</p>
+      </div>
+      <div class="step">
+        <h3>Get a fixed price</h3>
+        <p>A firm number and a time window, usually within the hour. If the car needs more than quoted, you approve it first.</p>
+      </div>
+      <div class="step">
+        <h3>We come to you</h3>
+        <p>Home or office. We carry our own water and power, so all we need is about 15 feet around the car.</p>
+      </div>
+      <div class="step">
+        <h3>Walk-around before we go</h3>
+        <p>We hand the car back together and go panel by panel. Not happy with something? It gets fixed on the spot.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== AREA ===== -->
+<section id="area">
+  <div class="wrap area">
+    <div>
+      <div class="eyebrow mono">Service area</div>
+      <h2>New Haven County, the Valley, and central CT.</h2>
+      <p class="lede">Fully mobile from the shoreline up through Hartford County. Not on the list? Ask anyway — if you're close to the edge of it, we'll usually make it work.</p>
+    </div>
+    <div class="towns">
+      <span class="areahead mono">New Haven County</span>
+      <span class="town hub">New Haven</span><span class="town hub">Hamden</span><span class="town hub">Milford</span>
+      <span class="town">West Haven</span><span class="town">East Haven</span><span class="town">North Haven</span>
+      <span class="town">Branford</span><span class="town">Guilford</span><span class="town">Orange</span>
+      <span class="town">Woodbridge</span><span class="town">Cheshire</span><span class="town">Wallingford</span>
+      <span class="town">Meriden</span>
+      <span class="areahead mono">Naugatuck Valley</span>
+      <span class="town hub">Shelton</span><span class="town hub">Ansonia</span>
+      <span class="town">Derby</span><span class="town">Seymour</span><span class="town">Oxford</span>
+      <span class="town">Beacon Falls</span><span class="town">Naugatuck</span><span class="town">Waterbury</span>
+      <span class="areahead mono">Central &amp; Hartford County</span>
+      <span class="town hub">Hartford</span>
+      <span class="town">West Hartford</span><span class="town">New Britain</span><span class="town">Berlin</span>
+      <span class="town">Southington</span><span class="town">Plainville</span><span class="town">Newington</span>
+      <span class="town">Wethersfield</span><span class="town">Rocky Hill</span><span class="town">Cromwell</span>
+      <span class="town">Middletown</span><span class="town">Farmington</span><span class="town">Glastonbury</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TINT ===== -->
+<section>
+  <div class="wrap">
+    <div class="tint">
+      <div class="txt">
+        <div class="eyebrow mono">Coming soon</div>
+        <h3>Window tinting joins the lab.</h3>
+        <p>Ceramic window film is landing at Cipher Auto Lab later this year — same mobile service, same driveway. Ask us to add you to the early list when you book.</p>
+      </div>
+      <div class="fade">
+        <i style="opacity:1"></i><i style="opacity:.78"></i><i style="opacity:.56"></i><i style="opacity:.34"></i><i style="opacity:.16"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BOOK ===== -->
+<section id="quote">
+  <div class="wrap formwrap">
+    <div class="contact-side">
+      <div class="eyebrow mono">Book a slot</div>
+      <h2>Pick a day. We'll come to you.</h2>
+      <p class="lede">Five steps, and you'll see the exact price, the deposit and the cancellation terms before you agree to anything. Nothing is hidden and nothing is charged on this page.</p>
+
+      <div style="margin-top:26px">
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.4 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>
+          <div><b>Rather just talk?</b><span><a href="tel:+12035929589">(203) 592-9589</a> — call or text</span></div>
+        </div>
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <div><b>Hours</b><span>Mon–Sat, 8am–6pm · Sunday by request</span></div>
+        </div>
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><b>Where we work</b><span>New Haven County, the Valley &amp; central CT</span></div>
+        </div>
+        <div class="cl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+          <div><b>Lead time</b><span>Usually 2–5 days out. Ask about cancellations for sooner.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bk">
+      <div class="steps-bar">
+        <div class="sb on" data-sb="1"><i>01</i>Service</div>
+        <div class="sb" data-sb="2"><i>02</i>Vehicle</div>
+        <div class="sb" data-sb="3"><i>03</i>When</div>
+        <div class="sb" data-sb="4"><i>04</i>Details</div>
+        <div class="sb" data-sb="5"><i>05</i>Confirm</div>
+        <div class="sb" data-sb="6"><i>06</i>Deposit</div>
+      </div>
+      <div class="bkbody">
+
+        <!-- STEP 1 -->
+        <div class="pane on" data-p="1">
+          <div class="qh">What does the car need?</div>
+          <div class="qs">Not sure? Pick the middle one — we'll tell you honestly if it's more or less than that.</div>
+          <div class="opts" id="svc">
+            <button type="button" class="opt" data-svc="Refresh" data-base="149" data-dep="25" data-key="refresh">
+              <b>Refresh</b><span>Maintenance wash, sealant, interior tidy. ~2 hrs.</span><span class="pz">from $149</span></button>
+            <button type="button" class="opt sel" data-svc="Full Detail" data-base="279" data-dep="40" data-key="full-detail">
+              <b>Full Detail</b><span>Inside and out, machine polish, extraction. ~5 hrs.</span><span class="pz">from $279</span></button>
+            <button type="button" class="opt" data-svc="Ceramic" data-base="749" data-dep="75" data-key="ceramic">
+              <b>Ceramic</b><span>Correction plus a 3–5 year coating. Two days.</span><span class="pz">from $749</span></button>
+          </div>
+
+          <div class="qh" style="margin-top:28px">What are we working on?</div>
+          <div class="qs">Size drives how long it takes, so it drives the price.</div>
+          <div class="opts" id="size">
+            <button type="button" class="opt sel" data-size="Sedan / coupe" data-mult="1">
+              <b>Sedan or coupe</b><span>Civic, Accord, TLX, Sonata</span></button>
+            <button type="button" class="opt" data-size="SUV / crossover" data-mult="1.2">
+              <b>SUV or crossover</b><span>RAV4, Explorer, Grand Cherokee</span></button>
+            <button type="button" class="opt" data-size="Truck / 3-row" data-mult="1.4">
+              <b>Truck or 3-row</b><span>F-150, Suburban, Odyssey</span></button>
+          </div>
+
+          <div class="estimate">
+            <div><div class="el mono">Estimated</div><div class="ev" id="est">$279</div></div>
+            <div class="en">Starting figure for a car in normal condition. Heavy pet hair, smoke or neglect costs more — you'll be told before we start, never after. Holding the slot takes a <b style="color:#A3E635" id="depInline">$40</b> refundable deposit, which comes off this total.</div>
+          </div>
+
+          <div class="navrow"><button type="button" class="btn btn-p btn-lg" data-go="2">Continue</button></div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="pane" data-p="2">
+          <div class="qh">Tell us about the vehicle.</div>
+          <div class="qs">The more we know, the tighter the number.</div>
+          <div class="fld"><label for="bv">Year, make and model</label>
+            <input id="bv" placeholder="2021 Honda Accord"></div>
+          <div class="row">
+            <div class="fld"><label for="bc">Condition</label>
+              <select id="bc">
+                <option>Normal — regular use</option>
+                <option>Light — kept clean, just needs a refresh</option>
+                <option>Heavy — pet hair, kids, spills</option>
+                <option>Rough — hasn't been done in years</option>
+              </select></div>
+            <div class="fld"><label for="bk2">Where will it be parked?</label>
+              <select id="bk2">
+                <option>Driveway</option><option>Garage</option>
+                <option>Street parking</option><option>Office or apartment lot</option>
+              </select></div>
+          </div>
+          <div class="fld"><label for="bn">Anything we should know? (optional)</label>
+            <textarea id="bn" placeholder="Coffee spill in the back seat, dog rides up front, brake dust on the fronts — all useful."></textarea></div>
+          <div class="navrow">
+            <button type="button" class="btn ghost btn-lg" data-go="1">Back</button>
+            <button type="button" class="btn btn-p btn-lg" data-go="3">Continue</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="pane" data-p="3">
+          <div class="qh">Pick a day.</div>
+          <div class="qs" id="leadnote">Mon–Sat, from two days out. Sundays by request only.</div>
+          <div class="dates" id="dates"></div>
+
+          <div class="qh" style="margin-top:26px">And a window.</div>
+          <div class="qs">We'll confirm an arrival time the day before.</div>
+          <div class="opts" id="win">
+            <button type="button" class="opt sel" data-win="Morning · 8–11am"><b>Morning</b><span>8am – 11am</span></button>
+            <button type="button" class="opt" data-win="Midday · 11am–2pm"><b>Midday</b><span>11am – 2pm</span></button>
+            <button type="button" class="opt" data-win="Afternoon · 2–5pm"><b>Afternoon</b><span>2pm – 5pm</span></button>
+          </div>
+          <div class="err" id="e3">Pick a date to continue.</div>
+          <div class="navrow">
+            <button type="button" class="btn ghost btn-lg" data-go="2">Back</button>
+            <button type="button" class="btn btn-p btn-lg" data-go="4">Continue</button>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="pane" data-p="4">
+          <div class="qh">Last bit — how do we reach you?</div>
+          <div class="qs">Straight to us. No mailing list, and no card details are ever entered on this site.</div>
+          <div class="row">
+            <div class="fld"><label for="bnm">Name</label><input id="bnm" placeholder="First and last name" required></div>
+            <div class="fld"><label for="bph">Phone</label><input id="bph" type="tel" placeholder="(203) 555-0100" required></div>
+          </div>
+          <div class="row">
+            <div class="fld"><label for="bem">Email (optional)</label><input id="bem" type="email" placeholder="you@email.com"></div>
+            <div class="fld"><label for="btw">Town</label><input id="btw" placeholder="Shelton" required></div>
+          </div>
+          <div class="fld"><label for="bad">Street address</label><input id="bad" placeholder="Where the car will be" required></div>
+
+          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">
+            <div class="sumrow"><span>Service</span><b id="s1">—</b></div>
+            <div class="sumrow"><span>Vehicle</span><b id="s2">—</b></div>
+            <div class="sumrow"><span>When</span><b id="s3">—</b></div>
+            <div class="sumrow"><span>Estimate</span><b id="s4">—</b></div>
+          </div>
+          <input class="hp" type="text" id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="err" id="e4">Enter a name, a 10-digit phone number, a town and an address.</div>
+          <div class="navrow">
+            <button type="button" class="btn ghost btn-lg" data-go="3">Back</button>
+            <button type="button" class="btn btn-p btn-lg" data-go="5">Review terms</button>
+          </div>
+        </div>
+
+        <!-- STEP 5 — CONFIRM -->
+        <div class="pane" data-p="5">
+          <div class="qh">Everything, in writing, before you agree.</div>
+          <div class="qs">Read it. If any of this doesn't suit you, go back or call instead — nothing is committed yet.</div>
+
+          <div class="depbox">
+            <div><div class="dl mono">Refundable deposit</div><div class="dv" id="depVal">$40</div></div>
+            <div class="dn">Comes off your total — it isn't an extra charge. Balance of <b id="balVal" style="color:#E4EAF0">$239</b> due after the walk-around.</div>
+          </div>
+
+          <div class="terms">
+            <h4 class="mono">You get the deposit back if</h4>
+            <ul>
+              <li>You cancel or reschedule with <b>24 hours notice or more</b> — refunded in full, no questions.</li>
+              <li><b>We</b> reschedule for any reason, including weather. Always refunded in full.</li>
+              <li>We arrive, find something that changes the price, and you decide not to go ahead. <b>You are never charged for a re-quote you didn't accept.</b></li>
+              <li>We can't reach the vehicle, or the site turns out to be unworkable through no fault of yours.</li>
+            </ul>
+          </div>
+
+          <div class="terms warn">
+            <h4 class="mono">You lose the deposit only if</h4>
+            <ul>
+              <li>You cancel with <b>less than 24 hours notice</b>, or nobody is there when we arrive.</li>
+              <li>The vehicle is unreachable on the day — locked garage, blocked in, keys unavailable — and we can't get hold of you.</li>
+            </ul>
+            <p style="font-size:12.5px;color:var(--mute);margin-top:12px;line-height:1.55">That's the whole point of it: a mobile slot is several hours plus travel, and a same-day cancellation can't be refilled. It's the smallest amount that makes a no-show hurt a little instead of not at all.</p>
+          </div>
+
+          <div class="terms">
+            <h4 class="mono">What could change the quoted price</h4>
+            <ul>
+              <li>Heavy pet hair, smoke odour, mould, or biological spills.</li>
+              <li>A vehicle materially different from what you described.</li>
+              <li>Existing damage that needs working around — we'll photograph it before we start.</li>
+            </ul>
+            <p style="font-size:12.5px;color:var(--mute);margin-top:12px;line-height:1.55">In every one of those cases we <b style="color:#E4EAF0">stop and re-quote before touching the car</b>. You approve the new number or you walk away with your deposit back. The price never moves after the work is done.</p>
+          </div>
+
+          <div class="terms">
+            <h4 class="mono">What we can't promise</h4>
+            <ul>
+              <li>Permanent defects: dye transfer, bleach spots, sun-cracked leather, etched paint, deep scratches through the clear coat.</li>
+              <li>Removal of odours bonded into foam or headliner — improvement, yes; elimination, not always.</li>
+            </ul>
+          </div>
+
+          <div style="margin:20px 0 16px;padding-top:18px;border-top:1px solid var(--line)">
+            <div class="sumrow"><span>Service</span><b id="b1">—</b></div>
+            <div class="sumrow"><span>Vehicle</span><b id="b2">—</b></div>
+            <div class="sumrow"><span>When</span><b id="b3">—</b></div>
+            <div class="sumrow"><span>Where</span><b id="b5">—</b></div>
+            <div class="sumrow"><span>Estimated total</span><b id="b4">—</b></div>
+            <div class="sumrow"><span>Deposit to hold it</span><b id="b6">—</b></div>
+          </div>
+
+          <label class="agree" id="agreeBox">
+            <input type="checkbox" id="agree">
+            <span>I've read the terms above. I understand the deposit is <b>refundable with 24 hours notice</b>, that it comes off my total, and that <b>the price can only change with my approval before work starts.</b></span>
+          </label>
+          <div class="err" id="e5">Please confirm you've read the terms.</div>
+
+          <div class="lock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            No card details are entered on this site. We send a secure payment link after we confirm your slot.
+          </div>
+
+          <div class="navrow">
+            <button type="button" class="btn ghost btn-lg" data-go="4">Back</button>
+            <button type="button" class="btn btn-p btn-lg" id="submitBk">Agree &amp; continue to deposit</button>
+          </div>
+        </div>
+
+        <!-- STEP 6 — DEPOSIT -->
+        <div class="pane" data-p="6">
+          <div class="qh">Hold the slot.</div>
+          <div class="qs">Paid here on this page — you are not sent anywhere else. Refundable under the terms you just agreed.</div>
+
+          <div class="payhead">
+            <div><div class="pl mono">Refundable deposit</div><div class="pv" id="payAmt">$40</div></div>
+            <div class="pn">Comes off your total. Balance of <b id="payBal" style="color:#E4EAF0">$239</b> due after the walk-around.</div>
+          </div>
+
+          <div id="payWrap">
+            <div class="paywait" id="payLoading"><span class="spin"></span> Setting up secure payment…</div>
+            <div id="payment-element"></div>
+          </div>
+          <div class="err" id="e6">Payment could not be completed. Nothing has been charged — try again or call us.</div>
+
+          <div class="paysafe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <span>Card details go straight to Stripe and never touch our servers. We only ever see the last four digits.</span>
+          </div>
+
+          <div class="navrow">
+            <button type="button" class="btn ghost btn-lg" data-go="5">Back</button>
+            <button type="button" class="btn btn-p btn-lg" id="payBtn">Pay deposit &amp; book</button>
+          </div>
+        </div>
+
+        <!-- DONE -->
+        <div class="pane" data-p="7">
+          <div class="confirm">
+            <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <h3>Booked.</h3>
+            <div class="ref mono" id="refCode">CAL-000000</div>
+            <p style="margin-top:14px">Deposit received and your slot is held. We'll confirm the arrival window by text the day before.</p>
+            <p style="color:var(--mute);font-size:13px">A Stripe receipt is on its way to your email. Send us the summary below too if you'd like it on record — and text photos of the vehicle any time, they help us come prepared.</p>
+            <div class="sendrow">
+              <a class="btn btn-p btn-lg" id="sendSms" href="#">Text us the details</a>
+              <a class="btn btn-o btn-lg" id="sendMail" href="#">Email us the details</a>
+            </div>
+            <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--line);text-align:left">
+              <div class="sumrow"><span>Reference</span><b id="f0">—</b></div>
+              <div class="sumrow"><span>Service</span><b id="f1">—</b></div>
+              <div class="sumrow"><span>Vehicle</span><b id="f2">—</b></div>
+              <div class="sumrow"><span>When</span><b id="f3">—</b></div>
+              <div class="sumrow"><span>Where</span><b id="f5">—</b></div>
+              <div class="sumrow"><span>Estimated total</span><b id="f4">—</b></div>
+              <div class="sumrow"><span>Deposit paid</span><b id="f6">—</b></div>
+            </div>
+            <div class="navrow"><button type="button" class="btn ghost btn-lg" data-go="1">Start over</button></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Questions</div>
+      <h2>The things people ask first.</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>Do you need my water or electricity?</summary>
+        <p>No. The van carries its own water tank and power, so we can work at an apartment complex or an office lot the same as a house. If a spigot is handy we'll happily use it, but nothing depends on it.</p></details>
+      <details><summary>How much space do you need?</summary>
+        <p>About 15 feet around the vehicle — roughly a standard driveway or two parking spaces. Covered parking is a bonus in bad weather but not required.</p></details>
+      <details><summary>What happens if it rains?</summary>
+        <p>Light rain is usually fine for interior work. For exterior polishing or ceramic coating we'll reschedule, at no charge, to protect the result. We'll call you the morning of if the forecast turns.</p></details>
+      <details><summary>Do I need to be home?</summary>
+        <p>Not necessarily. Plenty of clients leave the keys and go to work. We'll send photos when we start and when we finish, and the walk-around can happen by video if you'd rather.</p></details>
+      <details><summary>Why is it "starting at"?</summary>
+        <p>A three-row SUV takes longer than a Civic, and a car with heavy pet hair or ground-in salt takes longer still. We quote the real number up front once we've seen photos, so the price you agree to is the price you pay.</p></details>
+      <details><summary>You're new — why should I trust you with my car?</summary>
+        <p>Fair question, and the honest answer is that you shouldn't take our word for it. So it's set up so you don't have to: the price is fixed before we start, the only thing taken up front is a small refundable deposit to hold the slot, and the balance isn't due until you've inspected the car with us. Cipher Auto Lab is a registered Connecticut LLC and fully insured — ask and we'll send the certificate before you book. If we damage something, it's covered and you'll hear it from us first.</p></details>
+      <details><summary>Why is there a deposit, and can I get it back?</summary>
+        <p>A mobile slot is several hours plus travel, and a same-day cancellation can't be refilled — the deposit is the smallest amount that makes that sting a little instead of not at all. It's $25 to $75 depending on the package, it comes straight off your total rather than being an extra charge, and you get it back in full if you give 24 hours notice, if we reschedule for weather, or if we turn up, find something that changes the price and you'd rather not go ahead. You only lose it for a same-day cancellation or a no-show.</p></details>
+      <details><summary>What if a stain won't come out?</summary>
+        <p>Some won't. Dye transfer, old bleach spots, sun-cracked leather and ground-in salt damage are sometimes permanent, and no amount of product changes that. If it's visible going in you'll be told before the quote, and if it turns up mid-job we stop and talk to you rather than quietly charge for a result we can't deliver.</p></details>
+      <details><summary>When does window tinting start?</summary>
+        <p>We're targeting later this year. Mention it when you book and we'll add you to the early list — that group gets first appointments and launch pricing.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <a class="brand" href="#top">
+        <svg><use href="#bead"/></svg>
+        <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
+      </a>
+      <p class="fnote">Owner-operated mobile auto detailing and ceramic coating serving New Haven County, the Naugatuck Valley and central Connecticut. Window tinting coming soon.</p>
+    </div>
+    <div class="fmeta">
+      <p><a href="tel:+12035929589" style="text-decoration:none">(203) 592-9589</a></p>
+      <p><a href="mailto:hello@cipherautolab.com" style="text-decoration:none">hello@cipherautolab.com</a></p>
+      <p style="margin-top:12px">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
+    </div>
+  </div>
+</footer>
+
+<div class="stickybar">
+  <a class="btn btn-o" href="tel:+12035929589">Call</a>
+  <a class="btn btn-p" href="#quote">Get a quote</a>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>window.STRIPE_PK="pk_test_REPLACE_ME";</script>
+<script src="app.js" defer></script>
+</body>
+</html>

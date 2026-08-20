@@ -1,0 +1,9 @@
+{
+  "name": "cipher-auto-lab",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cipher Auto Lab — mobile detailing, New Haven County & central CT",
+  "dependencies": {
+    "stripe": "^18.5.0"
+  }
+}
