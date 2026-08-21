@@ -47,6 +47,62 @@ window.VEHICLES = {
   "Other": []
 };
 
+/* Exotic and luxury marques, kept in their own list so the main dropdown stays short.
+ * These get a Trim field as well — on a 911 or an AMG the trim genuinely changes the job
+ * (carbon aero, ceramic brakes, Alcantara, PPF already on the car), which is not true of
+ * a Camry. Merged into the make list at load time. */
+window.EXOTICS = {
+  "Aston Martin": ["DB11","DB12","DBS","DBX","Vantage","Vanquish"],
+  "Bentley": ["Bentayga","Continental GT","Flying Spur","Mulsanne"],
+  "Bugatti": ["Chiron","Mistral","Tourbillon","Veyron"],
+  "Ferrari": ["296 GTB","488","812 Superfast","F8 Tributo","Portofino","Purosangue","Roma","SF90"],
+  "Ford (Performance)": ["GT","Mustang Shelby GT350","Mustang Shelby GT500"],
+  "Koenigsegg": ["Gemera","Jesko","Regera"],
+  "Lamborghini": ["Aventador","Gallardo","Huracan","Revuelto","Temerario","Urus"],
+  "Lotus": ["Elise","Emira","Eletre","Evora","Exige"],
+  "McLaren": ["570S","720S","750S","Artura","GT","P1","Senna"],
+  "Pagani": ["Huayra","Utopia","Zonda"],
+  "Rolls-Royce": ["Cullinan","Dawn","Ghost","Phantom","Spectre","Wraith"]
+};
+
+/* Trims worth asking about. Only for cars where the answer changes the work — exposed
+ * carbon, Alcantara, ceramic brakes and factory PPF all need different products and
+ * different time. Anything not listed falls back to a free-text box. */
+window.TRIMS = {
+  "Aston Martin": ["Base","S","AMR","F1 Edition","Volante (convertible)"],
+  "Bentley": ["Base","V8","Speed","Azure","Mulliner","S"],
+  "Bugatti": ["Base","Sport","Super Sport","Pur Sport"],
+  "Ferrari": ["Base","S / Spider","Pista","Assetto Fiorano","Competizione"],
+  "Ford (Performance)": ["Base","Heritage Edition","Carbon Series","Track Pack"],
+  "Koenigsegg": ["Base","Absolut","Attack"],
+  "Lamborghini": ["Base","S","EVO","Performante","STO","SV / SVJ","Spyder / Roadster"],
+  "Lotus": ["Base","First Edition","Sport","Cup","R"],
+  "McLaren": ["Base","Spider","LT","MSO"],
+  "Pagani": ["Base","Roadster","BC","R"],
+  "Rolls-Royce": ["Base","Extended Wheelbase","Black Badge","Landspeed"],
+  "Porsche": ["Base","S","4S","GTS","Turbo","Turbo S","GT3","GT3 RS","GT4","Targa","Cabriolet"],
+  "Mercedes-Benz": ["Base","AMG Line","AMG 43","AMG 53","AMG 63","AMG Black Series","Maybach"],
+  "BMW": ["Base","M Sport","M Performance (M40i / M50i)","Full M","M Competition","CS / CSL"],
+  "Audi": ["Base","S line","S","RS","RS Performance"],
+  "Chevrolet": ["Base","RS","Z51","Z06","ZR1","ZL1","1LE","Trail Boss","High Country"],
+  "Dodge": ["Base","R/T","Scat Pack","SRT","Hellcat","Demon","Redeye"],
+  "Tesla": ["Standard","Long Range","Performance","Plaid","Cyberbeast"],
+  "Jeep": ["Base","Rubicon","Trailhawk","Summit","392","Trackhawk"],
+  "Toyota": ["Base","TRD Sport","TRD Off-Road","TRD Pro","Nightshade"],
+  "Land Rover": ["Base","Dynamic","Autobiography","SVR / SV","First Edition"]
+};
+
+/* Fold the exotics into the main make list, alphabetically, with "Other" kept last. */
+(function mergeExotics(){
+  var v = window.VEHICLES, x = window.EXOTICS, merged = {};
+  var keys = Object.keys(v).filter(function(k){ return k !== 'Other' })
+               .concat(Object.keys(x)).sort(function(a,b){ return a.localeCompare(b) });
+  keys.forEach(function(k){ merged[k] = v[k] || x[k] });
+  merged['Other'] = [];
+  window.VEHICLES = merged;
+  window.EXOTIC_MAKES = Object.keys(x);
+})();
+
 /* Towns we actually cover. Same list as the Service Area section — keep them in step.
  * A dropdown instead of a free-text box means nobody books from Stamford by accident. */
 window.TOWNS = {

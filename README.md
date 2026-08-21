@@ -355,7 +355,9 @@ adding Meta tracking to the site, which would make the privacy policy untrue.
 
 `vehicles.js` holds two static lists loaded before `app.js`:
 
-- **`window.VEHICLES`** — 39 makes, each with its common models. Year / Make / Model are
+- **`window.VEHICLES`** — 49 makes, each with its common models. `window.EXOTICS` holds
+  11 marques (Ferrari, Lamborghini, McLaren, Pagani, Koenigsegg, Bugatti, Rolls-Royce,
+  Bentley, Aston Martin, Lotus, Ford GT/Shelby) and is merged in alphabetically at load. Year / Make / Model are
   three dependent selects; picking a make fills the model list. Choosing **Other** as the
   make, or **"Not listed — type it"** as the model, reveals a free-text box. Whatever gets
   chosen is written into the hidden `#bv` field, so everything downstream — the summary,
@@ -383,3 +385,17 @@ would happily autocomplete an address in Stamford.
 
 If you do want it later, the honest cost is: billing account, one more script origin, one
 more `connect-src` entry, and a new bullet in the privacy policy under "Who else sees it".
+
+
+## Trim
+
+`window.TRIMS` covers 21 makes. The Trim select only appears once a make **and** model are
+chosen, and only for makes where the answer actually changes the work — exposed carbon,
+Alcantara, ceramic brakes, factory PPF, wide-body aero. A Camry owner never sees the field,
+because a Camry trim tells you nothing about detailing it.
+
+Picking **"Something else"** opens the free-text box, and the typed value is appended to
+the vehicle string. Switching to a make without trims clears and hides the field, so a
+stale trim can never ride along on the wrong car.
+
+Adding a make to `TRIMS` is all it takes to turn the field on for it.

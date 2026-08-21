@@ -360,6 +360,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
 .row3{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:520px){.row3{grid-template-columns:.72fr 1fr 1.15fr}}
 .fldnote{font-size:12px;color:var(--dim);margin-top:7px;line-height:1.5}
+.opt-lbl{color:var(--dim);letter-spacing:0;text-transform:none;font-weight:400}
 .fldnote.warn{color:#E3B341}
 select:disabled{opacity:.5;cursor:not-allowed}
 
@@ -840,6 +841,10 @@ select:disabled{opacity:.5;cursor:not-allowed}
               <select id="vmk"><option value="">Make</option></select></div>
             <div class="fld"><label for="vmd">Model</label>
               <select id="vmd" disabled><option value="">Pick a make first</option></select></div>
+          </div>
+          <div class="fld" id="vTrimWrap" hidden>
+            <label for="vtr">Trim <span class="opt-lbl">— changes the work on these</span></label>
+            <select id="vtr"><option value="">Not sure / standard</option></select>
           </div>
           <div class="fld" id="vOtherWrap" hidden>
             <label for="vOther">Tell us what it is</label>

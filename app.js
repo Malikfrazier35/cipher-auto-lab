@@ -48,15 +48,37 @@
     parent.appendChild(o); return o;
   }
   function vehicleText(){
+    var free = esc($('vOther').value).trim();
     if($('vmk').value==='Other' || $('vmd').value==='__other'){
-      var t=esc($('vOther').value).trim();
-      return t ? ($('vyr').value ? $('vyr').value+' '+t : t) : '';
+      return free ? ($('vyr').value ? $('vyr').value+' '+free : free) : '';
     }
-    return [$('vyr').value, $('vmk').value, $('vmd').value].filter(Boolean).join(' ');
+    if(!$('vTrimWrap').hidden && $('vtr').value==='__other'){
+      return [$('vyr').value,$('vmk').value,$('vmd').value,free].filter(Boolean).join(' ');
+    }
+    var trim = $('vtr') && !$('vTrimWrap').hidden ? $('vtr').value : '';
+    return [$('vyr').value, $('vmk').value, $('vmd').value, trim].filter(Boolean).join(' ');
+  }
+  // Trim only appears for makes where the answer changes the job — exposed carbon,
+  // Alcantara, ceramic brakes, factory PPF. Asking a Camry owner for a trim is noise.
+  function syncTrim(){
+    var T=(window.TRIMS||{})[$('vmk').value], sel=$('vtr'), wrap=$('vTrimWrap');
+    if(!sel||!wrap) return;
+    var show = !!(T && T.length && $('vmd').value && $('vmd').value!=='__other');
+    if(show && sel.dataset.make!==$('vmk').value){
+      sel.innerHTML=''; opt(sel,'','Not sure / standard');
+      T.forEach(function(t){ opt(sel,t) });
+      opt(sel,'__other','Something else — tell us below');
+      sel.dataset.make=$('vmk').value;
+    }
+    wrap.hidden = !show;
+    if(!show){ sel.value=''; sel.dataset.make='' }
   }
   function syncVehicle(){
-    var other = ($('vmk').value==='Other' || $('vmd').value==='__other');
+    syncTrim();
+    var other = ($('vmk').value==='Other' || $('vmd').value==='__other'
+                 || (!$('vTrimWrap').hidden && $('vtr').value==='__other'));
     $('vOtherWrap').hidden = !other;
+    if(!other) $('vOther').value='';
     $('bv').value = vehicleText();
   }
   (function initVehicle(){
@@ -76,7 +98,7 @@
       if(list.length) opt(md,'__other','Not listed — type it');
       syncVehicle();
     });
-    [yr,md].forEach(function(el){ el.addEventListener('change', syncVehicle) });
+    [yr,md,$('vtr')].forEach(function(el){ if(el) el.addEventListener('change', syncVehicle) });
     $('vOther').addEventListener('input', syncVehicle);
   })();
 
