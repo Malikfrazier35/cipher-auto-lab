@@ -348,3 +348,38 @@ Two links, in the header and the footer of `index.html`:
 Both are marked with an HTML comment in the footer so they are easy to find. There is no
 Facebook Page plugin and no Meta pixel: embedding either would mean loosening the CSP and
 adding Meta tracking to the site, which would make the privacy policy untrue.
+
+---
+
+# Vehicle and town pickers
+
+`vehicles.js` holds two static lists loaded before `app.js`:
+
+- **`window.VEHICLES`** — 39 makes, each with its common models. Year / Make / Model are
+  three dependent selects; picking a make fills the model list. Choosing **Other** as the
+  make, or **"Not listed — type it"** as the model, reveals a free-text box. Whatever gets
+  chosen is written into the hidden `#bv` field, so everything downstream — the summary,
+  the SMS fallback, the Stripe metadata — is unchanged.
+- **`window.TOWNS`** — the same 34 towns as the Service Area section, grouped by region,
+  plus a "My town is not listed" option that shows the phone number instead of silently
+  accepting an out-of-area booking. `validStep4` rejects that value, so it cannot be
+  submitted.
+
+**Static on purpose.** No API call, no key, no rate limit, no third party in the CSP, and
+nothing about the customer sent anywhere. Missing a model? Add it to the list — the
+"Other" path means nobody is ever blocked in the meantime.
+
+Keep `window.TOWNS` and the Service Area chips in `index.html` in step. If you start
+covering a new town, it goes in both places.
+
+## Why not Google Places autocomplete
+
+It would need `maps.googleapis.com` back in the CSP, a Google Cloud billing account, and
+a change to the privacy policy — which currently says Stripe and Vercel are the only third
+parties, and is worth keeping true.
+
+The town dropdown also does something Places cannot: it enforces the service area. Places
+would happily autocomplete an address in Stamford.
+
+If you do want it later, the honest cost is: billing account, one more script origin, one
+more `connect-src` entry, and a new bullet in the privacy policy under "Who else sees it".

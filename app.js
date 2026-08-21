@@ -42,6 +42,65 @@
   }
   bindSvc('svc'); bindSvc('svc2');
 
+  /* ---------- vehicle + town pickers ---------- */
+  function opt(parent, value, label){
+    var o=document.createElement('option'); o.value=value; o.textContent=label||value;
+    parent.appendChild(o); return o;
+  }
+  function vehicleText(){
+    if($('vmk').value==='Other' || $('vmd').value==='__other'){
+      var t=esc($('vOther').value).trim();
+      return t ? ($('vyr').value ? $('vyr').value+' '+t : t) : '';
+    }
+    return [$('vyr').value, $('vmk').value, $('vmd').value].filter(Boolean).join(' ');
+  }
+  function syncVehicle(){
+    var other = ($('vmk').value==='Other' || $('vmd').value==='__other');
+    $('vOtherWrap').hidden = !other;
+    $('bv').value = vehicleText();
+  }
+  (function initVehicle(){
+    var V=window.VEHICLES||{}, yr=$('vyr'), mk=$('vmk'), md=$('vmd');
+    if(!yr||!mk||!md) return;
+    var now=new Date().getFullYear();
+    for(var y=now+1; y>=1995; y--) opt(yr, String(y));
+    Object.keys(V).forEach(function(m){ opt(mk, m) });
+
+    mk.addEventListener('change', function(){
+      md.innerHTML='';
+      var list=V[mk.value]||[];
+      if(!mk.value){ opt(md,'','Pick a make first'); md.disabled=true; syncVehicle(); return }
+      md.disabled=false;
+      opt(md,'', list.length?'Model':'Type it below');
+      list.forEach(function(x){ opt(md,x) });
+      if(list.length) opt(md,'__other','Not listed — type it');
+      syncVehicle();
+    });
+    [yr,md].forEach(function(el){ el.addEventListener('change', syncVehicle) });
+    $('vOther').addEventListener('input', syncVehicle);
+  })();
+
+  (function initTowns(){
+    var T=window.TOWNS||{}, sel=$('btw'); if(!sel) return;
+    Object.keys(T).forEach(function(region){
+      var g=document.createElement('optgroup'); g.label=region;
+      T[region].forEach(function(t){
+        var o=document.createElement('option'); o.value=t; o.textContent=t; g.appendChild(o);
+      });
+      sel.appendChild(g);
+    });
+    var g2=document.createElement('optgroup'); g2.label='Not on the list';
+    var o2=document.createElement('option'); o2.value='__ask';
+    o2.textContent='My town is not listed'; g2.appendChild(o2); sel.appendChild(g2);
+
+    sel.addEventListener('change', function(){
+      var n=$('areaNote'), edge=(sel.value==='__ask');
+      n.hidden=!edge; n.classList.toggle('warn', edge);
+      if(edge) n.textContent='Not a problem — call (203) 592-9589 and we will tell you '
+        + 'straight away whether we can reach you. Close to the edge usually works.';
+    });
+  })();
+
   var hl=$('hlToggle');
   if(hl) hl.addEventListener('click',function(){
     this.classList.toggle('sel');
@@ -102,7 +161,7 @@
     var ok=true;
     var checks=[['bnm',function(v){return v.trim().length>1}],
                 ['bph',function(v){return digits(v).length===10}],
-                ['btw',function(v){return v.trim().length>1}],
+                ['btw',function(v){return v.trim().length>1 && v!=='__ask'}],
                 ['bad',function(v){return v.trim().length>3}]];
     checks.forEach(function(p){
       var el=$(p[0]);

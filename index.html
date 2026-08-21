@@ -356,6 +356,13 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
 }
 .stickybar .btn{flex:1}
 
+/* ---------- VEHICLE / TOWN PICKERS ---------- */
+.row3{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:520px){.row3{grid-template-columns:.72fr 1fr 1.15fr}}
+.fldnote{font-size:12px;color:var(--dim);margin-top:7px;line-height:1.5}
+.fldnote.warn{color:#E3B341}
+select:disabled{opacity:.5;cursor:not-allowed}
+
 /* ---------- SOCIAL ---------- */
 .soc-hdr{display:none;align-items:center;justify-content:center;width:34px;height:34px;
   border-radius:9px;border:1px solid var(--line);color:var(--mute);flex:none;
@@ -826,8 +833,19 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
         <div class="pane" data-p="2">
           <div class="qh">Tell us about the vehicle.</div>
           <div class="qs">The more we know, the tighter the number.</div>
-          <div class="fld"><label for="bv">Year, make and model</label>
-            <input id="bv" placeholder="2021 Honda Accord"></div>
+          <div class="row3">
+            <div class="fld"><label for="vyr">Year</label>
+              <select id="vyr"><option value="">Year</option></select></div>
+            <div class="fld"><label for="vmk">Make</label>
+              <select id="vmk"><option value="">Make</option></select></div>
+            <div class="fld"><label for="vmd">Model</label>
+              <select id="vmd" disabled><option value="">Pick a make first</option></select></div>
+          </div>
+          <div class="fld" id="vOtherWrap" hidden>
+            <label for="vOther">Tell us what it is</label>
+            <input id="vOther" placeholder="e.g. 2014 Saab 9-3" autocomplete="off">
+          </div>
+          <input type="hidden" id="bv">
           <div class="row">
             <div class="fld"><label for="bc">Condition</label>
               <select id="bc">
@@ -880,9 +898,12 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
           </div>
           <div class="row">
             <div class="fld"><label for="bem">Email (optional)</label><input id="bem" type="email" placeholder="you@email.com"></div>
-            <div class="fld"><label for="btw">Town</label><input id="btw" placeholder="Shelton" required></div>
+            <div class="fld"><label for="btw">Town</label>
+              <select id="btw" required><option value="">Choose your town</option></select></div>
           </div>
-          <div class="fld"><label for="bad">Street address</label><input id="bad" placeholder="Where the car will be" required></div>
+          <div class="fld"><label for="bad">Street address</label>
+            <input id="bad" placeholder="Where the car will be" autocomplete="street-address" required>
+            <p class="fldnote" id="areaNote" hidden></p></div>
 
           <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">
             <div class="sumrow"><span>Service</span><b id="s1">—</b></div>
@@ -1119,6 +1140,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
 
 <script src="https://js.stripe.com/v3/"></script>
 <script src="config.js"></script>
+<script src="vehicles.js"></script>
 <script src="app.js" defer></script>
 </body>
 </html>
