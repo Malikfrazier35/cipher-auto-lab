@@ -1,0 +1,72 @@
+/* Shared styling for the legal pages. Kept in its own file so the CSP can stay
+   strict and so privacy.html and terms.html can never drift apart visually. */
+:root{
+  --bg:#08090B; --panel:#0F1216; --panel2:#141920; --line:#212831;
+  --ink:#F0F4F8; --mute:#8B96A4; --dim:#5E6975;
+  --acc:#A3E635; --acc-dk:#047857;
+  --max:820px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  line-height:1.68;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+a{color:var(--acc)}
+a:hover{color:#C6F26B}
+
+header{
+  position:sticky;top:0;z-index:50;background:rgba(8,9,11,.88);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+}
+.hdr{max-width:1120px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+.brand svg{width:34px;height:34px;color:var(--acc);flex:none}
+.bn{font-size:15px;font-weight:800;letter-spacing:.13em;line-height:1}
+.bs{font-size:8px;letter-spacing:.34em;color:var(--mute);margin-top:4px;line-height:1}
+.back{font-size:13.5px;color:var(--mute);text-decoration:none}
+.back:hover{color:var(--ink)}
+
+main{padding:56px 0 40px}
+.eyebrow{font-size:11px;letter-spacing:.28em;color:var(--acc);font-weight:700}
+h1{font-size:clamp(30px,6vw,44px);line-height:1.08;letter-spacing:-.02em;margin:14px 0 12px}
+.updated{font-size:13px;color:var(--dim)}
+.lede{font-size:17px;color:#C2CCD6;margin-top:20px}
+
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;margin:34px 0 8px}
+.toc p{font-size:11px;letter-spacing:.22em;color:var(--mute);font-weight:700;margin-bottom:12px}
+.toc ol{margin:0;padding-left:20px}
+.toc li{font-size:14.5px;margin:5px 0}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+h2{font-size:20px;letter-spacing:-.01em;margin:44px 0 12px;scroll-margin-top:86px}
+h2 span{color:var(--dim);font-weight:400;margin-right:10px}
+h3{font-size:15.5px;margin:24px 0 8px;color:#E4EAF0}
+p{margin:12px 0;font-size:15.5px;color:#C7D1DA}
+ul,ol.body{margin:12px 0 12px 22px}
+li{font-size:15.5px;color:#C7D1DA;margin:7px 0}
+strong,b{color:var(--ink)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;margin:20px 0}
+.card.warn{border-color:#33301C;background:#14140C}
+.card p:first-child{margin-top:0}
+.card p:last-child{margin-bottom:0}
+
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);color:#C7D1DA}
+th{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:700}
+td b{color:var(--ink)}
+.tw{overflow-x:auto}
+
+footer{border-top:1px solid var(--line);margin-top:64px;padding:34px 0 46px}
+.fl{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13.5px;color:var(--mute)}
+.fl a{color:var(--mute);text-decoration:none}
+.fl a:hover{color:var(--ink)}
+.fnote{font-size:12.5px;color:var(--dim);margin-top:16px}

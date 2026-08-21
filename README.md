@@ -7,7 +7,13 @@ the Naugatuck Valley and central Connecticut. No framework, no build step, no de
 
 ```
 index.html      the whole site — markup and styles
-app.js          booking flow logic (kept external so CSP can ban inline script)
+privacy.html    privacy policy
+terms.html      terms of service
+legal.css       shared styling for the two legal pages
+sitemap.xml     three URLs, submit this to Google Search Console
+robots.txt      allows everything except /api/, points at the sitemap
+config.js       your Stripe publishable key (external so the CSP can ban inline script)
+app.js          booking flow logic (kept external for the same reason)
 img/            job photos, WebP
 vercel.json     security headers + cache policy
 ```
@@ -91,7 +97,8 @@ npx vercel --prod
 1. Wire the booking request to a real endpoint (Formspree, Netlify Forms, or a Vercel
    serverless function) so requests can't be lost to a broken mail client.
 2. Square Appointments or Stripe Checkout for the deposit, so slots lock automatically.
-3. Add `sitemap.xml` and structured data (`LocalBusiness`, `Service`) for local SEO.
+3. Add structured data (`LocalBusiness`, `Service`) for local SEO. `sitemap.xml` is done —
+   submit it at Google Search Console -> Sitemaps.
 4. Google Business Profile — the highest-value marketing action still outstanding.
 
 ---
@@ -120,8 +127,13 @@ There is no database. Every booking detail is written into the PaymentIntent's
 1. Create a Stripe account and get both keys from the Developers → API keys page.
 2. In Vercel → Settings → Environment Variables, add:
    `STRIPE_SECRET_KEY` = `sk_live_...` (or `sk_test_...` while testing)
-3. In `index.html`, replace `pk_test_REPLACE_ME` with your **publishable** key.
+3. In **`config.js`**, replace `pk_test_REPLACE_ME` with your **publishable** key.
    That key is safe in client code — the secret one never is.
+
+   It lives in its own file, not inline in `index.html`, because the CSP sets
+   `script-src 'self'` and silently blocks every inline `<script>` block. Put the
+   key inline and it will never run — the browser console shows
+   *"Refused to execute a script…"* and Stripe never initialises.
 4. Redeploy.
 
 Until a real publishable key is in place, the deposit step degrades gracefully: it tells
@@ -184,3 +196,46 @@ Three conflicts existed when the restoration menu was first added, all now resol
 The replacement third maintenance card is **Interior Reset ($199)** — interior-only, which
 is a real and common request, and it keeps the ladder at three cards without inventing an
 overlap.
+
+
+## Rule: no inline script, ever
+
+`vercel.json` sets `script-src 'self' https://js.stripe.com`. There is deliberately no
+`'unsafe-inline'`, which is what makes the policy worth having — an injected `<script>`
+cannot execute. The cost is that **your own** inline scripts cannot execute either.
+
+So: any JavaScript belongs in a `.js` file served from this origin. Inline `<script>`
+blocks and `onclick="..."` attributes will be silently blocked. If something stops
+working after an edit, check the console for *"Refused to execute a script"* before
+looking anywhere else.
+
+
+---
+
+# Legal pages
+
+`privacy.html` and `terms.html`, both linked from the footer, both reachable at `/privacy`
+and `/terms` because `cleanUrls` is on in `vercel.json`.
+
+They describe **what the site actually does**, which is the only way a policy is worth
+anything:
+
+- No analytics, no ad pixels, no cookies set by us. The privacy page says so explicitly.
+  If you ever add Google Analytics or a Meta pixel, that section becomes false — update it
+  the same day.
+- The only third parties named are Stripe and Vercel, because they are the only two.
+- The deposit table in `terms.html` is copied from `DEPOSITS` in
+  `api/create-payment-intent.js`. **Three places now state deposit amounts** — the API, the
+  FAQ in `index.html`, and the terms table. Change one, change all three.
+- Cancellation wording matches `app.js` exactly: full refund at 24h+ notice, on our
+  reschedule, on a declined re-quote, or an unworkable site; forfeited only for a same-day
+  cancellation or a no-show.
+
+Neither page is legal advice and neither was written by a lawyer. They are honest and
+specific, which covers most of what a small service business needs, but if you start
+handling volume worth suing over, have an attorney read them.
+
+## Sitemap
+
+Three URLs. Update `lastmod` on a real content change, not for typos. Submit once at
+Google Search Console; Google re-reads it on its own after that.
