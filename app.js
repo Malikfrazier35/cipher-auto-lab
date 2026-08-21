@@ -1,10 +1,10 @@
 (function(){
-  var S={svc:'Full Detail',key:'full-detail',base:279,dep:40,size:'Sedan / coupe',mult:1,date:null,win:'Morning · 8–11am',ref:''};
+  var S={svc:'Full Detail',key:'full-detail',base:279,dep:40,addon:0,size:'Sedan / coupe',mult:1,date:null,win:'Morning · 8–11am',ref:''};
   var $=function(id){return document.getElementById(id)};
   // strip control characters so nothing odd can ride along into an sms:/mailto: payload
   var esc=function(v){return String(v==null?'':v).replace(/[\u0000-\u001F\u007F]/g,' ').slice(0,300)};
   var money=function(n){return '$'+(Math.round(n/5)*5).toLocaleString()};
-  function total(){ return Math.round(S.base*S.mult/5)*5 }
+  function total(){ return Math.round(S.base*S.mult/5)*5 + (S.addon||0) }
   function bal(){ return Math.max(0, total()-S.dep) }
 
   function paint(){
@@ -20,12 +20,38 @@
       b.classList.add('sel'); fn(b); paint();
     });
   }
-  pick('svc',function(b){
-    S.svc=b.dataset.svc; S.base=+b.dataset.base; S.dep=+b.dataset.dep; S.key=b.dataset.key;
-    $('leadnote').textContent = S.svc==='Ceramic'
-      ? 'Ceramic runs over two days — pick the first one and we will confirm the second.'
-      : 'Mon–Sat, from two days out. Sundays by request only.';
+  function clearAllSvc(){
+    ['svc','svc2'].forEach(function(id){
+      var box=$(id); if(box) box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel')});
+    });
+  }
+  function bindSvc(id){
+    var box=$(id); if(!box) return;
+    box.addEventListener('click',function(ev){
+      var b=ev.target.closest('.opt'); if(!b) return;
+      clearAllSvc(); b.classList.add('sel');
+      S.svc=b.dataset.svc; S.base=+b.dataset.base; S.dep=+b.dataset.dep; S.key=b.dataset.key;
+      $('leadnote').textContent = (S.key==='show')
+        ? 'Show Finish runs over two days — pick the first and we will confirm the second.'
+        : 'Mon–Sat, from two days out. Sundays by request only.';
+      paint();
+    });
+  }
+  bindSvc('svc'); bindSvc('svc2');
+
+  var hl=$('hlToggle');
+  if(hl) hl.addEventListener('click',function(){
+    this.classList.toggle('sel');
+    S.addon = this.classList.contains('sel') ? +this.dataset.addon : 0;
+    paint();
   });
+
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest('[data-pre]'); if(!a) return;
+    var btn=document.querySelector('.opt[data-key="'+a.dataset.pre+'"]');
+    if(btn){ btn.click(); show(1) }
+  });
+
   pick('size',function(b){ S.size=b.dataset.size; S.mult=+b.dataset.mult });
   pick('win', function(b){ S.win=b.dataset.win });
 
@@ -62,7 +88,8 @@
   function fill(sfx){
     var when = S.date ? S.date+' · '+S.win : '—';
     var v = S.size + ($('bv').value ? ' · '+esc($('bv').value) : '');
-    var m={'1':S.svc,'2':v,'3':when,'4':money(total())+' estimated','5':where(),'6':'$'+S.dep+' refundable'};
+    var svcLabel = S.svc + (S.addon ? ' + headlights' : '');
+    var m={'1':svcLabel,'2':v,'3':when,'4':money(total())+' estimated','5':where(),'6':'$'+S.dep+' refundable'};
     for(var k in m){ var el=$(sfx+k); if(el) el.textContent=m[k] }
     if($(sfx+'0')) $(sfx+'0').textContent=S.ref;
   }
@@ -106,7 +133,7 @@
     var NL='\n';
     return 'BOOKING REQUEST — Cipher Auto Lab'+NL
       +'Reference: '+S.ref+NL+NL
-      +'Service: '+S.svc+NL
+      +'Service: '+S.svc+(S.addon?' + headlight restoration (+$'+S.addon+')':'')+NL
       +'Vehicle: '+S.size+($('bv').value?' — '+esc($('bv').value):'')+NL
       +'Condition: '+$('bc').value+NL
       +'Parked: '+$('bk2').value+NL
@@ -147,7 +174,7 @@
       var r = await fetch('/api/create-payment-intent',{
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-          packageKey:S.key, ref:S.ref,
+          packageKey:S.key, addon:(S.addon?1:0), ref:S.ref,
           name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
           vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value,
           date:S.date, window:S.win, address:$('bad').value, town:$('btw').value,

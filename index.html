@@ -198,6 +198,9 @@ ul.feats li::before{
 .fade i{display:block;width:112px;height:12px;border-radius:3px;background:var(--acc)}
 
 /* ---------- BOOKING ---------- */
+.optgroup{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-bottom:9px}
+.opt .pz em{font-size:11px}
+
 .bk{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .steps-bar{display:flex;border-bottom:1px solid var(--line);background:#0B0E12}
 .sb{flex:1;padding:14px 10px;text-align:center;font-size:10.5px;letter-spacing:.14em;
@@ -462,7 +465,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
     <div class="shead">
       <div class="eyebrow mono">Packages</div>
       <h2>Straightforward pricing.</h2>
-      <p class="lede">Prices start where most cars land. Oversized vehicles, heavy pet hair, and serious neglect cost more — we'll tell you before we start, never after. Every booking holds with a refundable $25–$75 deposit that comes off the total.</p>
+      <p class="lede">Upkeep, not paint repair. These get a car clean and protected — if the paint itself needs fixing, that's the <a href="#restoration" style="color:var(--acc)">restoration menu</a>. Prices start where most cars land; oversized vehicles and heavy neglect cost more, and you'll hear that before we start, never after.</p>
     </div>
     <div class="pk">
 
@@ -478,40 +481,37 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
           <li>Glass inside and out</li>
           <li>Roughly 2 hours</li>
         </ul>
-        <a class="btn btn-o" href="#quote">Book Refresh</a>
+        <a class="btn btn-o" href="#quote" data-pre="refresh">Book Refresh</a>
       </div>
 
+      <div class="card">
+        <div class="pname mono">Interior Reset</div>
+        <div class="price">$199<small> &nbsp;starting</small></div>
+        <p class="pfor">Inside only. For pets, kids, spills and the cars that never get vacuumed.</p>
+        <ul class="feats">
+          <li>Full vacuum, seats and carpets out to the edges</li>
+          <li>Shampoo &amp; hot-water extraction</li>
+          <li>Leather clean &amp; condition</li>
+          <li>Vents, crevices and door jambs</li>
+          <li>Interior glass</li>
+          <li>Roughly 3 hours</li>
+        </ul>
+        <a class="btn btn-o" href="#quote" data-pre="interior">Book Interior Reset</a>
+      </div>
       <div class="card feat">
         <div class="flag">Most booked</div>
         <div class="pname mono">Full Detail</div>
         <div class="price">$279<small> &nbsp;starting</small></div>
-        <p class="pfor">The reset. Everything inside and out, back to as-good-as-it-gets.</p>
+        <p class="pfor">Deep clean, inside and out. No machine polishing — that lives on the restoration menu.</p>
         <ul class="feats">
           <li>Everything in Refresh</li>
           <li>Clay bar &amp; iron decontamination</li>
-          <li>One-step machine polish</li>
           <li>Shampoo &amp; hot-water extraction</li>
           <li>Leather clean &amp; condition</li>
           <li>Engine bay detail</li>
           <li>Roughly 5 hours</li>
         </ul>
-        <a class="btn btn-p" href="#quote">Book Full Detail</a>
-      </div>
-
-      <div class="card">
-        <div class="pname mono">Ceramic</div>
-        <div class="price">$749<small> &nbsp;starting</small></div>
-        <p class="pfor">Paint correction plus a coating that lasts years, not weeks.</p>
-        <ul class="feats">
-          <li>Everything in Full Detail</li>
-          <li>Multi-stage paint correction</li>
-          <li>3–5 year ceramic coating</li>
-          <li>Coated wheels &amp; glass</li>
-          <li>Written care instructions</li>
-          <li>Free 6-month check-up</li>
-          <li>Two days, by appointment</li>
-        </ul>
-        <a class="btn btn-o" href="#quote">Ask about Ceramic</a>
+        <a class="btn btn-p" href="#quote" data-pre="full-detail">Book Full Detail</a>
       </div>
 
     </div>
@@ -540,7 +540,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
           <li>Roughly 4 hours</li>
         </ul>
         <div class="rsize"><span>SUV <b>$399</b></span><span>Truck / 3-row <b>$449</b></span></div>
-        <a class="btn btn-o" href="#quote">Book Gloss</a>
+        <a class="btn btn-o" href="#quote" data-pre="gloss">Book Gloss</a>
       </div>
 
       <div class="rcard feat">
@@ -556,7 +556,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
           <li>6–8 hours</li>
         </ul>
         <div class="rsize"><span>SUV <b>$849</b></span><span>Truck / 3-row <b>$949</b></span></div>
-        <a class="btn btn-p" href="#quote">Book Correction</a>
+        <a class="btn btn-p" href="#quote" data-pre="correction">Book Correction</a>
       </div>
 
       <div class="rcard">
@@ -570,7 +570,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
           <li>Two days</li>
         </ul>
         <div class="rsize"><span>By quote only</span></div>
-        <a class="btn btn-o" href="#quote">Request a quote</a>
+        <a class="btn btn-o" href="#quote" data-pre="show">Request a quote</a>
       </div>
     </div>
 
@@ -585,7 +585,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
       <div class="ao"><b>1–2 year coating</b><div class="p">+$349</div>
         <span>The sensible step up once the paint is right.</span></div>
       <div class="ao"><b>3–5 year ceramic</b><div class="p">+$599</div>
-        <span>Correction + ceramic bundled: <b style="color:#A3E635">$1,249</b>.</span></div>
+        <span>Correction + ceramic bundled: <b style="color:#A3E635">$1,249</b>. The only way we sell ceramic — never over uncorrected paint.</span></div>
     </div>
 
     <div class="shead" style="margin-top:56px;margin-bottom:20px">
@@ -720,13 +720,31 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
         <div class="pane on" data-p="1">
           <div class="qh">What does the car need?</div>
           <div class="qs">Not sure? Pick the middle one — we'll tell you honestly if it's more or less than that.</div>
+          <div class="optgroup mono">Maintenance · cleaning</div>
           <div class="opts" id="svc">
             <button type="button" class="opt" data-svc="Refresh" data-base="149" data-dep="25" data-key="refresh">
-              <b>Refresh</b><span>Maintenance wash, sealant, interior tidy. ~2 hrs.</span><span class="pz">from $149</span></button>
+              <b>Refresh</b><span>Wash, sealant, interior tidy. ~2 hrs.</span><span class="pz">from $149</span></button>
             <button type="button" class="opt sel" data-svc="Full Detail" data-base="279" data-dep="40" data-key="full-detail">
-              <b>Full Detail</b><span>Inside and out, machine polish, extraction. ~5 hrs.</span><span class="pz">from $279</span></button>
-            <button type="button" class="opt" data-svc="Ceramic" data-base="749" data-dep="75" data-key="ceramic">
-              <b>Ceramic</b><span>Correction plus a 3–5 year coating. Two days.</span><span class="pz">from $749</span></button>
+              <b>Full Detail</b><span>Deep clean inside and out. ~5 hrs.</span><span class="pz">from $279</span></button>
+            <button type="button" class="opt" data-svc="Interior Reset" data-base="199" data-dep="30" data-key="interior">
+              <b>Interior Reset</b><span>Inside only, extraction included. ~3 hrs.</span><span class="pz">from $199</span></button>
+          </div>
+
+          <div class="optgroup mono" style="margin-top:22px">Restoration · machine paint work</div>
+          <div class="opts" id="svc2">
+            <button type="button" class="opt" data-svc="Gloss Enhancement" data-base="349" data-dep="50" data-key="gloss">
+              <b>Gloss Enhancement</b><span>One machine step. ~4 hrs.</span><span class="pz">from $349</span></button>
+            <button type="button" class="opt" data-svc="Paint Correction" data-base="749" data-dep="100" data-key="correction">
+              <b>Paint Correction</b><span>Two stages, 80–90% removal. ~7 hrs.</span><span class="pz">from $749</span></button>
+            <button type="button" class="opt" data-svc="Show Finish" data-base="1299" data-dep="150" data-key="show">
+              <b>Show Finish</b><span>Multi-stage. Confirmed after inspection.</span><span class="pz">from $1,299</span></button>
+          </div>
+
+          <div class="optgroup mono" style="margin-top:22px">Add on</div>
+          <div class="opts">
+            <button type="button" class="opt" id="hlToggle" data-addon="99">
+              <b>Headlight restoration</b><span>Wet sand, polish, UV seal. 12-month warranty.</span>
+              <span class="pz">+$99 with any booking <em style="font-style:normal;color:var(--dim)">(usually $139)</em></span></button>
           </div>
 
           <div class="qh" style="margin-top:28px">What are we working on?</div>

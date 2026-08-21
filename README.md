@@ -142,15 +142,18 @@ it breaks PCI compliance and Stripe will reject it.
 
 ## Deposits (server-side, in `api/create-payment-intent.js`)
 
-| Package | Deposit |
-|---|---|
-| Refresh | $25 |
-| Full Detail | $40 |
-| Ceramic | $75 |
-| Gloss Enhancement | $50 |
-| Paint Correction | $100 |
-| Show Finish | $150 |
-| Headlight Restoration | $25 |
+| Package | Price from | Deposit |
+|---|---|---|
+| Refresh | $149 | $25 |
+| Interior Reset | $199 | $30 |
+| Full Detail | $279 | $40 |
+| Gloss Enhancement | $349 | $50 |
+| Paint Correction | $749 | $100 |
+| Show Finish | $1,299 | $150 |
+| Headlight Restoration | $139 | $25 |
+
+Headlights booked alongside anything else are $99 and handled as a flat add-on —
+not multiplied by vehicle size, because an hour is an hour regardless of the car.
 
 Change them in `DEPOSITS` in the API file. The copy in `app.js` is display only.
 
@@ -159,3 +162,25 @@ Change them in `DEPOSITS` in the API file. The copy in `app.js` is display only.
 Correction and headlight pricing live in `index.html` under `#restoration`, kept as a
 separate menu from the maintenance packages — upkeep and restoration are different
 purchases and mixing them makes the cheap tier look expensive.
+
+
+## Menu logic — why the two menus don't overlap
+
+Three conflicts existed when the restoration menu was first added, all now resolved:
+
+1. **Full Detail claimed a one-step machine polish**, which is exactly what Gloss
+   Enhancement sells at $349 — so Full Detail undercut it by $70 while including more.
+   Machine polishing is now removed from every maintenance package. **Maintenance cleans,
+   restoration corrects.** That is the dividing line, and nothing crosses it.
+2. **Ceramic sat in the maintenance menu at $749**, the same price as a two-step Paint
+   Correction, while claiming to include multi-stage correction *and* a coating. Nobody
+   would ever have bought from the restoration menu. Ceramic is gone from maintenance and
+   now exists in exactly one place: correction + ceramic bundled at $1,249.
+3. **The restoration cards booked the wrong thing.** They linked to a flow that only knew
+   the three maintenance packages, so "Book Correction" silently created a Full Detail
+   booking at a Full Detail deposit. Step 1 now carries both menus, and every pricing card
+   deep-links to its own service.
+
+The replacement third maintenance card is **Interior Reset ($199)** — interior-only, which
+is a real and common request, and it keeps the ladder at three cards without inventing an
+overlap.
