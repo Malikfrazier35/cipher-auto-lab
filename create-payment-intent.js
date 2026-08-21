@@ -43,6 +43,13 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Name and a 10-digit phone number are required.' });
     }
 
+    // No signature, no PaymentIntent. Checking this here and not only in the browser is
+    // the point — the client-side check is a convenience, this one is the actual gate.
+    const signature = clean(body.signature, 80);
+    if (signature.length < 3 || !/\s/.test(signature)) {
+      return res.status(400).json({ error: 'The Service Agreement must be signed with your full name.' });
+    }
+
     const intent = await stripe.paymentIntents.create({
       amount: pkg.cents,
       currency: 'usd',
@@ -67,6 +74,15 @@ module.exports = async (req, res) => {
         town:       clean(body.town, 60),
         notes:      clean(body.notes, 400),
         est_total:  clean(body.estTotal, 20),
+
+        // --- signed Service Agreement: the evidence that they agreed, and to what ---
+        agreement:  'v' + clean(body.agreementVersion, 10),
+        signed_by:  signature,
+        signed_at:  clean(body.signedAt, 40) || new Date().toISOString(),
+        signed_ip:  clean(
+                      (req.headers['x-forwarded-for'] || '').split(',')[0] ||
+                      (req.socket && req.socket.remoteAddress) || '', 45),
+        photo_consent: clean(body.photoConsent, 3) === 'yes' ? 'yes' : 'no',
         terms:      'accepted: 24h refund, no-show forfeit, price change requires approval',
       },
     });

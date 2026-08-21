@@ -1,5 +1,8 @@
 (function(){
-  var S={svc:'Full Detail',key:'full-detail',base:279,dep:40,addon:0,size:'Sedan / coupe',mult:1,date:null,win:'Morning · 8–11am',ref:''};
+  // Bump AGREEMENT_VERSION whenever agreement.html changes materially. It is stored on
+  // every booking so you can always prove which wording the customer actually signed.
+  var AGREEMENT_VERSION='1.0';
+  var S={svc:'Full Detail',key:'full-detail',base:279,dep:40,addon:0,size:'Sedan / coupe',mult:1,date:null,win:'Morning · 8–11am',ref:'',sig:'',signedAt:'',photoOk:false};
   var $=function(id){return document.getElementById(id)};
   // strip control characters so nothing odd can ride along into an sms:/mailto: payload
   var esc=function(v){return String(v==null?'':v).replace(/[\u0000-\u001F\u007F]/g,' ').slice(0,300)};
@@ -149,6 +152,8 @@
       +'TERMS ACCEPTED BY CUSTOMER:'+NL
       +'- Deposit refunded in full with 24h notice, on our reschedule, or if a re-quote is declined.'+NL
       +'- Deposit forfeited only for same-day cancellation or no-show.'+NL
+      +NL+'SIGNED: '+S.sig+' — Service Agreement v'+AGREEMENT_VERSION+' — '+S.signedAt+NL
+      +'Photo consent: '+(S.photoOk?'yes':'no')+NL
       +'- Price changes only with customer approval, before work starts.'+NL;
   }
 
@@ -178,7 +183,9 @@
           name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
           vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value,
           date:S.date, window:S.win, address:$('bad').value, town:$('btw').value,
-          notes:$('bn').value, estTotal:money(total())
+          notes:$('bn').value, estTotal:money(total()),
+          agreementVersion:AGREEMENT_VERSION, signature:S.sig, signedAt:S.signedAt,
+          photoConsent:S.photoOk?'yes':'no'
         })
       });
       var data = await r.json();
@@ -223,8 +230,21 @@
   $('submitBk').addEventListener('click',function(){
     if($('hp').value){ return }
     if(!validStep4()){ show(4); $('e4').style.display='block'; return }
-    if(!$('agree').checked){ $('e5').style.display='block'; $('agreeBox').classList.add('bad'); return }
-    $('e5').style.display='none'; $('agreeBox').classList.remove('bad');
+    var sigEl=$('sig'), sigVal=(sigEl&&sigEl.value||'').trim();
+    var okAgree=$('agree').checked;
+    // a signature has to look like a name, not a keyboard mash or a single initial
+    var okSig=sigVal.length>=3 && /^[A-Za-z][A-Za-z .'\u2019-]*[A-Za-z.]$/.test(sigVal) && /\s/.test(sigVal);
+    if(!okAgree || !okSig){
+      $('e5').style.display='block';
+      $('agreeBox').classList.toggle('bad', !okAgree);
+      if(sigEl) sigEl.classList.toggle('bad', !okSig);
+      (okAgree && sigEl ? sigEl : $('agreeBox')).focus();
+      return;
+    }
+    $('e5').style.display='none'; $('agreeBox').classList.remove('bad'); sigEl.classList.remove('bad');
+    S.sig=esc(sigVal).slice(0,80);
+    S.signedAt=new Date().toISOString();
+    S.photoOk=!!($('photoOk')&&$('photoOk').checked);
     S.ref=makeRef();
     var body=summary();
     $('refCode').textContent=S.ref;
@@ -235,7 +255,10 @@
     startPayment();
   });
   $('agree').addEventListener('change',function(){
-    if(this.checked){ $('e5').style.display='none'; $('agreeBox').classList.remove('bad') }
+    if(this.checked){ $('agreeBox').classList.remove('bad'); if($('sig').value.trim()) $('e5').style.display='none' }
+  });
+  $('sig').addEventListener('input',function(){
+    if(this.value.trim().length>=3){ this.classList.remove('bad'); if($('agree').checked) $('e5').style.display='none' }
   });
   paint();
 })();

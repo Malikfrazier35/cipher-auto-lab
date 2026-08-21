@@ -355,6 +355,49 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
   border-top:1px solid var(--line);
 }
 .stickybar .btn{flex:1}
+
+/* ---------- SOCIAL ---------- */
+.soc-hdr{display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:9px;border:1px solid var(--line);color:var(--mute);flex:none;
+  transition:color .15s,border-color .15s}
+.soc-hdr svg{width:17px;height:17px}
+.soc-hdr:hover{color:var(--acc);border-color:var(--acc)}
+@media(min-width:560px){.soc-hdr{display:flex}}
+.socrow{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+.soc{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel);color:var(--mute);
+  font-size:13px;text-decoration:none;transition:color .15s,border-color .15s}
+.soc svg{width:15px;height:15px;flex:none}
+.soc:hover{color:var(--ink);border-color:var(--acc)}
+
+/* ---------- SERVICE AGREEMENT ---------- */
+.sigblock{border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  padding:16px 16px 18px;margin:18px 0 4px}
+.sighead{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:10.5px;letter-spacing:.2em;color:var(--mute);margin-bottom:10px}
+.sighead a{color:var(--acc);text-decoration:none;letter-spacing:0;font-size:12px}
+.sighead a:hover{text-decoration:underline}
+.sigscroll{max-height:190px;overflow-y:auto;padding:14px 15px;border-radius:10px;
+  background:#0A0D11;border:1px solid var(--line)}
+.sigscroll:focus{outline:2px solid var(--acc);outline-offset:2px}
+.sigscroll p{font-size:12.8px;line-height:1.62;color:#A9B4C0;margin:0 0 11px}
+.sigscroll p:last-child{margin-bottom:0}
+.sigscroll b{color:#DDE4EB}
+.sigblock .agree{margin-top:14px}
+.agree.opt-in span{color:var(--mute)}
+.agree.opt-in em{color:var(--dim);font-style:normal}
+.sigrow{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+.fl-lbl{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mute);margin-bottom:7px}
+#sig{width:100%;background:#0A0D11;border:1px solid var(--line);border-radius:9px;
+  color:var(--ink);padding:12px 13px;font-size:19px;font-family:"Snell Roundhand","Segoe Script",cursive;
+  letter-spacing:.01em}
+#sig:focus{outline:none;border-color:var(--acc)}
+#sig.bad,.agree.bad{border-color:#B4453F}
+.sighint{font-size:11.5px;color:var(--dim);margin-top:9px;line-height:1.55}
+.flegal{margin-top:14px;font-size:12.5px;color:var(--dim)}
+.flegal a{color:var(--mute);text-decoration:none}
+.flegal a:hover{color:var(--ink);text-decoration:underline}
 .flegal{margin-top:14px;font-size:12.5px;color:var(--dim)}
 .flegal a{color:var(--mute);text-decoration:none}
 .flegal a:hover{color:var(--ink);text-decoration:underline}
@@ -385,6 +428,12 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
       <rect x="54" y="73" width="3.2" height="6" rx="1"/><rect x="66" y="73" width="3.2" height="6" rx="1"/>
     </g>
   </symbol>
+  <symbol id="ic-fb" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/>
+  </symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2.6l2.9 5.88 6.5.95-4.7 4.58 1.11 6.47L12 17.43l-5.81 3.05 1.11-6.47-4.7-4.58 6.5-.95L12 2.6Z"/>
+  </symbol>
 </defs></svg>
 
 <!-- ===== HEADER ===== -->
@@ -399,6 +448,9 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
       <a class="navlink" href="#restoration">Restoration</a>
       <a class="navlink" href="#how">How it works</a>
       <a class="navlink" href="#area">Service area</a>
+      <a class="soc-hdr" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me" aria-label="Cipher Auto Lab on Facebook" title="Facebook">
+        <svg><use href="#ic-fb"/></svg>
+      </a>
       <a class="btn btn-o btn-sm" href="tel:+12035929589">(203) 592-9589</a>
       <a class="btn btn-p btn-sm" href="#quote">Get a quote</a>
     </div>
@@ -902,11 +954,39 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
             <div class="sumrow"><span>Deposit to hold it</span><b id="b6">—</b></div>
           </div>
 
-          <label class="agree" id="agreeBox">
-            <input type="checkbox" id="agree">
-            <span>I've read the terms above. I understand the deposit is <b>refundable with 24 hours notice</b>, that it comes off my total, and that <b>the price can only change with my approval before work starts.</b></span>
-          </label>
-          <div class="err" id="e5">Please confirm you've read the terms.</div>
+          <div class="sigblock">
+            <div class="sighead">
+              <span class="mono">SERVICE AGREEMENT</span>
+              <a href="/agreement" target="_blank" rel="noopener">Read in full ↗</a>
+            </div>
+            <div class="sigscroll" id="agrScroll" tabindex="0">
+              <p><b>Price.</b> The figure above is an estimate. If the car needs more than the booking said, we quote you the new number <b>on arrival</b> — you approve it or take your deposit back in full. The price is never changed after the work is done.</p>
+              <p><b>Deposit.</b> Comes off your total, never added on top. Refunded in full with 24 hours notice, if we reschedule for any reason including weather, if you decline a re-quote, or if the site can't be worked. Forfeited only for a same-day cancellation or a no-show.</p>
+              <p><b>Condition.</b> We photograph the car on arrival. We're not responsible for pre-existing damage — failing clear coat, chips, dents, rust, previous bodywork, brittle trim or aftermarket parts — some of which can worsen under normal detailing through no fault of ours. If we see a real risk we stop and ask you first.</p>
+              <p><b>Results.</b> Correction reduces defects, it doesn't resurface the car: roughly 50–60% of light swirling in one stage, 80–90% in two. Anything deeper than the clear coat needs paint. Some stains and odours are permanent. Paint has a finite thickness and we stop while it's still safe to stop.</p>
+              <p><b>Belongings.</b> Please empty the car, child seats included. We're not responsible for items left inside.</p>
+              <p><b>Damage.</b> We're insured. If we damage something you'll hear it from us first and it gets covered. Report anything you think we caused within <b>48 hours</b>. Our liability is limited to what you paid for the job.</p>
+              <p><b>Law.</b> Connecticut, New Haven County. Version 1.0 — the version you sign is the one that governs your job.</p>
+            </div>
+
+            <label class="agree" id="agreeBox">
+              <input type="checkbox" id="agree">
+              <span>I have read and agree to the <b>Service Agreement</b>, and I own this vehicle or have the owner's permission to have it worked on.</span>
+            </label>
+
+            <label class="agree opt-in" id="photoBox">
+              <input type="checkbox" id="photoOk">
+              <span>Optional — you may photograph my vehicle for your portfolio. Plate removed, no address, and I can ask for it to come down any time. <em>Declining changes nothing about the service or the price.</em></span>
+            </label>
+
+            <div class="sigrow">
+              <label class="fl-lbl" for="sig">Type your full legal name to sign</label>
+              <input type="text" id="sig" autocomplete="name" spellcheck="false"
+                     placeholder="Your full name" aria-describedby="sighint">
+              <p class="sighint" id="sighint">Typing your name is your signature. We record the agreement version, your name, the date and time, and the IP address it came from. Your confirmation email is your copy.</p>
+            </div>
+          </div>
+          <div class="err" id="e5">Please agree to the Service Agreement and sign with your full name.</div>
 
           <div class="lock">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
@@ -1019,8 +1099,15 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
     <div class="fmeta">
       <p><a href="tel:+12035929589" style="text-decoration:none">(203) 592-9589</a></p>
       <p><a href="mailto:hello@cipherautolab.com" style="text-decoration:none">hello@cipherautolab.com</a></p>
+      <div class="socrow">
+        <!-- EDIT THESE TWO URLS. Delete the Google line entirely until the listing is live. -->
+        <a class="soc" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me">
+          <svg><use href="#ic-fb"/></svg><span>Facebook</span></a>
+        <a class="soc" href="https://g.page/cipher-auto-lab" target="_blank" rel="noopener me">
+          <svg><use href="#ic-star"/></svg><span>Review us on Google</span></a>
+      </div>
       <p style="margin-top:12px">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
-      <p class="flegal"><a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
+      <p class="flegal"><a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
     </div>
   </div>
 </footer>

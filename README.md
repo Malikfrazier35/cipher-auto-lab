@@ -239,3 +239,112 @@ handling volume worth suing over, have an attorney read them.
 
 Three URLs. Update `lastmod` on a real content change, not for typos. Submit once at
 Google Search Console; Google re-reads it on its own after that.
+
+---
+
+# Managing appointments
+
+There is still no database and no calendar. What there now is: **you find out the moment a
+deposit clears, and the customer gets a real confirmation.**
+
+## How a booking reaches you
+
+1. Customer signs the Service Agreement and pays the deposit.
+2. Stripe charges the card and fires `payment_intent.succeeded`.
+3. `api/stripe-webhook.js` verifies the signature, then sends two emails:
+   - **to the customer** — confirmation, reference, what to do before you arrive,
+     cancellation terms, and their signed copy of the agreement
+   - **to you** — every booking field, a "Call the customer" button, a link to the
+     payment in Stripe, and whether they consented to photos
+
+The webhook fires from Stripe's servers, not the browser. If the customer pays and
+immediately closes the tab, you still get the email. Anything wired to the front end
+would have silently lost that booking.
+
+## Also do this (two minutes, no code)
+
+Install the **Stripe mobile app** and turn on payment notifications. It buzzes your phone
+the second money lands. Free, and it does not depend on this webhook working.
+
+## Setup
+
+1. **Resend** — sign up at resend.com, add `cipherautolab.com`, add the DNS records it
+   gives you, then create an API key. Put it in Vercel as `RESEND_API_KEY`.
+   Without a verified domain, `FROM_EMAIL` must stay on `onboarding@resend.dev`.
+2. **Stripe webhook** — Developers → Webhooks → Add endpoint:
+   - URL: `https://cipherautolab.com/api/stripe-webhook`
+   - Event: `payment_intent.succeeded` only
+   - Copy the signing secret into Vercel as `STRIPE_WEBHOOK_SECRET`
+3. Add `OWNER_EMAIL` and `FROM_EMAIL`. Redeploy.
+4. Test with card `4242 4242 4242 4242`. Stripe's webhook page shows the delivery and the
+   response — a 400 means the signing secret is wrong.
+
+**Emails are best-effort.** If Resend fails the webhook still returns 200, because a 500
+would make Stripe retry and the customer could get duplicate confirmations. The payment is
+never at risk. Check the Vercel function logs if an email goes missing.
+
+## What this still does NOT do
+
+- **Nothing prevents double-booking.** Two people can pick the same Saturday morning.
+  With one van and a handful of jobs a week you will notice; when you stop noticing, that
+  is the signal to move to real availability (Square Appointments, or Supabase behind
+  the flow).
+- No reminder the day before. Send those by text for now.
+- No calendar entry. Put it in your own calendar when the email arrives.
+
+---
+
+# The Service Agreement
+
+`agreement.html` at `/agreement`, version **1.0**. This is the document that actually
+protects you, and it is signed on every booking.
+
+## How signing works
+
+Step 5 of the booking flow shows a scrollable summary of the clauses that matter, a
+checkbox, an optional photo-consent checkbox, and a field where the customer types their
+full legal name.
+
+Recorded on the PaymentIntent, and therefore permanent:
+
+| Metadata key | What it proves |
+|---|---|
+| `agreement` | which version they signed |
+| `signed_by` | the name they typed |
+| `signed_at` | ISO timestamp from the browser |
+| `signed_ip` | the IP the signature came from |
+| `photo_consent` | `yes` / `no` — check before posting any photo |
+
+**The server enforces it, not just the browser.** `api/create-payment-intent.js` refuses
+to create a PaymentIntent without a signature containing at least two words. Disabling the
+JavaScript check in devtools gets you a 400, not a booking.
+
+## When you change the agreement
+
+1. Edit `agreement.html`.
+2. Bump `AGREEMENT_VERSION` at the top of `app.js`.
+3. Update the summary text inside `.sigblock` in `index.html` so the short version still
+   matches the long one.
+
+Old bookings keep pointing at the version they signed, which is the whole point.
+
+## Photo consent
+
+Off by default. Before posting any customer vehicle, look up the booking in Stripe and
+check `photo_consent`. The privacy policy promises this, so it has to be real.
+
+---
+
+# Social links
+
+Two links, in the header and the footer of `index.html`:
+
+- **Facebook** — currently `https://www.facebook.com/cipherautolab`. **Check this URL.**
+  It is a guess, and a dead link in the header is worse than no link.
+- **Google** — currently `https://g.page/cipher-auto-lab`. **Delete this line entirely
+  until the listing is actually live**, then paste the real short link from your Google
+  Business Profile.
+
+Both are marked with an HTML comment in the footer so they are easy to find. There is no
+Facebook Page plugin and no Meta pixel: embedding either would mean loosening the CSP and
+adding Meta tracking to the site, which would make the privacy policy untrue.
