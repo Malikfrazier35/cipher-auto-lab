@@ -61,31 +61,106 @@
   // Trim only appears for makes where the answer changes the job — exposed carbon,
   // Alcantara, ceramic brakes, factory PPF. Asking a Camry owner for a trim is noise.
   function syncTrim(){
-    var T=(window.TRIMS||{})[$('vmk').value], sel=$('vtr'), wrap=$('vTrimWrap');
+    var mk=$('vmk').value, md=$('vmd').value;
+    var T=(window.TRIMS||{})[mk], sel=$('vtr'), wrap=$('vTrimWrap');
     if(!sel||!wrap) return;
-    var show = !!(T && T.length && $('vmd').value && $('vmd').value!=='__other');
-    if(show && sel.dataset.make!==$('vmk').value){
+    var show = !!(T && T.length && md && md!=='__other');
+    // Rebuild on a change of make OR model — an STO must not follow you to a Urus.
+    if(show && (sel.dataset.make!==mk || sel.dataset.model!==md)){
       sel.innerHTML=''; opt(sel,'','Not sure / standard');
       T.forEach(function(t){ opt(sel,t) });
       opt(sel,'__other','Something else — tell us below');
-      sel.dataset.make=$('vmk').value;
+      sel.dataset.make=mk; sel.dataset.model=md; sel.value='';
     }
     wrap.hidden = !show;
-    if(!show){ sel.value=''; sel.dataset.make='' }
+    if(!show){ sel.value=''; sel.dataset.make=''; sel.dataset.model='' }
   }
   function syncVehicle(){
     syncTrim();
+    syncYears();
     var other = ($('vmk').value==='Other' || $('vmd').value==='__other'
                  || (!$('vTrimWrap').hidden && $('vtr').value==='__other'));
     $('vOtherWrap').hidden = !other;
     if(!other) $('vOther').value='';
     $('bv').value = vehicleText();
   }
+  var YR_MIN=1995, YR_MAX=new Date().getFullYear()+1;
+
+  // Turn [[2015,2024],[2026,null]] into the set of years it covers.
+  function yearsFrom(windows){
+    var out={};
+    (windows||[]).forEach(function(w){
+      var a=Math.max(w[0], YR_MIN), b=Math.min(w[1]==null?YR_MAX:w[1], YR_MAX);
+      for(var y=a; y<=b; y++) out[y]=1;
+    });
+    return out;
+  }
+  function allYears(){ var o={}; for(var y=YR_MIN;y<=YR_MAX;y++) o[y]=1; return o }
+
+  /* Which years this exact car was sold. Model narrows it; trim narrows it further.
+     If a trim window somehow misses the model window entirely, the model wins —
+     better a year too many than blocking the car someone actually owns. */
+  // "1995–2001 and 2023 to now" — describe the real windows, gaps included.
+  // A min-to-max label would quietly claim the Integra was sold every year since 1995.
+  function describeRuns(ys){
+    var runs=[], i=0;
+    while(i<ys.length){
+      var a=ys[i], b=a;
+      while(i+1<ys.length && ys[i+1]===b+1){ b=ys[++i] }
+      runs.push([a,b]); i++;
+    }
+    var parts=runs.map(function(r){
+      if(r[1]>=YR_MAX) return r[0]+' to now';
+      return r[0]===r[1] ? String(r[0]) : r[0]+'–'+r[1];
+    });
+    return parts.length<3
+      ? parts.join(' and ')
+      : parts.slice(0,-1).join(', ')+' and '+parts[parts.length-1];
+  }
+
+  function allowedYears(){
+    var mk=$('vmk').value, md=$('vmd').value, tr=$('vtr')?$('vtr').value:'';
+    if(!mk || !md || md==='__other') return {set:allYears(), label:''};
+
+    var mw=((window.MODEL_YEARS||{})[mk]||{})[md];
+    var set = mw ? yearsFrom(mw) : allYears();
+
+    // A trim can narrow a model that has no window of its own — a Corvette runs
+    // every year, a Corvette Z06 does not.
+    if(tr && tr!=='__other'){
+      var tw=((window.TRIM_YEARS||{})[mk]||{})[tr];
+      if(tw){
+        var t=yearsFrom(tw), both={}, n=0;
+        Object.keys(set).forEach(function(y){ if(t[y]){ both[y]=1; n++ } });
+        if(n) set=both;   // empty intersection => keep the model window, never nothing
+      }
+    }
+    var ys=Object.keys(set).map(Number).sort(function(a,b){return a-b});
+    if(!ys.length) return {set:allYears(), label:''};
+    if(ys.length >= (YR_MAX-YR_MIN+1)) return {set:set, label:''};
+    var name=[md, (tr && tr!=='__other') ? tr : ''].filter(Boolean).join(' ');
+    return {set:set, label:name+' — sold '+describeRuns(ys)};
+  }
+
+  function syncYears(){
+    var yr=$('vyr'); if(!yr) return;
+    var keep=yr.value, a=allowedYears();
+    var ys=Object.keys(a.set).map(Number).sort(function(x,y){return y-x});
+    var ready=!!($('vmk').value && $('vmd').value);
+    yr.innerHTML=''; yr.disabled=!ready;
+    if(!ready){ opt(yr,'','Pick a model first'); }
+    else{
+      opt(yr,'','Year');
+      ys.forEach(function(y){ opt(yr,String(y)) });
+      if(keep && a.set[keep]) yr.value=keep;
+    }
+    var n=$('yrNote');
+    if(n){ n.hidden=!(ready && a.label); n.textContent=a.label; }
+  }
+
   (function initVehicle(){
     var V=window.VEHICLES||{}, yr=$('vyr'), mk=$('vmk'), md=$('vmd');
     if(!yr||!mk||!md) return;
-    var now=new Date().getFullYear();
-    for(var y=now+1; y>=1995; y--) opt(yr, String(y));
     Object.keys(V).forEach(function(m){ opt(mk, m) });
 
     mk.addEventListener('change', function(){
@@ -100,6 +175,7 @@
     });
     [yr,md,$('vtr')].forEach(function(el){ if(el) el.addEventListener('change', syncVehicle) });
     $('vOther').addEventListener('input', syncVehicle);
+    syncYears();
   })();
 
   (function initTowns(){

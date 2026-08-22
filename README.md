@@ -399,3 +399,30 @@ the vehicle string. Switching to a make without trims clears and hides the field
 stale trim can never ride along on the wrong car.
 
 Adding a make to `TRIMS` is all it takes to turn the field on for it.
+
+
+## Year narrowing
+
+Field order is **Make → Model → Trim → Year**, because the year list depends on the rest.
+
+`window.MODEL_YEARS` holds production windows for 325 models and `window.TRIM_YEARS` for
+47 trims. Both are keyed by make first, so McLaren's "GT" and Ford's "GT" never collide.
+Every value is an **array of windows** — `[[1995,2001],[2023,null]]` — because the Integra,
+the Bronco, the Camaro and the Demon all came, went and came back. `null` means still sold.
+
+- The model window sets the year list; the trim window narrows it further.
+- A trim narrows even when the model has no window of its own — a Corvette runs every year,
+  a Corvette Z06 does not.
+- If a trim window and a model window somehow don't overlap, **the model wins**. The list
+  is never allowed to come out empty.
+- Anything with no entry shows the full range, so a missing model is harmless.
+- Selecting a year then narrowing past it clears the year rather than keeping a wrong one.
+- Changing model clears the trim, so an STO can't follow you onto a Urus.
+
+The note under the field describes the real windows, gaps included — *"Integra — sold
+1995–2001 and 2023 to now"*. A plain min-to-max label would quietly claim it was sold
+every year in between.
+
+**Where a date was uncertain the window was widened, not narrowed.** Offering a year that
+never existed is a shrug; blocking the year someone actually owns is a lost booking. If a
+customer ever tells you their year is missing, fix that model's entry — it's one line.

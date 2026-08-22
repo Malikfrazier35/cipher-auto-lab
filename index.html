@@ -357,8 +357,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 40px}
 .stickybar .btn{flex:1}
 
 /* ---------- VEHICLE / TOWN PICKERS ---------- */
-.row3{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:520px){.row3{grid-template-columns:.72fr 1fr 1.15fr}}
+.yrfld{max-width:230px}
 .fldnote{font-size:12px;color:var(--dim);margin-top:7px;line-height:1.5}
 .opt-lbl{color:var(--dim);letter-spacing:0;text-transform:none;font-weight:400}
 .fldnote.warn{color:#E3B341}
@@ -834,9 +833,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
         <div class="pane" data-p="2">
           <div class="qh">Tell us about the vehicle.</div>
           <div class="qs">The more we know, the tighter the number.</div>
-          <div class="row3">
-            <div class="fld"><label for="vyr">Year</label>
-              <select id="vyr"><option value="">Year</option></select></div>
+          <div class="row">
             <div class="fld"><label for="vmk">Make</label>
               <select id="vmk"><option value="">Make</option></select></div>
             <div class="fld"><label for="vmd">Model</label>
@@ -845,6 +842,11 @@ select:disabled{opacity:.5;cursor:not-allowed}
           <div class="fld" id="vTrimWrap" hidden>
             <label for="vtr">Trim <span class="opt-lbl">— changes the work on these</span></label>
             <select id="vtr"><option value="">Not sure / standard</option></select>
+          </div>
+          <div class="fld yrfld">
+            <label for="vyr">Year</label>
+            <select id="vyr" disabled><option value="">Pick a model first</option></select>
+            <p class="fldnote" id="yrNote" hidden></p>
           </div>
           <div class="fld" id="vOtherWrap" hidden>
             <label for="vOther">Tell us what it is</label>
