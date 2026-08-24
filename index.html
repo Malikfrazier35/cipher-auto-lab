@@ -14,7 +14,8 @@
   --max:1120px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
   background:var(--bg);color:var(--ink);
   font-family:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -410,6 +411,270 @@ select:disabled{opacity:.5;cursor:not-allowed}
 .flegal a:hover{color:var(--ink);text-decoration:underline}
 @media(min-width:760px){.stickybar{display:none}}
 @media(max-width:759px){body{padding-bottom:70px}}
+
+/* ============ BOOKING FLOOR PLAN ============ */
+/* Step 1 is three doors and nothing else. Everything priced above a Full Detail
+   lives behind step 3 — reachable, but not the first thing a stranger sees. */
+.doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px}
+.door{background:#0B0E12;border:1px solid #242C36;border-radius:11px;padding:20px 19px 18px;
+  cursor:pointer;transition:.14s;text-align:left;font-family:inherit;color:var(--ink);
+  display:block;width:100%;position:relative}
+.door:hover{border-color:#38434F}
+.door.sel{border-color:var(--acc);background:rgba(163,230,53,.07)}
+.door .dnm{display:block;font-size:18px;font-weight:750;letter-spacing:-.01em}
+.door .dfrom{display:block;font-family:ui-monospace,Menlo,monospace;font-size:19px;
+  font-weight:700;color:var(--acc);margin:9px 0 2px;letter-spacing:-.02em}
+.door .dfrom em{font-style:normal;font-size:11px;color:var(--mute);font-weight:500}
+.door .dwho{display:block;font-size:12.5px;color:var(--mute);line-height:1.5;margin-top:8px}
+.door .dhrs{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.door .dflag{position:absolute;top:-9px;right:14px;background:var(--acc);color:#08110A;
+  font-size:9.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+  padding:3px 8px;border-radius:20px}
+.door.sel .dhrs{border-top-color:rgba(163,230,53,.22)}
+.bundleline{margin-top:13px;font-size:12.5px;color:var(--mute);line-height:1.6}
+.bundleline b{color:#A3E635;font-family:ui-monospace,Menlo,monospace}
+.deepnote{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--dim);line-height:1.6}
+
+/* The price bar. A range at the door, an exact number here, and it never moves again. */
+.pricebar{margin-top:22px;padding:16px 19px;border:1px solid var(--line);border-radius:11px;
+  background:linear-gradient(180deg,#101A14,#0D1210);display:flex;justify-content:space-between;
+  align-items:center;gap:18px;flex-wrap:wrap}
+.pricebar .pbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.pricebar .pbv{font-size:29px;font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.pricebar .pbn{font-size:12px;color:var(--mute);max-width:34ch;text-align:right;line-height:1.55}
+.pricebar .pbn b{color:#A3E635}
+@media(max-width:560px){.pricebar .pbn{text-align:left}}
+.pbitems{margin-top:11px;padding-top:11px;border-top:1px solid rgba(163,230,53,.16);
+  font-size:12px;color:var(--mute);line-height:1.7;width:100%}
+.pbitems span{display:block}
+.pbitems i{font-style:normal;color:var(--dim);float:right;font-family:ui-monospace,Menlo,monospace}
+
+/* Add-ons: the aisle on the way to the counter. Every one carries a duration,
+   because a time turns a fee into a service. */
+.addlist{display:grid;gap:9px}
+.addrow{background:#0B0E12;border:1px solid #242C36;border-radius:9px;padding:13px 15px;
+  cursor:pointer;transition:.14s;text-align:left;font-family:inherit;color:var(--ink);
+  display:flex;align-items:center;gap:13px;width:100%}
+.addrow:hover{border-color:#38434F}
+.addrow.sel{border-color:var(--acc);background:rgba(163,230,53,.07)}
+.addrow .tick{flex:0 0 19px;height:19px;border:1.5px solid #38434F;border-radius:5px;
+  display:grid;place-items:center;transition:.14s}
+.addrow.sel .tick{background:var(--acc);border-color:var(--acc)}
+.addrow .tick svg{width:12px;height:12px;stroke:#08110A;stroke-width:3.2;fill:none;opacity:0}
+.addrow.sel .tick svg{opacity:1}
+.addrow .atx{flex:1 1 auto;min-width:0}
+.addrow .atx b{display:block;font-size:14px;font-weight:650}
+.addrow .atx span{display:block;font-size:12px;color:var(--mute);line-height:1.45;margin-top:2px}
+.addrow .adur{flex:0 0 auto;font-size:11px;color:var(--dim);letter-spacing:.06em;
+  font-family:ui-monospace,Menlo,monospace}
+.addrow .apz{flex:0 0 auto;font-family:ui-monospace,Menlo,monospace;font-size:14px;
+  font-weight:700;color:var(--acc);min-width:52px;text-align:right}
+@media(max-width:520px){.addrow .adur{display:none}}
+.bundlehint{margin-top:9px;font-size:12px;color:#A3E635;line-height:1.5}
+
+/* The paint room. Different flooring on purpose — you have walked somewhere else.
+   Full-width cards, real explanation, and what each one will NOT do. */
+.paintroom{margin-top:34px;padding:26px 22px 22px;border:1px solid #2A3340;border-radius:13px;
+  background:linear-gradient(180deg,#0D1117,#0A0D11)}
+.paintroom .prh{font-size:19px;font-weight:750;letter-spacing:-.01em}
+.paintroom .prs{font-size:13px;color:var(--mute);line-height:1.65;margin-top:7px;max-width:56ch}
+.paintcards{display:grid;gap:10px;margin-top:20px}
+.pcard{background:#0B0E12;border:1px solid #242C36;border-radius:10px;padding:16px 18px;
+  cursor:pointer;transition:.14s;text-align:left;font-family:inherit;color:var(--ink);
+  display:block;width:100%}
+.pcard:hover{border-color:#38434F}
+.pcard.sel{border-color:var(--acc);background:rgba(163,230,53,.06)}
+.pcard .pct{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.pcard .pcn{font-size:15.5px;font-weight:700}
+.pcard .pcp{font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;
+  color:var(--acc);white-space:nowrap}
+.pcard .pcd{display:block;font-size:12.5px;color:var(--mute);line-height:1.55;margin-top:7px}
+.pcard .pcno{display:block;font-size:12px;color:var(--dim);line-height:1.5;margin-top:7px;
+  padding-left:12px;border-left:2px solid #2A3340}
+.pcard .pchr{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+  margin-top:9px;display:block}
+.pcnone{margin-top:10px}
+.swapnote{margin-top:14px;padding:13px 15px;border:1px solid rgba(163,230,53,.3);border-radius:9px;
+  background:rgba(163,230,53,.06);font-size:12.5px;line-height:1.6;color:var(--mute)}
+.swapnote b{color:#A3E635}
+.swapnote button{margin-top:9px;background:none;border:1px solid var(--acc);color:var(--acc);
+  font-family:inherit;font-size:12px;font-weight:650;padding:6px 13px;border-radius:7px;cursor:pointer}
+.swapnote button:hover{background:rgba(163,230,53,.12)}
+
+/* Four-tier price grid on the marketing side of the page */
+.tiertbl{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+.tiertbl th,.tiertbl td{padding:13px 14px;text-align:right;border-bottom:1px solid var(--line)}
+.tiertbl th:first-child,.tiertbl td:first-child{text-align:left}
+.tiertbl thead th{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mute);font-weight:600}
+.tiertbl tbody td{font-family:ui-monospace,Menlo,monospace;font-weight:650}
+.tiertbl tbody td:first-child{font-family:inherit;font-weight:500;color:var(--mute)}
+.tiertbl .hi{color:var(--acc)}
+.tiertbl tbody tr:last-child td{border-bottom:none}
+.tscroll{overflow-x:auto}
+
+/* ============ PHOTO QUOTE — the light room ============
+   Deliberately the only light band on the site. It is the top of the funnel and
+   it should not look like the rest of the page: a different room, entered on
+   purpose. Tokens are scoped to the section so nothing leaks into the dark UI. */
+#photoquote{
+  --pq-bg:#F1F4EE; --pq-panel:#FFFFFF; --pq-sunk:#E8EDE3;
+  --pq-ink:#111814; --pq-body:#3A453D; --pq-mute:#6C776F; --pq-faint:#9AA69D;
+  --pq-line:#D9E0D3; --pq-hair:#E6EBE1;
+  --pq-acc:#2F6B21; --pq-lime:#8CC63F;
+  background:var(--pq-bg); color:var(--pq-body);
+  padding:clamp(56px,7vw,88px) 0;
+  border-top:1px solid #1B2129; border-bottom:1px solid #1B2129;
+}
+.pqwrap{display:flex;flex-direction:column;gap:38px}
+.pqhead{max-width:60ch;display:flex;flex-direction:column;gap:14px}
+.pqeyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--pq-acc);
+  display:flex;align-items:center;gap:9px}
+.pqeyebrow::before{content:"";width:22px;height:2px;background:var(--pq-lime);border-radius:2px}
+#photoquote h2{color:var(--pq-ink);font-size:clamp(26px,4.2vw,40px);letter-spacing:-.025em;
+  line-height:1.08;margin:0}
+#photoquote .pqhead p{color:var(--pq-body);font-size:16.5px;line-height:1.66;margin:0}
+#photoquote .pqfoot{color:var(--pq-mute);font-size:14.5px}
+
+.pqcols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,3.4vw,46px);align-items:start}
+@media(max-width:900px){
+  .pqcols{grid-template-columns:1fr}
+  /* On a phone the form is the thing to do and the shot guide is reference, so
+     the guide moves below it rather than making you scroll past four diagrams. */
+  .pqform{order:1}
+  .pqguide{order:2}
+}
+
+/* ---- the shot guide: instrument diagrams, not photographs ---- */
+.pqgh{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--pq-mute);
+  margin-bottom:14px}
+.pqshots{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:359px){.pqshots{grid-template-columns:1fr}}
+.pqshot{margin:0;background:var(--pq-panel);border:1px solid var(--pq-line);border-radius:12px;
+  padding:12px 14px 15px;display:flex;flex-direction:column;gap:8px}
+.pqshot svg{display:block;width:100%;height:auto;background:var(--pq-sunk);border-radius:8px}
+.pqshot .body{fill:#fff;stroke:var(--pq-ink);stroke-width:2.4}
+.pqshot .glass{fill:var(--pq-sunk);stroke:var(--pq-ink);stroke-width:1.8}
+.pqshot .wheel{fill:var(--pq-ink)}
+.pqshot .ln{fill:none;stroke:var(--pq-ink);stroke-width:1.6;stroke-linecap:round}
+.pqshot .door{fill:none;stroke:var(--pq-ink);stroke-width:2.2;stroke-linejoin:round}
+.pqshot .cone{fill:var(--pq-lime);fill-opacity:.34;stroke:var(--pq-acc);stroke-width:1.4;
+  stroke-linejoin:round}
+.pqshot .cam{fill:var(--pq-acc)}
+.pqshot .hatch path{fill:none;stroke:var(--pq-faint);stroke-width:1.6;stroke-linecap:round}
+.pqshot .lens{fill:none;stroke:var(--pq-ink);stroke-width:2.6}
+.pqshot .grip{fill:none;stroke:var(--pq-ink);stroke-width:5;stroke-linecap:round}
+.pqshot .spark{fill:none;stroke:var(--pq-acc);stroke-width:2.2;stroke-linecap:round}
+.pqshot figcaption{font-size:12.5px;line-height:1.5;color:var(--pq-mute)}
+.pqshot figcaption b{display:block;color:var(--pq-ink);font-size:13.5px;font-weight:650;
+  margin-bottom:3px}
+.pqtip{margin:14px 0 0;font-size:13.5px;line-height:1.6;color:var(--pq-mute);
+  padding-left:14px;border-left:2px solid var(--pq-lime)}
+.pqtip b{color:var(--pq-ink)}
+
+/* ---- the form ---- */
+.pqform{background:var(--pq-panel);border:1px solid var(--pq-line);border-radius:14px;
+  padding:clamp(20px,2.6vw,30px);box-shadow:0 1px 2px rgba(17,24,20,.05),0 18px 40px -28px rgba(17,24,20,.4)}
+/* The site sets a dark card on bare `form`. This one lives inside its own light
+   panel, so it must not carry that treatment. */
+#pqForm{background:none;border:none;border-radius:0;padding:0}
+/* `hidden` loses to any display rule, so both states have to say so explicitly. */
+#pqForm[hidden],.pqdone[hidden],.pqerr[hidden]{display:none}
+.pqfh{display:flex;align-items:center;gap:10px;margin:22px 0 9px}
+.pqfh:first-child{margin-top:0}
+.pqstep{font-size:11px;font-weight:600;color:var(--pq-acc);background:var(--pq-sunk);
+  border-radius:5px;padding:3px 7px;letter-spacing:.06em}
+.pqfh label{font-size:14.5px;font-weight:650;color:var(--pq-ink)}
+
+.pqdrop{position:relative;border:1.6px dashed var(--pq-line);border-radius:11px;
+  background:var(--pq-sunk);padding:26px 18px;text-align:center;transition:.15s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.pqdrop:hover,.pqdrop.over{border-color:var(--pq-acc);background:#E3EBDC}
+.pqdrop input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.pqdrop svg{width:26px;height:26px;fill:none;stroke:var(--pq-acc);stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+.pqdrop b{font-size:15px;color:var(--pq-ink);font-weight:650}
+.pqdrop span{font-size:12.5px;color:var(--pq-mute);line-height:1.5;max-width:38ch}
+.pqdrop.full{padding:16px 18px}
+
+.pqthumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;
+  margin-top:10px}
+.pqthumbs:empty{display:none}
+.pqth{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;
+  border:1px solid var(--pq-line);background:var(--pq-sunk)}
+.pqth img{width:100%;height:100%;object-fit:cover;display:block}
+.pqth button{position:absolute;top:4px;right:4px;width:21px;height:21px;border-radius:50%;
+  border:none;background:rgba(17,24,20,.78);color:#fff;font-size:13px;line-height:1;
+  cursor:pointer;display:grid;place-items:center;padding:0}
+.pqth button:hover{background:#111814}
+.pqth .sz{position:absolute;left:0;right:0;bottom:0;background:rgba(17,24,20,.72);color:#fff;
+  font-size:9.5px;letter-spacing:.05em;text-align:center;padding:2px 0;
+  font-family:ui-monospace,Menlo,monospace}
+
+.pqrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.pqrow{grid-template-columns:1fr}}
+.pqfld{margin-top:10px}
+.pqfld:first-child{margin-top:0}
+.pqrow .pqfld{margin-top:0}
+#photoquote input[type=text],#photoquote input[type=tel],#photoquote select,#photoquote textarea,
+.pqform input:not([type=file]),.pqform select,.pqform textarea{
+  width:100%;background:var(--pq-panel);border:1px solid var(--pq-line);border-radius:9px;
+  padding:12px 13px;color:var(--pq-ink);font-family:inherit;font-size:15px;transition:.14s;
+  -webkit-appearance:none;appearance:none}
+.pqform textarea{resize:vertical;line-height:1.55;min-height:76px}
+.pqform select{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236C776F' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;background-size:11px;
+  padding-right:34px}
+.pqform input::placeholder,.pqform textarea::placeholder{color:var(--pq-faint)}
+.pqform input:focus,.pqform select:focus,.pqform textarea:focus{
+  outline:none;border-color:var(--pq-acc);box-shadow:0 0 0 3px rgba(140,198,63,.28)}
+.pqform input.bad,.pqform select.bad{border-color:#C0392B;box-shadow:0 0 0 3px rgba(192,57,43,.14)}
+
+.pqsubmit{width:100%;margin-top:20px;justify-content:center}
+.pqsubmit[disabled]{opacity:.62;cursor:progress}
+.pqerr{margin:14px 0 0;font-size:13.5px;color:#A9301F;background:#FBEAE7;
+  border:1px solid #F0C9C2;border-radius:9px;padding:11px 13px;line-height:1.5}
+.pqfine{margin:13px 0 0;font-size:12px;line-height:1.55;color:var(--pq-mute)}
+.pqfine a{color:var(--pq-acc);text-decoration:underline;text-underline-offset:2px}
+
+.pqdone{text-align:center;padding:22px 8px 10px;display:flex;flex-direction:column;
+  align-items:center;gap:11px}
+.pqtick{width:52px;height:52px;border-radius:50%;background:var(--pq-lime);display:grid;
+  place-items:center}
+.pqtick svg{width:26px;height:26px;fill:none;stroke:#11290A;stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.pqdone h3{color:var(--pq-ink);font-size:23px;margin:0;letter-spacing:-.02em}
+.pqdone p{margin:0;font-size:15px;color:var(--pq-body);line-height:1.6;max-width:44ch}
+.pqdone .mono{color:var(--pq-acc);font-weight:650}
+.pqdone a{color:var(--pq-acc)}
+@media(prefers-reduced-motion:reduce){.pqdrop{transition:none}}
+
+/* the Job Card handoff on the confirmation screen */
+.jobcard{margin-top:22px;padding:20px;border:1px solid rgba(163,230,53,.3);border-radius:12px;
+  background:linear-gradient(180deg,#111A0E,#0C120A);text-align:left}
+.jobcard .jc-l{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc)}
+.jobcard p{margin:8px 0 15px;font-size:13.5px;line-height:1.6;color:var(--mute)}
+.jobcard p b{color:var(--ink)}
+.jobcard .btn{width:100%;justify-content:center}
+.jobcard .jc-n{display:block;margin-top:10px;font-size:12px;color:var(--dim)}
+
+/* ---------- FLEET CALLOUT ---------- */
+#fleetcta{padding-top:0}
+.fcta{display:grid;grid-template-columns:1.35fr 1fr;gap:clamp(20px,3vw,40px);align-items:center;
+  border:1px solid var(--line);border-radius:14px;padding:clamp(24px,3.4vw,38px);
+  background:linear-gradient(120deg,#0E1318,#0A0D10)}
+@media(max-width:760px){.fcta{grid-template-columns:1fr}}
+.fcta h2{font-size:clamp(21px,3vw,29px);margin:10px 0 0;letter-spacing:-.02em}
+.fcta p{margin:13px 0 20px;font-size:15px;line-height:1.65;color:var(--mute);max-width:52ch}
+.fcta p b{color:var(--acc);font-family:ui-monospace,Menlo,monospace}
+.fnums{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.fnums div{background:#0B0E12;padding:16px 17px}
+.fnums b{display:block;font-family:ui-monospace,Menlo,monospace;font-size:19px;color:var(--ink);
+  letter-spacing:-.02em}
+.fnums span{display:block;font-size:11.5px;color:var(--mute);margin-top:3px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -451,10 +716,13 @@ select:disabled{opacity:.5;cursor:not-allowed}
       <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
     </a>
     <div class="hdr-r">
+      <a class="navlink" href="#photoquote">Free quote</a>
       <a class="navlink" href="#packages">Packages</a>
+      <a class="navlink" href="#addons">Add-ons</a>
       <a class="navlink" href="#restoration">Restoration</a>
       <a class="navlink" href="#how">How it works</a>
       <a class="navlink" href="#area">Service area</a>
+      <a class="navlink" href="/fleet">Fleet</a>
       <a class="soc-hdr" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me" aria-label="Cipher Auto Lab on Facebook" title="Facebook">
         <svg><use href="#ic-fb"/></svg>
       </a>
@@ -472,8 +740,8 @@ select:disabled{opacity:.5;cursor:not-allowed}
     <h1>Your car gets the <em>lab treatment</em>. In your own driveway.</h1>
     <p class="sub">Fully mobile detailing and ceramic coating from New Haven and the Valley up through central Connecticut. We bring the water, the power, and a documented process — you don't move the car or lose your Saturday.</p>
     <div class="cta">
-      <a class="btn btn-p btn-lg" href="#quote">Get a free quote</a>
-      <a class="btn btn-o btn-lg" href="sms:+12035929589">Text us a photo</a>
+      <a class="btn btn-p btn-lg" href="#photoquote">Get a free photo quote</a>
+      <a class="btn btn-o btn-lg" href="#quote">Book a slot</a>
     </div>
     <p class="hnote">Owner-operated · Connecticut LLC, insured · Fixed price agreed before we start · 30+ towns covered</p>
 
@@ -507,8 +775,8 @@ select:disabled{opacity:.5;cursor:not-allowed}
         <span>Acura TLX A-Spec — mid-wash, foam still lifting grit off the bumper.</span>
       </div>
       <div class="shot">
-        <img src="img/civic-foam.webp?v=2" alt="Iron fallout remover reacting purple on the rear of a white Honda Civic" loading="lazy">
-        <span>Iron remover bleeding purple — that colour is brake dust dissolving out of the paint.</span>
+        <img src="img/civic-foam.webp?v=2" alt="Iron fallout remover reacting purple as it dissolves embedded iron from the paint of a white Honda Civic" loading="lazy">
+        <span>Iron decontamination working. The purple is embedded iron — rail dust, industrial fallout, brake dust — dissolving out of the clear coat. Soap never touches it.</span>
       </div>
       <div class="shot">
         <img src="img/ilx-mat.webp?v=2" alt="Clean Acura ILX floor mat and parchment leather seat after detailing" loading="lazy">
@@ -522,61 +790,267 @@ select:disabled{opacity:.5;cursor:not-allowed}
   </div>
 </section>
 
+<!-- ===== PHOTO QUOTE ===== -->
+<section id="photoquote">
+  <div class="wrap pqwrap">
+
+    <div class="pqhead">
+      <div class="pqeyebrow mono">Free photo quote</div>
+      <h2>Send four photos. Get a real number back.</h2>
+      <p>Not a range, not "starting from" — the actual price for your actual car, usually within the
+        hour on a working day. We quote off what we can see rather than what you had to remember to
+        mention, which is why the number doesn't move afterwards.</p>
+      <p class="pqfoot">No account, no card, no mailing list. If the answer is "your car doesn't need
+        that yet", you'll get that answer too.</p>
+    </div>
+
+    <div class="pqcols">
+
+      <div class="pqguide">
+        <div class="pqgh mono">What to send</div>
+        <div class="pqshots">
+
+          <figure class="pqshot">
+            <svg viewBox="0 0 200 150" role="img" aria-label="Overhead diagram: stand at the front left corner of the car">
+              <g class="car">
+                <rect class="body" x="42" y="44" width="116" height="60" rx="19"/>
+                <rect class="glass" x="76" y="55" width="46" height="38" rx="8"/>
+                <path class="ln" d="M70 50 L78 55 M70 98 L78 93"/>
+                <rect class="wheel" x="58" y="36" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="58" y="103" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="124" y="36" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="124" y="103" width="20" height="9" rx="4"/>
+              </g>
+              <path class="cone" d="M20 22 L64 44 L44 74 Z"/>
+              <circle class="cam" cx="20" cy="22" r="6.5"/>
+            </svg>
+            <figcaption><b>Front three-quarter</b>Stand at the front corner so one side and the
+              whole front are in frame.</figcaption>
+          </figure>
+
+          <figure class="pqshot">
+            <svg viewBox="0 0 200 150" role="img" aria-label="Overhead diagram: stand at the rear right corner of the car">
+              <g class="car">
+                <rect class="body" x="42" y="44" width="116" height="60" rx="19"/>
+                <rect class="glass" x="76" y="55" width="46" height="38" rx="8"/>
+                <path class="ln" d="M70 50 L78 55 M70 98 L78 93"/>
+                <rect class="wheel" x="58" y="36" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="58" y="103" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="124" y="36" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="124" y="103" width="20" height="9" rx="4"/>
+              </g>
+              <path class="cone" d="M180 128 L136 104 L156 76 Z"/>
+              <circle class="cam" cx="180" cy="128" r="6.5"/>
+            </svg>
+            <figcaption><b>Rear three-quarter</b>The opposite corner. Between the two we see every
+              panel on the car.</figcaption>
+          </figure>
+
+          <figure class="pqshot">
+            <svg viewBox="0 0 200 150" role="img" aria-label="Overhead diagram: open the driver's door and shoot across the cabin">
+              <g class="car">
+                <rect class="body" x="42" y="44" width="116" height="60" rx="19"/>
+                <rect class="glass" x="76" y="55" width="46" height="38" rx="8"/>
+                <path class="ln" d="M70 50 L78 55 M70 98 L78 93"/>
+                <rect class="wheel" x="58" y="36" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="58" y="103" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="124" y="36" width="20" height="9" rx="4"/>
+                <rect class="wheel" x="124" y="103" width="20" height="9" rx="4"/>
+              </g>
+              <path class="door" d="M84 103 L80 131 L112 135 L116 103"/>
+              <path class="cone" d="M100 126 L80 96 L124 96 Z"/>
+              <circle class="cam" cx="100" cy="126" r="6.5"/>
+            </svg>
+            <figcaption><b>Inside, from the open door</b>Driver's side, shooting across. Seats,
+              carpet and console in one frame.</figcaption>
+          </figure>
+
+          <figure class="pqshot">
+            <svg viewBox="0 0 200 150" role="img" aria-label="Diagram: a close-up of the specific mark or area that bothers you">
+              <g class="hatch">
+                <path d="M48 46 q14 8 28 0 M48 62 q14 8 28 0 M48 78 q14 8 28 0 M48 94 q14 8 28 0
+                         M84 54 q14 8 28 0 M84 70 q14 8 28 0 M84 86 q14 8 28 0
+                         M120 46 q14 8 28 0 M120 62 q14 8 28 0 M120 78 q14 8 28 0 M120 94 q14 8 28 0"/>
+              </g>
+              <circle class="lens" cx="104" cy="70" r="34"/>
+              <path class="grip" d="M128 94 L152 118"/>
+              <path class="spark" d="M92 62 q12 7 24 0 M92 76 q12 7 24 0"/>
+            </svg>
+            <figcaption><b>Whatever bothers you</b>The scuff, the stain, the swirls. Close, in
+              daylight, at an angle to the sun.</figcaption>
+          </figure>
+
+        </div>
+        <p class="pqtip"><b>Daylight, not a garage.</b> Swirls and water spots are invisible under
+          fluorescent light and obvious in the sun. If you can only shoot at night, say so and we'll
+          quote conservatively rather than optimistically.</p>
+      </div>
+
+      <div class="pqform">
+        <form id="pqForm" novalidate>
+          <div class="pqfh">
+            <span class="pqstep mono">01</span>
+            <label for="pqFiles">Your photos</label>
+          </div>
+          <div class="pqdrop" id="pqDrop">
+            <input type="file" id="pqFiles" accept="image/jpeg,image/png,image/webp,image/heic"
+                   multiple capture="environment">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17V6a2 2 0 012-2h3l1.6-2h4.8L18 4h3a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" transform="translate(-1 1)"/><circle cx="11" cy="12" r="4"/></svg>
+            <b id="pqDropLead">Tap to add photos</b>
+            <span>Up to six. They're shrunk on your phone before sending, so it won't eat your data.</span>
+          </div>
+          <div class="pqthumbs" id="pqThumbs"></div>
+
+          <div class="pqfh"><span class="pqstep mono">02</span><label for="pqPhone">How to reach you</label></div>
+          <div class="pqrow">
+            <div class="pqfld"><input id="pqName" placeholder="Your name" autocomplete="name" required></div>
+            <div class="pqfld"><input id="pqPhone" type="tel" placeholder="(203) 555-0100" autocomplete="tel" required></div>
+          </div>
+          <div class="pqfld"><select id="pqTown" required><option value="">Your town</option></select></div>
+
+          <div class="pqfh"><span class="pqstep mono">03</span><label for="pqSvc">What are you thinking?</label></div>
+          <div class="pqfld">
+            <select id="pqSvc">
+              <option value="Not sure — tell me what it needs">Not sure — tell me what it needs</option>
+              <option value="Exterior Detail">Exterior Detail</option>
+              <option value="Interior Detail">Interior Detail</option>
+              <option value="Full Detail">Full Detail</option>
+              <option value="Paint correction or ceramic">Paint correction or ceramic</option>
+              <option value="Headlights">Headlights</option>
+            </select>
+          </div>
+          <div class="pqfld">
+            <textarea id="pqNote" rows="3" placeholder="Anything worth knowing — the car, the timing, the thing in the back seat you'd rather we knew about first."></textarea>
+          </div>
+
+          <input class="hp" type="text" id="pqHp" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <p class="pqerr" id="pqErr" hidden></p>
+          <button type="submit" class="btn btn-p btn-lg pqsubmit" id="pqSend">Send for a price</button>
+          <p class="pqfine">Your photos go to us and nowhere else. We only use them for your quote —
+            if we ever want to put one on the site, we ask first. <a href="/privacy">Privacy policy</a></p>
+        </form>
+
+        <div class="pqdone" id="pqDone" hidden>
+          <div class="pqtick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>Got it.</h3>
+          <p>Reference <b id="pqRef" class="mono">—</b>. We'll come back with a real number — usually
+            within the hour Monday to Saturday, first thing if you sent this overnight.</p>
+          <p class="pqfine">Want it faster? Call or text <a href="tel:+12035929589">(203) 592-9589</a>
+            — the same photos by text work just as well.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ===== PACKAGES ===== -->
 <section id="packages">
   <div class="wrap">
     <div class="shead">
       <div class="eyebrow mono">Packages</div>
-      <h2>Straightforward pricing.</h2>
-      <p class="lede">Upkeep, not paint repair. These get a car clean and protected — if the paint itself needs fixing, that's the <a href="#restoration" style="color:var(--acc)">restoration menu</a>. Prices start where most cars land; oversized vehicles and heavy neglect cost more, and you'll hear that before we start, never after.</p>
+      <h2>Three services. Every price published.</h2>
+      <p class="lede">Exterior, interior, or both. What's in the base price is the work every car needs — the work only <em>some</em> cars need sits on the <a href="#addons" style="color:var(--acc)">add-on menu</a> with its own price and its own time, so you're not quietly paying for someone else's pet hair. If the paint itself needs fixing, that's the <a href="#restoration" style="color:var(--acc)">restoration menu</a>.</p>
     </div>
     <div class="pk">
 
       <div class="card">
-        <div class="pname mono">Refresh</div>
-        <div class="price">$149<small> &nbsp;starting</small></div>
-        <p class="pfor">For a clean car that needs to stay that way. Every 4–8 weeks.</p>
+        <div class="pname mono">Exterior Detail</div>
+        <div class="price">$109<small> &nbsp;sedan</small></div>
+        <p class="pfor">Outside only. Hand washed, dried and protected properly.</p>
         <ul class="feats">
-          <li>Hand wash, wheels &amp; tires</li>
-          <li>Chemical decontamination</li>
-          <li>6-month spray sealant</li>
-          <li>Interior vacuum &amp; wipe-down</li>
-          <li>Glass inside and out</li>
+          <li>Two-bucket hand wash, top down</li>
+          <li>Wheels, barrels, tires &amp; wheel wells</li>
+          <li>Door jambs and sills</li>
+          <li>Spray protection, tire dressing</li>
+          <li>Exterior glass, streak-free</li>
           <li>Roughly 2 hours</li>
         </ul>
-        <a class="btn btn-o" href="#quote" data-pre="refresh">Book Refresh</a>
+        <a class="btn btn-o" href="#quote" data-pre="exterior">Book Exterior</a>
       </div>
 
-      <div class="card">
-        <div class="pname mono">Interior Reset</div>
-        <div class="price">$199<small> &nbsp;starting</small></div>
-        <p class="pfor">Inside only. For pets, kids, spills and the cars that never get vacuumed.</p>
-        <ul class="feats">
-          <li>Full vacuum, seats and carpets out to the edges</li>
-          <li>Shampoo &amp; hot-water extraction</li>
-          <li>Leather clean &amp; condition</li>
-          <li>Vents, crevices and door jambs</li>
-          <li>Interior glass</li>
-          <li>Roughly 3 hours</li>
-        </ul>
-        <a class="btn btn-o" href="#quote" data-pre="interior">Book Interior Reset</a>
-      </div>
       <div class="card feat">
         <div class="flag">Most booked</div>
         <div class="pname mono">Full Detail</div>
-        <div class="price">$279<small> &nbsp;starting</small></div>
-        <p class="pfor">Deep clean, inside and out. No machine polishing — that lives on the restoration menu.</p>
+        <div class="price">$259<small> &nbsp;sedan</small></div>
+        <p class="pfor">Both, together. Cheaper than buying the two separately, and it's one visit instead of two.</p>
         <ul class="feats">
-          <li>Everything in Refresh</li>
-          <li>Clay bar &amp; iron decontamination</li>
-          <li>Shampoo &amp; hot-water extraction</li>
-          <li>Leather clean &amp; condition</li>
-          <li>Engine bay detail</li>
+          <li>Everything in Exterior</li>
+          <li>Everything in Interior</li>
+          <li>Trunk and cargo area included</li>
+          <li>Full walk-around before we leave</li>
           <li>Roughly 5 hours</li>
         </ul>
-        <a class="btn btn-p" href="#quote" data-pre="full-detail">Book Full Detail</a>
+        <a class="btn btn-p" href="#quote" data-pre="full">Book Full Detail</a>
       </div>
 
+      <div class="card">
+        <div class="pname mono">Interior Detail</div>
+        <div class="price">$169<small> &nbsp;sedan</small></div>
+        <p class="pfor">Inside only. For the car that gets driven, not the one that gets shown.</p>
+        <ul class="feats">
+          <li>Full vacuum — seats, carpets, out to the edges</li>
+          <li>All surfaces cleaned and dressed</li>
+          <li>Vents, crevices, cupholders, console</li>
+          <li>Mats cleaned and refitted</li>
+          <li>Interior glass</li>
+          <li>Roughly 3 hours</li>
+        </ul>
+        <a class="btn btn-o" href="#quote" data-pre="interior">Book Interior</a>
+      </div>
+
+    </div>
+
+    <div class="shead" style="margin-top:52px;margin-bottom:0">
+      <div class="eyebrow mono">Every size, every price</div>
+      <h2 style="font-size:clamp(20px,3vw,26px)">Bigger car, more hours. That's the whole rule.</h2>
+      <p class="lede">Interior work scales with seats. Exterior work scales with panel area. They're different curves, which is why there are four rows rather than a vague "SUVs cost more".</p>
+    </div>
+    <div class="tscroll">
+      <table class="tiertbl">
+        <thead><tr><th>Vehicle</th><th>Exterior</th><th>Interior</th><th>Full Detail</th><th>You save</th></tr></thead>
+        <tbody>
+          <tr><td>Sedan or coupe</td><td>$109</td><td>$169</td><td class="hi">$259</td><td>$19</td></tr>
+          <tr><td>SUV, 5 seats</td><td>$125</td><td>$185</td><td class="hi">$279</td><td>$31</td></tr>
+          <tr><td>SUV, 7 seats / 3-row</td><td>$135</td><td>$205</td><td class="hi">$305</td><td>$35</td></tr>
+          <tr><td>Truck or van</td><td>$139</td><td>$219</td><td class="hi">$325</td><td>$33</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede" style="margin-top:16px;font-size:13.5px">These are the prices, not starting points to be negotiated upward. A car in unusual condition — heavy pet hair, smoke, years of neglect — gets re-quoted <b style="color:#E4EAF0">on arrival, before anything is touched</b>, and you can walk away with the deposit back. The number never moves after the work is done.</p>
+  </div>
+</section>
+
+<!-- ===== ADD-ONS ===== -->
+<section id="addons">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Add-on menu</div>
+      <h2>The work only some cars need.</h2>
+      <p class="lede">Every one of these used to be buried in the package price, which meant the person whose carpets were fine was paying to shampoo somebody else's. Now each has a price and a time. Add them when you book, or decide with us on the driveway.</p>
+    </div>
+    <div class="addon">
+      <div class="ao"><b>Shampoo &amp; hot-water extraction</b><div class="p">$99</div>
+        <span>1 hour · Carpets and cloth seats, agitated and pulled back out. The one that actually resets an interior.</span></div>
+      <div class="ao"><b>Leather clean &amp; condition</b><div class="p">$79</div>
+        <span>45 min · pH-correct clean, then conditioned. Slows the cracking that starts on the driver's bolster.</span></div>
+      <div class="ao"><b>Stain removal</b><div class="p">$79</div>
+        <span>1 hour · Targeted work on specific marks. Old dye transfer and bleach are usually permanent — we'll say so before charging you.</span></div>
+      <div class="ao"><b>Pet hair removal</b><div class="p">$69<small style="font-size:13px"> +</small></div>
+        <span>45 min · Woven-in hair is a separate job from vacuuming. Heavy cases quoted on sight.</span></div>
+      <div class="ao"><b>Iron decontamination</b><div class="p">$69</div>
+        <span>45 min · Dissolves embedded iron out of the clear coat — rail dust, industrial fallout, brake dust. Soap never touches it.</span></div>
+      <div class="ao"><b>Clay bar</b><div class="p">$69</div>
+        <span>45 min · Lifts the bonded grit iron decon leaves behind. Take both together and it's <b style="color:#A3E635">$119</b>.</span></div>
+      <div class="ao"><b>6-month paint sealant</b><div class="p">$69</div>
+        <span>30 min · Machine-applied, lasts a season and a half. The sensible default if you're not coating the car.</span></div>
+      <div class="ao"><b>Ceramic spray coating</b><div class="p">$89</div>
+        <span>45 min · 6–12 months of real slickness. Not a five-year coating and we won't call it one.</span></div>
+      <div class="ao"><b>Engine bay</b><div class="p">$69</div>
+        <span>45 min · Degreased, rinsed carefully, dressed. Electronics covered first.</span></div>
+      <div class="ao"><b>Headlight restoration</b><div class="p">$89</div>
+        <span>1 hour · Wet sand, polish, UV seal, <b style="color:#E4EAF0">12-month clarity warranty</b>. $139 as a standalone visit.</span></div>
     </div>
   </div>
 </section>
@@ -587,29 +1061,29 @@ select:disabled{opacity:.5;cursor:not-allowed}
     <div class="shead">
       <div class="eyebrow mono">Restoration menu</div>
       <h2>When cleaning isn't enough.</h2>
-      <p class="lede">Detailing makes a car clean. Correction makes the paint <em>right</em> — it removes the swirls and haze that washing can't touch. Different job, different menu. Every correction starts with a test panel we photograph and show you before quoting.</p>
+      <p class="lede">Detailing makes a car clean. Machine polishing makes the paint <em>right</em> — it removes the swirls and haze that washing can't touch, because they're in the clear coat rather than on it. Different job, different menu. Every correction starts with a test panel we photograph and show you before quoting.</p>
     </div>
 
     <div class="rest">
       <div class="rcard">
         <div class="pname mono">Gloss Enhancement</div>
-        <div class="price">$349<small> &nbsp;from</small></div>
+        <div class="price">$349<small> &nbsp;sedan</small></div>
         <p class="pfor">One machine step. For paint that looks dull rather than damaged.</p>
         <ul class="feats">
           <li>Wash, iron decon, clay</li>
           <li>Single-stage machine polish</li>
-          <li>Removes 50–60% of swirls</li>
+          <li>Removes 50–60% of light swirls</li>
           <li>6-month sealant included</li>
           <li>Roughly 4 hours</li>
         </ul>
-        <div class="rsize"><span>SUV <b>$399</b></span><span>Truck / 3-row <b>$449</b></span></div>
+        <div class="rsize"><span>SUV <b>$399–429</b></span><span>Truck / van <b>$449</b></span></div>
         <a class="btn btn-o" href="#quote" data-pre="gloss">Book Gloss</a>
       </div>
 
       <div class="rcard feat">
         <div class="flag">Best value</div>
         <div class="pname mono">Paint Correction</div>
-        <div class="price">$749<small> &nbsp;from</small></div>
+        <div class="price">$749<small> &nbsp;sedan</small></div>
         <p class="pfor">Two stages — compound then refine. Removes most of what you can actually see.</p>
         <ul class="feats">
           <li>Everything in Gloss Enhancement</li>
@@ -618,7 +1092,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
           <li>Paint depth measured and recorded</li>
           <li>6–8 hours</li>
         </ul>
-        <div class="rsize"><span>SUV <b>$849</b></span><span>Truck / 3-row <b>$949</b></span></div>
+        <div class="rsize"><span>SUV <b>$849–899</b></span><span>Truck / van <b>$949</b></span></div>
         <a class="btn btn-p" href="#quote" data-pre="correction">Book Correction</a>
       </div>
 
@@ -639,16 +1113,18 @@ select:disabled{opacity:.5;cursor:not-allowed}
 
     <div class="shead" style="margin-top:56px;margin-bottom:20px">
       <div class="eyebrow mono">Protection</div>
-      <h2 style="font-size:clamp(21px,3vw,27px)">Coatings, priced separately.</h2>
-      <p class="lede">A coating locks in whatever is underneath it. We won't put one on uncorrected paint — you'd be sealing the swirls in for five years.</p>
+      <h2 style="font-size:clamp(21px,3vw,27px)">Two ways to buy a ceramic coating.</h2>
+      <p class="lede">A coating locks in whatever is underneath it for five years. So the only question that matters is what's underneath — and most places don't tell you. Here are both versions, priced honestly, with what's actually included stated on the card.</p>
     </div>
     <div class="addon">
-      <div class="ao"><b>6-month sealant</b><div class="p">Included</div>
-        <span>Baseline protection on every correction.</span></div>
-      <div class="ao"><b>1–2 year coating</b><div class="p">+$349</div>
-        <span>The sensible step up once the paint is right.</span></div>
-      <div class="ao"><b>3–5 year ceramic</b><div class="p">+$599</div>
-        <span>Correction + ceramic bundled: <b style="color:#A3E635">$1,249</b>. The only way we sell ceramic — never over uncorrected paint.</span></div>
+      <div class="ao" data-pre="ceramic" style="cursor:pointer"><b>Ceramic Coating</b><div class="p">$949</div>
+        <span>Sedan. Wash, iron decon, clay, <b style="color:#E4EAF0">single-stage polish</b>, then a 5-year coating.<br>
+        For paint that's already in decent shape. SUV $1,049–1,099 · Truck $1,149.</span></div>
+      <div class="ao" data-pre="corrceramic" style="cursor:pointer"><b>Correction + Ceramic</b><div class="p">$1,249</div>
+        <span>Sedan. Full <b style="color:#E4EAF0">two-stage correction</b> first, then the same 5-year coating.<br>
+        If the paint has swirls, this is the only version worth buying. SUV $1,399–1,449 · Truck $1,549.</span></div>
+      <div class="ao nope"><b>Coating over swirled paint</b><div class="p">Not offered</div>
+        <span>You'd be sealing the defects in for five years and paying for the privilege. We'll polish it first or we'll pass.</span></div>
     </div>
 
     <div class="shead" style="margin-top:56px;margin-bottom:20px">
@@ -658,9 +1134,9 @@ select:disabled{opacity:.5;cursor:not-allowed}
     </div>
     <div class="addon">
       <div class="ao"><b>Headlight Restoration</b><div class="p">$139 / pair</div>
-        <span>Wet sand, polish, UV sealant. <b style="color:#E4EAF0">12-month clarity warranty.</b><br>Single lens $89 · with any detail <b style="color:#A3E635">$99</b></span></div>
+        <span>Wet sand, polish, UV sealant. <b style="color:#E4EAF0">12-month clarity warranty.</b><br>Single lens $89 · added to any detail <b style="color:#A3E635">$89</b></span></div>
       <div class="ao"><b>+ Ceramic topper</b><div class="p">$189 / pair</div>
-        <span>Ceramic UV layer instead of sealant. <b style="color:#E4EAF0">24-month warranty.</b><br>With any detail <b style="color:#A3E635">$149</b></span></div>
+        <span>Ceramic UV layer instead of sealant. <b style="color:#E4EAF0">24-month warranty.</b><br>Added to any detail <b style="color:#A3E635">$149</b></span></div>
       <div class="ao nope"><b>Polish only</b><div class="p">Not offered</div>
         <span>Without a UV seal it hazes back within months. We'd rather lose the sale than sell you that.</span></div>
     </div>
@@ -724,6 +1200,28 @@ select:disabled{opacity:.5;cursor:not-allowed}
   </div>
 </section>
 
+<!-- ===== FLEET CALLOUT ===== -->
+<section id="fleetcta">
+  <div class="wrap">
+    <div class="fcta">
+      <div>
+        <div class="eyebrow mono">For businesses</div>
+        <h2>Run vans? There's a contract for that.</h2>
+        <p>Scheduled interior and exterior maintenance from <b>$28 a vehicle</b>, a named day every
+          month, one invoice on net 15, and a photographed condition report on every vehicle — so you
+          find out about the new dent from us rather than three weeks later.</p>
+        <a class="btn btn-p btn-lg" href="/fleet">See fleet pricing</a>
+      </div>
+      <div class="fnums">
+        <div><b>2+</b><span>vehicles to start</span></div>
+        <div><b>Net 15</b><span>one monthly invoice</span></div>
+        <div><b>COI</b><span>additional insured</span></div>
+        <div><b>30 days</b><span>notice, both ways</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== TINT ===== -->
 <section>
   <div class="wrap">
@@ -746,7 +1244,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
     <div class="contact-side">
       <div class="eyebrow mono">Book a slot</div>
       <h2>Pick a day. We'll come to you.</h2>
-      <p class="lede">Five steps, and you'll see the exact price, the deposit and the cancellation terms before you agree to anything. Nothing is hidden and nothing is charged on this page.</p>
+      <p class="lede">Six steps. You see the exact price for your actual vehicle at step two, and it stops moving there — the deposit and the cancellation terms are in front of you before you agree to anything.</p>
 
       <div style="margin-top:26px">
         <div class="cl">
@@ -772,67 +1270,55 @@ select:disabled{opacity:.5;cursor:not-allowed}
       <div class="steps-bar">
         <div class="sb on" data-sb="1"><i>01</i>Service</div>
         <div class="sb" data-sb="2"><i>02</i>Vehicle</div>
-        <div class="sb" data-sb="3"><i>03</i>When</div>
-        <div class="sb" data-sb="4"><i>04</i>Details</div>
+        <div class="sb" data-sb="3"><i>03</i>Add to it</div>
+        <div class="sb" data-sb="4"><i>04</i>When</div>
         <div class="sb" data-sb="5"><i>05</i>Confirm</div>
         <div class="sb" data-sb="6"><i>06</i>Deposit</div>
       </div>
       <div class="bkbody">
 
-        <!-- STEP 1 -->
+        <!-- STEP 1 — THE DOOR. Three choices, nothing else on the screen. -->
         <div class="pane on" data-p="1">
-          <div class="qh">What does the car need?</div>
-          <div class="qs">Not sure? Pick the middle one — we'll tell you honestly if it's more or less than that.</div>
-          <div class="optgroup mono">Maintenance · cleaning</div>
-          <div class="opts" id="svc">
-            <button type="button" class="opt" data-svc="Refresh" data-base="149" data-dep="25" data-key="refresh">
-              <b>Refresh</b><span>Wash, sealant, interior tidy. ~2 hrs.</span><span class="pz">from $149</span></button>
-            <button type="button" class="opt sel" data-svc="Full Detail" data-base="279" data-dep="40" data-key="full-detail">
-              <b>Full Detail</b><span>Deep clean inside and out. ~5 hrs.</span><span class="pz">from $279</span></button>
-            <button type="button" class="opt" data-svc="Interior Reset" data-base="199" data-dep="30" data-key="interior">
-              <b>Interior Reset</b><span>Inside only, extraction included. ~3 hrs.</span><span class="pz">from $199</span></button>
+          <div class="qh">Outside, inside, or both?</div>
+          <div class="qs">That's the only decision here. Everything else — extras, paint work, protection — comes after you've told us about the car, when we can price it properly.</div>
+          <div class="doors" id="svc">
+            <button type="button" class="door" data-key="exterior">
+              <span class="dnm">Exterior</span>
+              <span class="dfrom">from $109 <em>sedan</em></span>
+              <span class="dwho">Hand wash, wheels, jambs, glass and protection. The outside done properly.</span>
+              <span class="dhrs">About 2 hours</span>
+            </button>
+            <button type="button" class="door sel" data-key="full">
+              <span class="dflag">Most booked</span>
+              <span class="dnm">Full Detail</span>
+              <span class="dfrom">from $259 <em>sedan</em></span>
+              <span class="dwho">Both, in one visit. Cheaper than booking the two separately and you only give up one morning.</span>
+              <span class="dhrs">About 5 hours</span>
+            </button>
+            <button type="button" class="door" data-key="interior">
+              <span class="dnm">Interior</span>
+              <span class="dfrom">from $169 <em>sedan</em></span>
+              <span class="dwho">Vacuum, every surface, vents, mats and glass. The inside reset.</span>
+              <span class="dhrs">About 3 hours</span>
+            </button>
           </div>
 
-          <div class="optgroup mono" style="margin-top:22px">Restoration · machine paint work</div>
-          <div class="opts" id="svc2">
-            <button type="button" class="opt" data-svc="Gloss Enhancement" data-base="349" data-dep="50" data-key="gloss">
-              <b>Gloss Enhancement</b><span>One machine step. ~4 hrs.</span><span class="pz">from $349</span></button>
-            <button type="button" class="opt" data-svc="Paint Correction" data-base="749" data-dep="100" data-key="correction">
-              <b>Paint Correction</b><span>Two stages, 80–90% removal. ~7 hrs.</span><span class="pz">from $749</span></button>
-            <button type="button" class="opt" data-svc="Show Finish" data-base="1299" data-dep="150" data-key="show">
-              <b>Show Finish</b><span>Multi-stage. Confirmed after inspection.</span><span class="pz">from $1,299</span></button>
+          <div class="bundleline" id="bundleLine">
+            Exterior <b>$109</b> plus Interior <b>$169</b> is <b>$278</b>. Together it's <b>$259</b>.
           </div>
 
-          <div class="optgroup mono" style="margin-top:22px">Add on</div>
-          <div class="opts">
-            <button type="button" class="opt" id="hlToggle" data-addon="99">
-              <b>Headlight restoration</b><span>Wet sand, polish, UV seal. 12-month warranty.</span>
-              <span class="pz">+$99 with any booking <em style="font-style:normal;color:var(--dim)">(usually $139)</em></span></button>
-          </div>
-
-          <div class="qh" style="margin-top:28px">What are we working on?</div>
-          <div class="qs">Size drives how long it takes, so it drives the price.</div>
-          <div class="opts" id="size">
-            <button type="button" class="opt sel" data-size="Sedan / coupe" data-mult="1">
-              <b>Sedan or coupe</b><span>Civic, Accord, TLX, Sonata</span></button>
-            <button type="button" class="opt" data-size="SUV / crossover" data-mult="1.2">
-              <b>SUV or crossover</b><span>RAV4, Explorer, Grand Cherokee</span></button>
-            <button type="button" class="opt" data-size="Truck / 3-row" data-mult="1.4">
-              <b>Truck or 3-row</b><span>F-150, Suburban, Odyssey</span></button>
-          </div>
-
-          <div class="estimate">
-            <div><div class="el mono">Estimated</div><div class="ev" id="est">$279</div></div>
-            <div class="en">Starting figure for a car in normal condition. Heavy pet hair, smoke or neglect costs more — you'll be told before we start, never after. Holding the slot takes a <b style="color:#A3E635" id="depInline">$40</b> refundable deposit, which comes off this total.</div>
+          <div class="deepnote">
+            Looking for paint correction, a ceramic coating or headlights? They're all here — pick the
+            cleaning first and they come up at step three, priced for your actual car rather than "from".
           </div>
 
           <div class="navrow"><button type="button" class="btn btn-p btn-lg" data-go="2">Continue</button></div>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2 — VEHICLE. The price stops being a range here and never moves again. -->
         <div class="pane" data-p="2">
-          <div class="qh">Tell us about the vehicle.</div>
-          <div class="qs">The more we know, the tighter the number.</div>
+          <div class="qh">What are we working on?</div>
+          <div class="qs">Size drives hours and hours drive the price, so this is where the number becomes exact.</div>
           <div class="row">
             <div class="fld"><label for="vmk">Make</label>
               <select id="vmk"><option value="">Make</option></select></div>
@@ -853,7 +1339,20 @@ select:disabled{opacity:.5;cursor:not-allowed}
             <input id="vOther" placeholder="e.g. 2014 Saab 9-3" autocomplete="off">
           </div>
           <input type="hidden" id="bv">
-          <div class="row">
+
+          <div class="optgroup mono" style="margin-top:20px">Size</div>
+          <div class="opts" id="size">
+            <button type="button" class="opt sel" data-size="Sedan / coupe" data-tier="sedan">
+              <b>Sedan or coupe</b><span>Civic, Accord, TLX, 3-Series</span></button>
+            <button type="button" class="opt" data-size="SUV · 5 seat" data-tier="suv5">
+              <b>SUV, 5 seats</b><span>RAV4, CR-V, Grand Cherokee</span></button>
+            <button type="button" class="opt" data-size="SUV · 7 seat" data-tier="suv7">
+              <b>SUV, 7 seats</b><span>Telluride, Explorer, Suburban</span></button>
+            <button type="button" class="opt" data-size="Truck / van" data-tier="truck">
+              <b>Truck or van</b><span>F-150, Silverado, Odyssey</span></button>
+          </div>
+
+          <div class="row" style="margin-top:20px">
             <div class="fld"><label for="bc">Condition</label>
               <select id="bc">
                 <option>Normal — regular use</option>
@@ -868,15 +1367,153 @@ select:disabled{opacity:.5;cursor:not-allowed}
               </select></div>
           </div>
           <div class="fld"><label for="bn">Anything we should know? (optional)</label>
-            <textarea id="bn" placeholder="Coffee spill in the back seat, dog rides up front, brake dust on the fronts — all useful."></textarea></div>
+            <textarea id="bn" placeholder="Coffee spill in the back seat, dog rides up front, wheels haven't been done in a while — all useful."></textarea></div>
+
+          <div class="pricebar">
+            <div><div class="pbl mono">Your price</div><div class="pbv" id="pv2">$259</div></div>
+            <div class="pbn">Not a starting figure — this is the number for a <b id="pvSvc">Full Detail</b> on a <b id="pvSize">sedan</b>. It only changes if the car turns out to be something other than what you've told us, and we'd say so on arrival, not after.</div>
+          </div>
+
           <div class="navrow">
             <button type="button" class="btn ghost btn-lg" data-go="1">Back</button>
             <button type="button" class="btn btn-p btn-lg" data-go="3">Continue</button>
           </div>
         </div>
 
-        <!-- STEP 3 -->
+        <!-- STEP 3 — THE AISLE, THEN THE ROOM AT THE BACK.
+             Add-ons are contextual to the service chosen. Paint work sits below,
+             styled differently on purpose: you have walked somewhere else. -->
         <div class="pane" data-p="3">
+          <div class="qh">Anything else while we're there?</div>
+          <div class="qs" id="addIntro">All optional, all priced with the time they take. Skip the lot and continue — nothing here is required, and we'll tell you on the driveway if we think the car actually needs one.</div>
+
+          <div id="addInt">
+            <div class="optgroup mono" style="margin-top:18px">Inside</div>
+            <div class="addlist">
+              <button type="button" class="addrow" data-add="extract" data-price="99" data-lbl="Shampoo &amp; extraction">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Shampoo &amp; hot-water extraction</b><span>Carpets and cloth seats agitated and pulled back out. The one that actually resets an interior.</span></span>
+                <span class="adur">1 hr</span><span class="apz">$99</span></button>
+              <button type="button" class="addrow" data-add="leather" data-price="79" data-lbl="Leather clean &amp; condition">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Leather clean &amp; condition</b><span>pH-correct clean, then conditioned. Slows the cracking that starts on the driver's bolster.</span></span>
+                <span class="adur">45 min</span><span class="apz">$79</span></button>
+              <button type="button" class="addrow" data-add="stain" data-price="79" data-lbl="Stain removal">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Stain removal</b><span>Targeted work on specific marks. Old dye transfer and bleach are usually permanent — we'll say so rather than charge you.</span></span>
+                <span class="adur">1 hr</span><span class="apz">$79</span></button>
+              <button type="button" class="addrow" data-add="pethair" data-price="69" data-lbl="Pet hair removal">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Pet hair removal</b><span>Woven-in hair is a separate job from vacuuming. Heavy cases get quoted on sight.</span></span>
+                <span class="adur">45 min</span><span class="apz">$69</span></button>
+            </div>
+          </div>
+
+          <div id="addExt">
+            <div class="optgroup mono" style="margin-top:22px">Outside</div>
+            <div class="addlist">
+              <button type="button" class="addrow" data-add="iron" data-price="69" data-lbl="Iron decontamination">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Iron decontamination</b><span>Dissolves embedded iron out of the clear coat — rail dust, industrial fallout, brake dust. Soap never touches it.</span></span>
+                <span class="adur">45 min</span><span class="apz">$69</span></button>
+              <button type="button" class="addrow" data-add="clay" data-price="69" data-lbl="Clay bar">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Clay bar</b><span>Lifts the bonded grit that iron decon leaves behind. Take both and we bundle them.</span></span>
+                <span class="adur">45 min</span><span class="apz">$69</span></button>
+              <button type="button" class="addrow" data-add="sealant" data-price="69" data-lbl="6-month paint sealant">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>6-month paint sealant</b><span>Machine-applied, lasts a season and a half. The sensible default if you're not coating the car.</span></span>
+                <span class="adur">30 min</span><span class="apz">$69</span></button>
+              <button type="button" class="addrow" data-add="cspray" data-price="89" data-lbl="Ceramic spray coating">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Ceramic spray coating</b><span>Six to twelve months of real slickness. Not a five-year coating and we won't call it one.</span></span>
+                <span class="adur">45 min</span><span class="apz">$89</span></button>
+              <button type="button" class="addrow" data-add="engine" data-price="69" data-lbl="Engine bay">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Engine bay</b><span>Degreased, rinsed carefully, dressed. Electronics covered first.</span></span>
+                <span class="adur">45 min</span><span class="apz">$69</span></button>
+              <button type="button" class="addrow" data-add="headlight" data-price="89" data-lbl="Headlight restoration">
+                <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="atx"><b>Headlight restoration</b><span>Wet sand, polish, UV seal. 12-month clarity warranty. $139 as a standalone visit.</span></span>
+                <span class="adur">1 hr</span><span class="apz">$89</span></button>
+            </div>
+          </div>
+          <p class="bundlehint" id="bundleHint" hidden>Iron decon and clay bundled — $138 becomes $119.</p>
+
+          <!-- The room at the back. -->
+          <div class="paintroom" id="paintRoom">
+            <div class="prh">Your paint, separately.</div>
+            <p class="prs">Everything above cleans the car. This is machine polishing — correcting the clear coat
+              itself, removing swirls and haze that no wash will ever touch. It's a different job, it takes a
+              different day, and most cars don't need it. Skip it without a second thought if yours doesn't.</p>
+
+            <div class="paintcards" id="paint">
+              <button type="button" class="pcard sel" data-paint="">
+                <span class="pct"><span class="pcn">No paint work</span><span class="pcp">—</span></span>
+                <span class="pcd">Just the detail. This is the right answer for most cars, and it's the default.</span>
+              </button>
+
+              <button type="button" class="pcard" data-paint="gloss">
+                <span class="pct"><span class="pcn">Gloss Enhancement</span><span class="pcp" data-pp="gloss">+$349</span></span>
+                <span class="pcd">One machine stage. Takes out roughly half the light swirling and puts the depth
+                  back into the color. The right call when paint looks tired rather than damaged.</span>
+                <span class="pcno">Won't remove anything you can catch a fingernail in.</span>
+                <span class="pchr">About 4 hours · same day</span>
+              </button>
+
+              <button type="button" class="pcard" data-paint="correction">
+                <span class="pct"><span class="pcn">Paint Correction</span><span class="pcp" data-pp="correction">+$749</span></span>
+                <span class="pcd">Two stages — compound, then refine. Removes 80–90% of what you can see, and the
+                  paint depth gets measured and recorded before anything is cut.</span>
+                <span class="pcno">Scratches through the clear coat need paint, not polish. We'll show you which is which on the test panel.</span>
+                <span class="pchr">6–8 hours · may run to a second morning</span>
+              </button>
+
+              <button type="button" class="pcard" data-paint="ceramic">
+                <span class="pct"><span class="pcn">Ceramic Coating</span><span class="pcp" data-pp="ceramic">+$949</span></span>
+                <span class="pcd">Decon, clay, a single-stage polish, then a five-year coating. For paint that's
+                  already in good shape and you want to keep that way.</span>
+                <span class="pcno">A coating locks in whatever is under it. If your paint is swirled, this seals the swirls in — take the one below instead.</span>
+                <span class="pchr">About 6 hours</span>
+              </button>
+
+              <button type="button" class="pcard" data-paint="corrceramic">
+                <span class="pct"><span class="pcn">Correction + Ceramic</span><span class="pcp" data-pp="corrceramic">+$1,249</span></span>
+                <span class="pcd">The full two-stage correction first, then the same five-year coating over it.
+                  Correct, then protect — the only order that makes sense.</span>
+                <span class="pcno">Two days. We take the car through it properly or we don't take it on.</span>
+                <span class="pchr">Two days · coating cures overnight</span>
+              </button>
+
+              <button type="button" class="pcard" data-paint="show">
+                <span class="pct"><span class="pcn">Show Finish</span><span class="pcp" data-pp="show">from $1,299</span></span>
+                <span class="pcd">Three or more stages, chasing the last few percent. Concours cars, show season,
+                  and paint worth the hours.</span>
+                <span class="pcno">Never sold sight-unseen. Book this and we come and look first — the number is confirmed after inspection, and the deposit is refunded in full if you don't like it.</span>
+                <span class="pchr">Two days · quoted after inspection</span>
+              </button>
+            </div>
+
+            <div class="swapnote" id="swapNote" hidden>
+              <span id="swapTxt"></span>
+              <button type="button" id="swapBtn">Switch to Full Detail</button>
+            </div>
+          </div>
+
+          <div class="pricebar">
+            <div><div class="pbl mono">Your price</div><div class="pbv" id="pv3">$259</div></div>
+            <div class="pbn">Deposit to hold the slot is <b id="pdep3">$40</b>, refundable, and it comes off this total rather than sitting on top of it.</div>
+            <div class="pbitems" id="pitems3"></div>
+          </div>
+
+          <div class="navrow">
+            <button type="button" class="btn ghost btn-lg" data-go="2">Back</button>
+            <button type="button" class="btn btn-p btn-lg" data-go="4">Continue</button>
+          </div>
+        </div>
+
+        <!-- STEP 4 — WHEN AND WHERE -->
+        <div class="pane" data-p="4">
           <div class="qh">Pick a day.</div>
           <div class="qs" id="leadnote">Mon–Sat, from two days out. Sundays by request only.</div>
           <div class="dates" id="dates"></div>
@@ -888,47 +1525,36 @@ select:disabled{opacity:.5;cursor:not-allowed}
             <button type="button" class="opt" data-win="Midday · 11am–2pm"><b>Midday</b><span>11am – 2pm</span></button>
             <button type="button" class="opt" data-win="Afternoon · 2–5pm"><b>Afternoon</b><span>2pm – 5pm</span></button>
           </div>
-          <div class="err" id="e3">Pick a date to continue.</div>
-          <div class="navrow">
-            <button type="button" class="btn ghost btn-lg" data-go="2">Back</button>
-            <button type="button" class="btn btn-p btn-lg" data-go="4">Continue</button>
-          </div>
-        </div>
 
-        <!-- STEP 4 -->
-        <div class="pane" data-p="4">
-          <div class="qh">Last bit — how do we reach you?</div>
-          <div class="qs">Straight to us. No mailing list, and no card details are ever entered on this site.</div>
-          <div class="row">
-            <div class="fld"><label for="bnm">Name</label><input id="bnm" placeholder="First and last name" required></div>
-            <div class="fld"><label for="bph">Phone</label><input id="bph" type="tel" placeholder="(203) 555-0100" required></div>
-          </div>
-          <div class="row">
-            <div class="fld"><label for="bem">Email (optional)</label><input id="bem" type="email" placeholder="you@email.com"></div>
-            <div class="fld"><label for="btw">Town</label>
-              <select id="btw" required><option value="">Choose your town</option></select></div>
-          </div>
+          <div class="qh" style="margin-top:28px">Where's the car?</div>
+          <div class="qs">We bring our own water, power and canopy. All we need is about 15 feet of clear space around the vehicle.</div>
+          <div class="fld"><label for="btw">Town</label>
+            <select id="btw" required><option value="">Choose your town</option></select></div>
           <div class="fld"><label for="bad">Street address</label>
             <input id="bad" placeholder="Where the car will be" autocomplete="street-address" required>
             <p class="fldnote" id="areaNote" hidden></p></div>
 
-          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">
-            <div class="sumrow"><span>Service</span><b id="s1">—</b></div>
-            <div class="sumrow"><span>Vehicle</span><b id="s2">—</b></div>
-            <div class="sumrow"><span>When</span><b id="s3">—</b></div>
-            <div class="sumrow"><span>Estimate</span><b id="s4">—</b></div>
-          </div>
-          <input class="hp" type="text" id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <div class="err" id="e4">Enter a name, a 10-digit phone number, a town and an address.</div>
+          <div class="err" id="e3">Pick a date, a town and an address to continue.</div>
           <div class="navrow">
             <button type="button" class="btn ghost btn-lg" data-go="3">Back</button>
             <button type="button" class="btn btn-p btn-lg" data-go="5">Review terms</button>
           </div>
         </div>
 
-        <!-- STEP 5 — CONFIRM -->
+        <!-- STEP 5 — CONFIRM. Contact details live here, next to the signature,
+             because you give your name in one place rather than two. -->
         <div class="pane" data-p="5">
-          <div class="qh">Everything, in writing, before you agree.</div>
+          <div class="qh">Who are we coming to see?</div>
+          <div class="qs">Straight to us. No mailing list, and no card details are ever entered on this page.</div>
+          <div class="row">
+            <div class="fld"><label for="bnm">Name</label><input id="bnm" placeholder="First and last name" required></div>
+            <div class="fld"><label for="bph">Phone</label><input id="bph" type="tel" placeholder="(203) 555-0100" required></div>
+          </div>
+          <div class="fld"><label for="bem">Email (optional)</label><input id="bem" type="email" placeholder="you@email.com"></div>
+          <input class="hp" type="text" id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="err" id="e4">Enter a name and a 10-digit phone number.</div>
+
+          <div class="qh" style="margin-top:30px">Everything, in writing, before you agree.</div>
           <div class="qs">Read it. If any of this doesn't suit you, go back or call instead — nothing is committed yet.</div>
 
           <div class="depbox">
@@ -975,6 +1601,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
 
           <div style="margin:20px 0 16px;padding-top:18px;border-top:1px solid var(--line)">
             <div class="sumrow"><span>Service</span><b id="b1">—</b></div>
+            <div class="sumrow" id="b7row"><span>Added</span><b id="b7">—</b></div>
             <div class="sumrow"><span>Vehicle</span><b id="b2">—</b></div>
             <div class="sumrow"><span>When</span><b id="b3">—</b></div>
             <div class="sumrow"><span>Where</span><b id="b5">—</b></div>
@@ -1062,6 +1689,15 @@ select:disabled{opacity:.5;cursor:not-allowed}
             <div class="ref mono" id="refCode">CAL-000000</div>
             <p style="margin-top:14px">Deposit received and your slot is held. We'll confirm the arrival window by text the day before.</p>
             <p style="color:var(--mute);font-size:13px">A Stripe receipt is on its way to your email. Send us the summary below too if you'd like it on record — and text photos of the vehicle any time, they help us come prepared.</p>
+            <div class="jobcard" id="jobBox" hidden>
+              <div class="jc-l mono">Your booking page</div>
+              <p>We watch the National Weather Service forecast for <b id="jobTown">your town</b> and
+                your exact time slot, and this page tells you the moment it turns. On the day it shows
+                how far away we are. It's also where you'll find your quote and your signed agreement.</p>
+              <a class="btn btn-p btn-lg" id="jobLink" href="#" rel="noopener">Open my booking page</a>
+              <span class="jc-n">Bookmark it — the link is in your confirmation email too.</span>
+            </div>
+
             <div class="sendrow">
               <a class="btn btn-p btn-lg" id="sendSms" href="#">Text us the details</a>
               <a class="btn btn-o btn-lg" id="sendMail" href="#">Email us the details</a>
@@ -1105,7 +1741,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
       <details><summary>You're new — why should I trust you with my car?</summary>
         <p>Fair question, and the honest answer is that you shouldn't take our word for it. So it's set up so you don't have to: the price is fixed before we start, the only thing taken up front is a small refundable deposit to hold the slot, and the balance isn't due until you've inspected the car with us. Cipher Auto Lab is a registered Connecticut LLC and fully insured — ask and we'll send the certificate before you book. If we damage something, it's covered and you'll hear it from us first.</p></details>
       <details><summary>Why is there a deposit, and can I get it back?</summary>
-        <p>A mobile slot is several hours plus travel, and a same-day cancellation can't be refilled — the deposit is the smallest amount that makes that sting a little instead of not at all. It's $25 to $150 depending on the package, it comes straight off your total rather than being an extra charge, and you get it back in full if you give 24 hours notice, if we reschedule for weather, or if we turn up, find something that changes the price and you'd rather not go ahead. You only lose it for a same-day cancellation or a no-show.</p></details>
+        <p>A mobile slot is several hours plus travel, and a same-day cancellation can't be refilled — the deposit is the smallest amount that makes that sting a little instead of not at all. It's $25 to $150 depending on the service, it comes straight off your total rather than being an extra charge, and you get it back in full if you give 24 hours notice, if we reschedule for weather, or if we turn up, find something that changes the price and you'd rather not go ahead. You only lose it for a same-day cancellation or a no-show.</p></details>
       <details><summary>What if a stain won't come out?</summary>
         <p>Some won't. Dye transfer, old bleach spots, sun-cracked leather and ground-in salt damage are sometimes permanent, and no amount of product changes that. If it's visible going in you'll be told before the quote, and if it turns up mid-job we stop and talk to you rather than quietly charge for a result we can't deliver.</p></details>
       <details><summary>When does window tinting start?</summary>
@@ -1135,7 +1771,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
           <svg><use href="#ic-star"/></svg><span>Review us on Google</span></a>
       </div>
       <p style="margin-top:12px">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
-      <p class="flegal"><a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
+      <p class="flegal"><a href="/fleet">Fleet</a> · <a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
     </div>
   </div>
 </footer>
@@ -1149,5 +1785,6 @@ select:disabled{opacity:.5;cursor:not-allowed}
 <script src="config.js"></script>
 <script src="vehicles.js"></script>
 <script src="app.js" defer></script>
+<script src="photoquote.js" defer></script>
 </body>
 </html>

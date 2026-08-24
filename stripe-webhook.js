@@ -8,6 +8,7 @@
 // that check this URL is a public endpoint anyone can POST fake bookings to.
 
 const Stripe = require('stripe');
+const B = require('../lib/booking');
 
 // Vercel's Node runtime parses JSON bodies by default. Stripe's signature is computed
 // over the RAW bytes, so a parsed-and-restringified body will not verify. Turn it off.
@@ -120,6 +121,14 @@ module.exports = async (req, res) => {
   const pi = event.data.object;
   const m = pi.metadata || {};
 
+  // Two links, two different HMACs. The customer's opens the Job Card; the
+  // owner's is the only thing that can post an arrival time. Both are derived
+  // from JOB_LINK_SECRET, so if it is unset neither exists and the emails simply
+  // go out without them rather than shipping a guessable URL.
+  const SITE = process.env.SITE_ORIGIN || 'https://cipherautolab.com';
+  const jobLink = m.reference ? B.jobUrl(SITE, m.reference) : null;
+  const otwLink = m.reference ? B.otwUrl(SITE, m.reference) : null;
+
   try {
     const details =
       row('Reference', m.reference) +
@@ -166,12 +175,24 @@ about 15 feet of clear space around it. We bring our own water and power.
 Cancelling: full refund with 24 hours notice, if we reschedule for any reason
 including weather, or if we re-quote on arrival and you would rather not go ahead.
 
-Questions: ${PHONE}
+${jobLink ? `Track this booking — the weather for your slot, and how far away we are
+on the day:
+${jobLink}
+
+` : ''}Questions: ${PHONE}
 cipherautolab.com`,
         html: shell('Your booking is confirmed', `
           <p style="margin:0 0 4px;font-size:15px;color:#3D4A56">Thanks${m.name ? ', ' + esc(String(m.name).split(' ')[0]) : ''} — you're on the books. Here's what we have:</p>
           ${table}
           ${balance}
+          ${jobLink ? `<div style="background:#0E1318;border-radius:10px;padding:20px;margin:20px 0;text-align:center">
+            <p style="margin:0 0 4px;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:#A3E635">Your booking page</p>
+            <p style="margin:0 0 14px;font-size:13.5px;color:#AEBAC4;line-height:1.6">
+              We watch the National Weather Service forecast for your town and your exact time slot,
+              and this page tells you if it turns. On the day it shows how far away we are.</p>
+            <a href="${jobLink}" style="display:inline-block;background:#A3E635;color:#08110A;font-weight:700;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:15px">Open my booking</a>
+            <p style="margin:12px 0 0;font-size:11.5px;color:#7C8892">Bookmark it. The link is yours and it stays live until the job is done.</p>
+          </div>` : ''}
           <div style="background:#F6FAF2;border:1px solid #E0EFCB;border-radius:10px;padding:16px 18px;margin:20px 0">
             <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#0E1418">Before we arrive</p>
             <p style="margin:0;font-size:13.5px;color:#3D4A56;line-height:1.6">
@@ -212,6 +233,10 @@ PARKED ${m.parked || '-'}
 
 CAR    ${[m.vehicle, m.size, m.condition].filter(Boolean).join(' · ') || '-'}
 QUOTE  ${m.est_total || '-'}
+${otwLink ? `
+ON MY WAY (yours only, do not forward)
+${otwLink}
+` : ''}
 
 ${m.name || '-'}
 ${m.phone || '-'}
@@ -242,7 +267,14 @@ Stripe: https://dashboard.stripe.com/payments/${pi.id}`,
                     font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px">Call the customer</a>
           <a href="https://dashboard.stripe.com/payments/${esc(pi.id)}"
              style="display:inline-block;margin-left:8px;font-size:13px;color:#6B7783">View in Stripe</a>
-        </p>`),
+        </p>
+        ${otwLink ? `<div style="margin:22px 0 0;padding:16px 18px;border:1px solid #E3E8EE;border-radius:10px">
+          <p style="margin:0 0 4px;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:#6B7783">On the day</p>
+          <p style="margin:0 0 12px;font-size:13.5px;color:#3D4A56;line-height:1.6">
+            Open this on your phone when you set off and tap once. They see "about 15 minutes away"
+            on their booking page — no map, no position. <b>Yours only. Do not forward it.</b></p>
+          <a href="${otwLink}" style="display:inline-block;border:1px solid #0E1418;color:#0E1418;text-decoration:none;font-weight:700;font-size:14px;padding:10px 18px;border-radius:8px">On my way</a>
+        </div>` : ''}`),
     });
   } catch (err) {
     // Never 500 on an email problem — Stripe would retry and the customer could get

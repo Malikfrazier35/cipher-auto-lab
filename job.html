@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your booking — Cipher Auto Lab</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Your Cipher Auto Lab booking: what you booked, the weather for your slot, and how far away we are on the day.">
+<meta name="theme-color" content="#080A0C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080A0C'/%3E%3Cpath d='M16 7l7 4v10l-7 4-7-4V11z' fill='none' stroke='%23A3E635' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#080A0C; --panel:#0E1318; --raise:#131A21; --sunk:#0B0E12; --line:#1C242C;
+  --ink:#E9EFF4; --body:#AEBAC4; --mute:#7C8892; --dim:#5A6570;
+  --acc:#A3E635; --acc-dk:#14300A; --good:#22C55E; --warn:#E0A458; --bad:#F87171;
+  --r:13px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--body);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:660px;margin:0 auto;padding:0 20px}
+a{color:var(--acc)}
+h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.022em;text-wrap:balance}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+[hidden]{display:none !important}
+
+/* ---------- chrome ---------- */
+header{border-bottom:1px solid var(--line);background:rgba(11,14,18,.9);
+  backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink)}
+.brand svg{width:26px;height:26px;color:var(--acc)}
+.brand b{font-size:14px;font-weight:750;letter-spacing:.02em;display:block;line-height:1.1}
+.brand i{display:block;font-style:normal;font-size:8.5px;letter-spacing:.34em;color:var(--mute);margin-top:2px}
+.callbtn{border:1px solid var(--line);border-radius:9px;padding:9px 14px;font-size:13.5px;
+  font-weight:650;text-decoration:none;color:var(--ink);white-space:nowrap;display:flex;
+  align-items:center;gap:7px}
+.callbtn svg{width:14px;height:14px;fill:none;stroke:var(--acc);stroke-width:2}
+
+main{padding:28px 0 72px;display:flex;flex-direction:column;gap:16px}
+
+/* ---------- skeleton ---------- */
+.sk{display:flex;flex-direction:column;gap:16px}
+.skb{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.skl{height:13px;border-radius:7px;background:linear-gradient(90deg,#141B22,#1B242D,#141B22);
+  background-size:220% 100%;animation:sh 1.5s linear infinite}
+@keyframes sh{0%{background-position:120% 0}100%{background-position:-120% 0}}
+@media(prefers-reduced-motion:reduce){.skl{animation:none}}
+.sk .head{display:flex;flex-direction:column;gap:11px;padding:2px 0 6px}
+.sk .p{padding:20px;display:flex;flex-direction:column;gap:11px}
+
+.state{padding:56px 8px;text-align:center;color:var(--mute);font-size:15px;line-height:1.6}
+.state b{display:block;color:var(--ink);font-size:19px;margin-bottom:8px}
+.state .btns{justify-content:center}
+
+/* ---------- hero ---------- */
+.hero{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.refbtn{background:none;border:none;padding:0;font:inherit;font-size:10px;letter-spacing:.16em;
+  color:var(--dim);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.refbtn:hover{color:var(--acc)}
+.refbtn svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+h1{font-size:clamp(26px,7vw,36px);line-height:1.08;margin-top:9px}
+.when{margin:13px 0 0;font-size:17.5px;color:var(--ink);font-weight:600}
+.count{margin:3px 0 0;font-size:14px;color:var(--mute)}
+.count.soon{color:var(--acc)}
+
+/* ---------- action row ---------- */
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:6px}
+.act{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:15px 8px;
+  font:650 12.5px/1.25 inherit;color:var(--ink);text-decoration:none;cursor:pointer;
+  text-align:center;transition:border-color .14s,background .14s}
+.act:hover{border-color:#2C3742;background:var(--raise)}
+.act svg{width:19px;height:19px;fill:none;stroke:var(--acc);stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+.act span{display:block;min-height:2.5em;display:flex;align-items:center}
+
+/* ---------- live ---------- */
+.live{background:linear-gradient(180deg,#121C0E,#0C120A);border:1px solid rgba(163,230,53,.36);
+  border-radius:var(--r);padding:20px;display:flex;align-items:center;gap:16px}
+.pulse{width:13px;height:13px;border-radius:50%;background:var(--acc);flex:none;position:relative}
+.pulse::after{content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:2px solid var(--acc);opacity:.55;animation:p 1.9s ease-out infinite}
+@keyframes p{0%{transform:scale(.6);opacity:.6}100%{transform:scale(1.35);opacity:0}}
+@media(prefers-reduced-motion:reduce){.pulse::after{animation:none;opacity:.3}}
+.live b{display:block;font-size:20px;color:var(--ink);letter-spacing:-.025em}
+.live span{display:block;font-size:13px;color:var(--mute);margin-top:3px;line-height:1.5}
+
+/* ---------- cards ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card h3{font-size:15px;margin-bottom:14px}
+.card h3 .sub{font-weight:400;color:var(--mute);font-size:13px;margin-left:6px}
+
+/* ---------- weather ---------- */
+.wx{border-radius:var(--r);padding:22px 20px;border:1px solid var(--line);background:var(--panel);
+  position:relative;overflow:hidden}
+.wx::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--dim)}
+.wx.clear::before{background:var(--good)}
+.wx.watch::before{background:var(--warn)}
+.wx.risk::before{background:var(--bad)}
+.wxstate{display:flex;align-items:center;gap:11px}
+.wxdot{width:10px;height:10px;border-radius:50%;background:var(--dim);flex:none}
+.wx.clear .wxdot{background:var(--good);box-shadow:0 0 0 4px rgba(34,197,94,.16)}
+.wx.watch .wxdot{background:var(--warn);box-shadow:0 0 0 4px rgba(224,164,88,.16)}
+.wx.risk .wxdot{background:var(--bad);box-shadow:0 0 0 4px rgba(248,113,113,.16)}
+.wxstate b{font-size:19px;color:var(--ink);letter-spacing:-.022em}
+.wxwhy{margin:10px 0 0;font-size:14.5px;line-height:1.6;color:var(--body)}
+.wxnums{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}
+.wxnums span{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:.04em;
+  border:1px solid var(--line);border-radius:100px;padding:5px 11px;color:var(--mute);
+  background:var(--sunk)}
+.wxpromise{margin:16px 0 0;padding-top:15px;border-top:1px solid var(--line);
+  font-size:13px;line-height:1.6;color:var(--mute)}
+.wxpromise b{color:var(--ink)}
+
+/* ---------- progress rail ---------- */
+.rail{position:relative;padding-left:28px}
+.railbg,.railfill{position:absolute;left:5px;top:9px;width:2px;border-radius:2px}
+.railbg{bottom:11px;background:var(--line)}
+.railfill{background:var(--acc);height:0;transition:height .5s ease}
+@media(prefers-reduced-motion:reduce){.railfill{transition:none}}
+.rs{position:relative;padding-bottom:19px}
+.rs:last-child{padding-bottom:0}
+.rs::before{content:"";position:absolute;left:-28px;top:5px;width:12px;height:12px;
+  border-radius:50%;border:2px solid var(--line);background:var(--bg);z-index:1}
+.rs.done::before{background:var(--acc);border-color:var(--acc)}
+.rs.on::before{border-color:var(--acc);background:var(--bg);
+  box-shadow:0 0 0 4px rgba(163,230,53,.16)}
+.rs b{display:block;font-size:14.5px;color:var(--dim);font-weight:600}
+.rs.done b{color:var(--body)}
+.rs.on b{color:var(--ink)}
+.rs span{display:block;font-size:12.5px;color:var(--dim);line-height:1.5;margin-top:2px}
+.rs.on span{color:var(--mute)}
+
+/* ---------- rows ---------- */
+.rows{display:flex;flex-direction:column}
+.row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;
+  border-bottom:1px solid var(--line);font-size:14.5px}
+.row:last-child{border-bottom:none}
+.row>span{color:var(--mute);flex:none}
+.row b{color:var(--ink);font-weight:600;text-align:right}
+.row.tot b{color:var(--acc);font-size:17px}
+
+details.inc{margin-top:14px;border-top:1px solid var(--line);padding-top:13px}
+details.inc summary{cursor:pointer;font-size:13.5px;color:var(--acc);list-style:none;
+  display:flex;align-items:center;gap:7px}
+details.inc summary::-webkit-details-marker{display:none}
+details.inc summary svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;
+  transition:transform .18s}
+details.inc[open] summary svg{transform:rotate(90deg)}
+details.inc ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+details.inc li{display:grid;grid-template-columns:16px 1fr;gap:10px;font-size:13.5px;
+  line-height:1.5;color:var(--body)}
+details.inc li svg{width:13px;height:13px;stroke:var(--acc);stroke-width:2.8;fill:none;margin-top:4px}
+
+ul.prep{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+ul.prep li{display:grid;grid-template-columns:20px 1fr;gap:11px;font-size:14.5px;line-height:1.55}
+ul.prep svg{width:16px;height:16px;stroke:var(--acc);stroke-width:2.4;fill:none;margin-top:4px}
+ul.prep b{color:var(--ink)}
+
+/* ---------- who ---------- */
+.who{display:flex;align-items:center;gap:15px}
+.avat{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:linear-gradient(150deg,#1B2A12,#0F1610);border:1px solid rgba(163,230,53,.3);
+  font:750 16px/1 ui-monospace,Menlo,monospace;color:var(--acc);letter-spacing:.02em}
+.who b{display:block;font-size:15px;color:var(--ink)}
+.who span{display:block;font-size:13px;color:var(--mute);line-height:1.5;margin-top:2px}
+
+/* ---------- buttons ---------- */
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;
+  padding:13px 19px;font:650 14.5px/1 inherit;text-decoration:none;cursor:pointer;
+  border:1px solid var(--line);color:var(--ink);background:none}
+.btn:hover{border-color:#2C3742}
+.btn.p{background:var(--acc);color:var(--acc-dk);border-color:var(--acc)}
+.btn.p:hover{background:#B4EF4F;border-color:#B4EF4F}
+.btn.q{border:none;color:var(--mute);padding-left:6px;padding-right:6px}
+.btn.q:hover{color:var(--ink)}
+.btn.danger{color:var(--bad);border-color:#3A2326}
+.btn[disabled]{opacity:.55;cursor:progress}
+.btn.grow{flex:1 1 auto}
+
+/* ---------- change sheet ---------- */
+.sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.veil{position:absolute;inset:0;background:rgba(4,6,8,.72);backdrop-filter:blur(3px)}
+.sheetin{position:relative;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 0 0;
+  padding:24px 22px calc(24px + env(safe-area-inset-bottom));
+  animation:up .22s cubic-bezier(.2,.7,.3,1)}
+@keyframes up{from{transform:translateY(14px);opacity:.6}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.sheetin{animation:none}}
+@media(min-width:560px){
+  .sheet{align-items:center}
+  .sheetin{border-radius:16px;padding-bottom:24px}
+}
+.sheetin h2{font-size:20px}
+.sheetin p{font-size:14px;line-height:1.6;margin:9px 0 0;color:var(--body)}
+.warnbox{margin-top:15px;border:1px solid #3A2326;background:#150E10;border-radius:10px;
+  padding:14px 16px;font-size:13.5px;line-height:1.6;color:#F0C3C3}
+.warnbox b{color:#FFD9D9}
+.okbox{margin-top:15px;border:1px solid rgba(163,230,53,.28);background:#0F1509;border-radius:10px;
+  padding:14px 16px;font-size:13.5px;line-height:1.6;color:var(--body)}
+.okbox b{color:var(--acc)}
+.fld{margin-top:14px}
+.fld label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mute);margin-bottom:7px}
+.fld input,.fld select,.fld textarea{width:100%;background:var(--sunk);border:1px solid var(--line);
+  border-radius:9px;padding:12px 13px;color:var(--ink);font:15px/1.5 inherit;-webkit-appearance:none;
+  appearance:none}
+.fld textarea{resize:vertical;min-height:70px}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%237C8892' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;background-size:11px;padding-right:34px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--acc)}
+.dts{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;
+  max-height:186px;overflow-y:auto;padding-right:3px}
+.dt{background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:10px 5px;
+  text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
+.dt.sel{border-color:var(--acc);background:rgba(163,230,53,.09)}
+.dt em{display:block;font-style:normal;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.dt b{display:block;font-size:16px;font-weight:750;margin:2px 0 1px}
+.dt i{display:block;font-style:normal;font-size:9.5px;color:var(--dim)}
+.err{margin-top:12px;font-size:13.5px;color:#F0B4B4;background:#170F10;border:1px solid #4A2A2A;
+  border-radius:9px;padding:11px 13px;line-height:1.5}
+
+/* ---------- pending change banner ---------- */
+.pending{border:1px solid rgba(224,164,88,.35);background:#16120C;border-radius:var(--r);
+  padding:18px 20px}
+.pending b{display:block;color:var(--warn);font-size:14.5px;margin-bottom:5px}
+.pending p{margin:0;font-size:13.5px;line-height:1.6;color:var(--body)}
+
+.foot{font-size:13.5px;line-height:1.65;color:var(--mute)}
+.foot b{color:var(--ink)}
+.fine{text-align:center;font-size:12.5px;color:var(--dim);line-height:1.7;padding-top:8px}
+.fine a{color:var(--mute)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:80;
+  background:var(--raise);border:1px solid var(--line);border-radius:100px;padding:11px 20px;
+  font-size:13.5px;color:var(--ink);box-shadow:0 12px 34px -12px rgba(0,0,0,.8)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M16 4l10.4 6v12L16 28 5.6 22V10z"/><circle cx="16" cy="16" r="3.4"/></svg>
+      <div><b>CIPHER</b><i>AUTO LAB</i></div>
+    </a>
+    <a class="callbtn" href="tel:+12035929589">
+      <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.4 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>
+      Call
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- skeleton: a shape that matches what arrives, not a spinner -->
+  <div class="sk" id="loading" aria-busy="true" aria-label="Loading your booking">
+    <div class="head">
+      <div class="skl" style="width:38%;height:10px"></div>
+      <div class="skl" style="width:78%;height:30px"></div>
+      <div class="skl" style="width:52%"></div>
+    </div>
+    <div class="skb p"><div class="skl" style="width:46%;height:17px"></div>
+      <div class="skl" style="width:88%"></div><div class="skl" style="width:64%"></div></div>
+    <div class="skb p"><div class="skl" style="width:34%;height:15px"></div>
+      <div class="skl" style="width:92%"></div><div class="skl" style="width:80%"></div>
+      <div class="skl" style="width:70%"></div></div>
+  </div>
+
+  <div class="state" id="failed" hidden>
+    <b>We couldn't open that.</b>
+    <span id="failMsg"></span>
+    <div class="btns"><a class="btn p" href="tel:+12035929589">Call (203) 592-9589</a></div>
+  </div>
+
+  <div id="card" hidden>
+
+    <div class="hero">
+      <div class="eyebrow mono">
+        <span>Your booking</span>
+        <button type="button" class="refbtn mono" id="refBtn" title="Copy reference">
+          <span id="ref">—</span>
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>
+        </button>
+      </div>
+      <h1 id="head">Your detail</h1>
+      <p class="when" id="when">—</p>
+      <p class="count" id="count"></p>
+    </div>
+
+    <div class="acts">
+      <a class="act" id="calBtn" href="#">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 14v4M10 16h4"/></svg>
+        <span>Add to calendar</span></a>
+      <button type="button" class="act" id="shareBtn">
+        <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+        <span>Share the link</span></button>
+      <button type="button" class="act" id="changeBtn">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 3v6h-6"/></svg>
+        <span id="changeLbl">Change or cancel</span></button>
+    </div>
+
+    <div class="pending" id="pending" hidden>
+      <b id="pendHead">Request with us</b>
+      <p id="pendBody"></p>
+    </div>
+
+    <div class="live" id="live" hidden aria-live="polite">
+      <span class="pulse"></span>
+      <div><b id="liveHead">On the way</b><span id="liveSub"></span></div>
+    </div>
+
+    <div class="wx" id="wx">
+      <div class="wxstate"><span class="wxdot"></span><b id="wxState">Checking the forecast…</b></div>
+      <p class="wxwhy" id="wxWhy">Pulling the National Weather Service forecast for your town and your time slot.</p>
+      <div class="wxnums" id="wxNums"></div>
+      <p class="wxpromise">We work in rain more often than people expect — a canopy handles drizzle.
+        What we won't do is seal or coat a panel that can't stay dry, or polish in the cold. If we
+        move your day for weather, <b>your deposit is refunded in full</b> and you get first pick of
+        the next slot.</p>
+    </div>
+
+    <div class="card">
+      <h3>How the day goes</h3>
+      <div class="rail" id="rail">
+        <div class="railbg"></div><div class="railfill" id="railFill"></div>
+        <div class="rs" data-s="0"><b>Booked and held</b><span id="s0sub">Deposit received.</span></div>
+        <div class="rs" data-s="1"><b>We confirm your arrival time</b><span>A text the day before, narrowing the window.</span></div>
+        <div class="rs" data-s="2"><b>On the way</b><span>This page starts showing how far out we are.</span></div>
+        <div class="rs" data-s="3"><b>Here — walk-around first</b><span>We look over the vehicle with you before anything is touched.</span></div>
+        <div class="rs" data-s="4"><b>Finished, together</b><span>Panel by panel at the end. Anything not right gets fixed on the spot.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What you booked</h3>
+      <div class="rows" id="rows"></div>
+      <details class="inc" id="incBox" hidden>
+        <summary><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          <span>What's included</span></summary>
+        <ul id="incList"></ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <h3>Who's coming</h3>
+      <div class="who">
+        <div class="avat">MF</div>
+        <div><b>Malik Frazier</b><span>Owner-operated — you get the same person every time, not a
+          rotating crew. Connecticut LLC, insured, certificate on request.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Before we arrive <span class="sub">takes two minutes</span></h3>
+      <ul class="prep">
+        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><b>Empty the car</b> — including the trunk and child seats. We're not responsible for
+            anything left inside, and it slows the job down.</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><b>About 15 feet of clear space</b> around the vehicle, and somewhere legal to park
+            the van. Apartment or office lots — worth checking they allow it.</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><b>You don't need to supply water or power.</b> We carry both.</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><b>Leave the keys reachable.</b> If we can't get into the car on the day and can't
+            reach you, that counts as a no-show.</span></li>
+      </ul>
+    </div>
+
+    <p class="fine">
+      Signed Service Agreement <span id="ver" class="mono"></span> ·
+      <a href="/agreement">read it again</a> · <a href="/terms">terms</a> · <a href="/privacy">privacy</a><br>
+      Anyone with this link can see this booking. Share it with whoever will be home, not more widely.
+    </p>
+
+  </div>
+</main>
+
+<script src="job.js" defer></script>
+</body>
+</html>

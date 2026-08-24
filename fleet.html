@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fleet maintenance — Cipher Auto Lab</title>
+<meta name="description" content="Scheduled interior and exterior maintenance for work vans, trucks and company cars across New Haven County, the Valley and central Connecticut. One invoice, a named day, a photographed condition report on every vehicle.">
+<link rel="canonical" href="https://cipherautolab.com/fleet">
+<meta name="theme-color" content="#080A0C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080A0C'/%3E%3Cpath d='M16 7l7 4v10l-7 4-7-4V11z' fill='none' stroke='%23A3E635' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#080A0C; --panel:#0E1318; --raise:#131A21; --sunk:#0B0E12; --line:#1C242C;
+  --ink:#E9EFF4; --body:#AEBAC4; --mute:#7C8892; --dim:#5A6570;
+  --acc:#A3E635; --acc-dk:#14300A; --warn:#E0A458; --bad:#F87171; --r:13px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--body);
+  font:16px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+.narrow{max-width:66ch}
+a{color:var(--acc)}
+h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.022em;text-wrap:balance}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+[hidden]{display:none !important}
+p{margin:0}
+
+header{border-bottom:1px solid var(--line);background:rgba(11,14,18,.9);
+  backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand svg{width:27px;height:27px;color:var(--acc)}
+.brand b{font-size:14.5px;font-weight:750;letter-spacing:.02em;display:block;line-height:1.1}
+.brand i{display:block;font-style:normal;font-size:8.5px;letter-spacing:.34em;color:var(--mute);margin-top:2px}
+.hnav{display:flex;align-items:center;gap:16px}
+.hnav a.nl{font-size:13.5px;color:var(--body);text-decoration:none}
+.hnav a.nl:hover{color:var(--ink)}
+@media(max-width:640px){.hnav a.nl{display:none}}
+.hbtn{background:var(--acc);color:var(--acc-dk);border-radius:9px;padding:9px 15px;
+  font-size:13.5px;font-weight:700;text-decoration:none;white-space:nowrap}
+
+section{padding:clamp(46px,6vw,72px) 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);
+  display:flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:20px;height:2px;background:var(--acc);border-radius:2px}
+h1{font-size:clamp(31px,6.4vw,52px);line-height:1.04;margin:16px 0 0}
+h2{font-size:clamp(23px,3.6vw,32px);line-height:1.12}
+h3{font-size:17px}
+.lede{font-size:clamp(16.5px,2vw,18.5px);line-height:1.62;color:var(--body);margin-top:18px}
+.shead{margin-bottom:26px}
+.shead .lede{max-width:66ch}
+strong{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink)}
+
+.hero .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+  margin-top:32px}
+.hero .st{background:var(--panel);padding:18px 19px}
+.hero .st b{display:block;font-size:22px;color:var(--ink);letter-spacing:-.03em;
+  font-family:ui-monospace,Menlo,monospace}
+.hero .st span{display:block;font-size:12.5px;color:var(--mute);margin-top:4px;line-height:1.5}
+.cta{display:flex;gap:11px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;
+  padding:14px 22px;font:700 15px/1 inherit;text-decoration:none;cursor:pointer;
+  border:1px solid var(--line);color:var(--ink);background:none}
+.btn:hover{border-color:#2C3742}
+.btn.p{background:var(--acc);color:var(--acc-dk);border-color:var(--acc)}
+.btn.p:hover{background:#B4EF4F;border-color:#B4EF4F}
+.btn[disabled]{opacity:.55;cursor:progress}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.split{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.card.bad{border-color:#33262A;background:#120E10}
+.card .tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.card.bad .tag{color:var(--bad)}
+.card.good .tag{color:var(--acc)}
+.card h3{margin:9px 0 10px}
+.card p{font-size:14.5px;line-height:1.6;color:var(--body)}
+.card .num{font-family:ui-monospace,Menlo,monospace;font-size:26px;color:var(--ink);
+  letter-spacing:-.03em;margin:4px 0 8px;display:block}
+
+.svc{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.svc{grid-template-columns:1fr}}
+.svc .card{display:flex;flex-direction:column}
+.svc .from{font-family:ui-monospace,Menlo,monospace;font-size:24px;color:var(--acc);
+  letter-spacing:-.03em;margin:6px 0 2px}
+.svc .from em{font-size:12px;color:var(--mute);font-style:normal;letter-spacing:0}
+.svc ul{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.svc li{display:grid;grid-template-columns:16px 1fr;gap:10px;font-size:14px;line-height:1.5}
+.svc li svg{width:13px;height:13px;stroke:var(--acc);stroke-width:2.8;fill:none;margin-top:4px}
+.svc li.no svg{stroke:var(--dim)}
+.svc li.no{color:var(--dim)}
+.svc .mins{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
+th,td{padding:14px 16px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+tbody td{font-family:ui-monospace,Menlo,monospace;color:var(--ink);font-variant-numeric:tabular-nums}
+tbody td:first-child{font-family:inherit;color:var(--body)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.hl td{background:rgba(163,230,53,.05)}
+.tcap{font-size:13.5px;line-height:1.6;color:var(--mute);margin-top:14px}
+.tcap b{color:var(--ink)}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 16px;
+  font:650 13.5px/1 inherit;color:var(--body);cursor:pointer}
+.tab.on{border-color:var(--acc);color:var(--acc);background:rgba(163,230,53,.07)}
+
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.fi{background:var(--panel);padding:20px}
+.fi svg{width:20px;height:20px;stroke:var(--acc);stroke-width:1.8;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.fi b{display:block;font-size:14.5px;color:var(--ink);margin:11px 0 5px}
+.fi span{display:block;font-size:13.5px;color:var(--mute);line-height:1.55}
+
+.spot{background:linear-gradient(180deg,#111A0E,#0B100A);border:1px solid rgba(163,230,53,.28);
+  border-radius:var(--r);padding:clamp(22px,3.4vw,32px)}
+.spot .eyebrow{color:var(--acc)}
+.spot h2{margin-top:14px;font-size:clamp(21px,3vw,28px)}
+.spot p{margin-top:14px;font-size:15.5px;line-height:1.65;max-width:62ch}
+
+.nots{display:flex;flex-direction:column;gap:2px}
+.not{display:grid;grid-template-columns:22px 1fr;gap:14px;padding:16px 0;
+  border-bottom:1px solid var(--line);align-items:start}
+.not:last-child{border-bottom:none}
+.not svg{width:17px;height:17px;stroke:var(--dim);stroke-width:2.2;fill:none;margin-top:4px}
+.not b{color:var(--ink)}
+.not p{font-size:14.5px;color:var(--mute);line-height:1.6;margin-top:3px}
+
+/* ---- form ---- */
+.formcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:clamp(22px,3vw,30px)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.row2{grid-template-columns:1fr}}
+.fld{margin-top:14px}
+.fld:first-child{margin-top:0}
+.row2 .fld{margin-top:0}
+.fld label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mute);margin-bottom:7px}
+.fld input,.fld select,.fld textarea{width:100%;background:var(--sunk);border:1px solid var(--line);
+  border-radius:9px;padding:13px 14px;color:var(--ink);font:15px/1.5 inherit;
+  -webkit-appearance:none;appearance:none}
+.fld textarea{resize:vertical;min-height:82px}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%237C8892' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:11px;padding-right:36px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--acc)}
+.fld input.bad,.fld select.bad{border-color:var(--bad)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.est{margin-top:18px;padding:16px 18px;border:1px solid rgba(163,230,53,.26);border-radius:11px;
+  background:#0F1509}
+.est .el{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc)}
+.est .ev{font-family:ui-monospace,Menlo,monospace;font-size:25px;color:var(--ink);
+  letter-spacing:-.03em;margin:5px 0 4px}
+.est .en{font-size:12.5px;color:var(--mute);line-height:1.55}
+.err{margin-top:14px;font-size:13.5px;color:#F0B4B4;background:#170F10;border:1px solid #4A2A2A;
+  border-radius:9px;padding:12px 14px;line-height:1.5}
+.fine{margin-top:14px;font-size:12.5px;color:var(--dim);line-height:1.6}
+.done{text-align:center;padding:20px 6px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.tick{width:52px;height:52px;border-radius:50%;background:var(--acc);display:grid;place-items:center}
+.tick svg{width:26px;height:26px;fill:none;stroke:var(--acc-dk);stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.done h3{font-size:22px}
+.done p{font-size:15px;color:var(--body);max-width:46ch;line-height:1.6}
+
+footer{border-top:1px solid var(--line);background:var(--sunk);padding:34px 0 44px}
+footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  font-size:13px;color:var(--dim)}
+footer a{color:var(--mute);text-decoration:none}
+footer a:hover{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M16 4l10.4 6v12L16 28 5.6 22V10z"/><circle cx="16" cy="16" r="3.4"/></svg>
+      <div><b>CIPHER</b><i>AUTO LAB</i></div>
+    </a>
+    <nav class="hnav">
+      <a class="nl" href="/">Consumer detailing</a>
+      <a class="nl" href="#prices">Prices</a>
+      <a class="hbtn" href="#enquire">Get a fleet quote</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="narrow">
+      <div class="eyebrow">Fleet maintenance</div>
+      <h1>A dirty van with your name on it is advertising too.</h1>
+      <p class="lede">Scheduled interior and exterior maintenance for work vans, trucks and company
+        cars across New Haven County, the Valley and central Connecticut. A named day, one invoice a
+        month, and a photographed condition report on every vehicle so you know what state your fleet
+        is actually in.</p>
+    </div>
+    <div class="stats">
+      <div class="st"><b>2+</b><span>Vehicles at one site is enough to start</span></div>
+      <div class="st"><b>Net 15</b><span>One monthly invoice, not a card per wash</span></div>
+      <div class="st"><b>COI</b><span>Certificate of insurance, you named as additional insured</span></div>
+      <div class="st"><b>Every visit</b><span>Photographed condition report per vehicle</span></div>
+    </div>
+    <div class="cta">
+      <a class="btn p" href="#enquire">Get a fleet quote</a>
+      <a class="btn" href="tel:+12035929589">Call (203) 592-9589</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow">Where we fit</div>
+      <h2>This is not fleet washing, and it shouldn't be priced like it.</h2>
+      <p class="lede">Worth being straight about, because the two get confused and the comparison
+        does neither of us any favors.</p>
+    </div>
+    <div class="split">
+      <div class="card bad">
+        <div class="tag">Fleet washing</div>
+        <span class="num">$20–25</span>
+        <h3>Per unit, exterior only</h3>
+        <p>A crew with a pressure rig and water reclamation, doing thirty trucks at a depot after
+          hours. Ten minutes a vehicle. Nobody opens a door. It is a genuinely good service and if
+          that is what you need, <em>you should buy that instead of this</em> — we will happily tell
+          you so and point you at someone.</p>
+      </div>
+      <div class="card good">
+        <div class="tag">What we do</div>
+        <span class="num">$28–76</span>
+        <h3>Per vehicle, inside included</h3>
+        <p>Hand work, one van, on your site. The exterior gets done properly and — the part almost
+          nobody sells on a schedule — <em>so does the cab</em>. That is where your driver spends
+          eight hours a day and where your customer sits down.</p>
+      </div>
+    </div>
+    <p class="tcap"><b>The gap is deliberate.</b> Every fleet operator we can find sells exterior
+      washing and treats interiors as an occasional extra. A trade van's interior is the part that
+      gets genuinely bad, the part a pressure washer physically cannot reach, and the part your
+      customers notice. It is also the work a one-van operation is actually better at.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow">Two contracts</div>
+      <h2>Pick the one that matches the problem.</h2>
+    </div>
+    <div class="svc">
+      <div class="card">
+        <div class="tag">Contract A</div>
+        <h3>Fleet Exterior</h3>
+        <div class="from">from $28 <em>per vehicle, per visit</em></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Two-bucket hand wash, top down</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Wheels, tires and wheel wells</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Door jambs and sills</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>All glass, streak-free</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Spray protection, tire dressing</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Condition photos, every vehicle</span></li>
+          <li class="no"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg><span>Nothing inside the cab</span></li>
+        </ul>
+        <div class="mins">25–35 minutes per vehicle</div>
+      </div>
+      <div class="card">
+        <div class="tag">Contract B · the one we'd recommend</div>
+        <h3>Fleet Full</h3>
+        <div class="from">from $44 <em>per vehicle, per visit</em></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Everything in Fleet Exterior</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Full vacuum — seats, floors, footwells</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Every touch surface wiped and dressed</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Cupholders, console, door pockets emptied</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Interior glass and dash</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Trash out, bins emptied</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Condition photos, every vehicle</span></li>
+        </ul>
+        <div class="mins">45–60 minutes per vehicle</div>
+      </div>
+    </div>
+    <p class="tcap">Cargo areas, ladder racks, shampoo and extraction, headliners and heavy grease
+      are quoted separately — they are real work and pretending otherwise is how a contract goes
+      sour in month three.</p>
+  </div>
+</section>
+
+<section id="prices">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow">Prices</div>
+      <h2>Per vehicle, per visit. Published, like everything else here.</h2>
+      <p class="lede">The discount is for <em>vehicles at one site on one visit</em>, not for how many
+        the company owns. That is the honest version: what we save is the drive and the setup, not
+        the labour, so that is what gets passed on.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab on" id="tabFull" role="tab" aria-selected="true">Fleet Full</button>
+      <button type="button" class="tab" id="tabExt" role="tab" aria-selected="false">Fleet Exterior</button>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Vehicles on site</th><th>Weekly</th><th>Every 2 weeks</th><th>Monthly</th></tr></thead>
+        <tbody id="priceBody"></tbody>
+      </table>
+    </div>
+    <p class="tcap">
+      Sedans, company cars and small vans. <b>Cargo vans and pickups +$10</b> per vehicle;
+      box trucks and anything over 10,000 lb by quote.
+      <b>Minimum $180 per visit</b> — a two-van weekly stop does not pay for the drive, so small
+      fleets usually land on biweekly or monthly, and we will say so rather than sell you the wrong
+      frequency.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="spot">
+      <div class="eyebrow">The part you can't get elsewhere</div>
+      <h2>A photographed condition report on every vehicle, every visit.</h2>
+      <p>Your actual problem probably isn't dirty vans. It is not knowing what state your fleet is
+        in — which one picked up a dent, whose bumper is hanging, which cab has been lived in for
+        three weeks.</p>
+      <p>We are already stood at every vehicle with a phone in hand. So each visit you get a dated
+        set of photos per vehicle, plus anything worth flagging: fresh damage, a tire that looks
+        low, a warning light on the dash, a leak under a van. It costs us nothing and it is usually
+        the reason people renew.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow">What a contract comes with</div>
+      <h2>The boring things that actually decide it.</h2>
+    </div>
+    <div class="feat">
+      <div class="fi">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <b>A named day</b><span>"Second Tuesday, 7am" — not a window, not "sometime that week".
+          You can plan around it and your drivers can be told once.</span></div>
+      <div class="fi">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 15h6"/></svg>
+        <b>One invoice a month</b><span>Net 15, emailed, itemised by vehicle. No card on file, no
+          deposit per wash, no chasing receipts for the bookkeeper.</span></div>
+      <div class="fi">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <b>Certificate of insurance</b><span>Naming your company as additional insured. Most sites
+          will not let a contractor through the gate without it, and we have it ready.</span></div>
+      <div class="fi">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+        <b>A vehicle roster</b><span>You send the list with plates. We track which got done and
+          which did not, and it is on the invoice.</span></div>
+      <div class="fi">
+        <svg viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+        <b>Out-of-hours if you need it</b><span>Early mornings, evenings and Saturdays. Most fleets
+          would rather we came before the vans roll than pull one off a job.</span></div>
+      <div class="fi">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <b>Thirty days' notice, both ways</b><span>No twelve-month lock-in. If it stops being worth
+          it, say so and it stops. A contract that traps you is a contract we would have to defend
+          instead of earn.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="shead">
+      <div class="eyebrow">Straight answers</div>
+      <h2>What we won't take on.</h2>
+      <p class="lede">One van and one person. Saying yes to the wrong contract means failing
+        somebody, and it is cheaper for both of us to work that out now.</p>
+    </div>
+    <div class="nots">
+      <div class="not">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <div><b>Depots of 25+ heavy trucks.</b>
+          <p>That is a pressure-rig job with a crew and water reclamation. We would be slower and
+            dearer and you would be right to be annoyed.</p></div>
+      </div>
+      <div class="not">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <div><b>Dealership lot prep at lot-prep prices.</b>
+          <p>Volume used-car prep runs $40–60 a car and is won on speed. It would eat every hour we
+            have at a rate that makes it worse than the consumer work it displaces.</p></div>
+      </div>
+      <div class="not">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <div><b>Sites with no water runoff route or no space.</b>
+          <p>We carry our own water and capture what we sensibly can, but a vehicle needs about 15
+            feet around it and somewhere for water to go that isn't a storm drain full of soap.</p></div>
+      </div>
+      <div class="not">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <div><b>Biohazard, mould or infestation.</b>
+          <p>Different equipment, different insurance. We will tell you on sight and not charge you
+            for the visit.</p></div>
+      </div>
+      <div class="not">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <div><b>A vehicle that isn't there.</b>
+          <p>Not a refusal, just the rule: if a van is out on a job when we arrive, it rolls to the
+            next visit at no charge. If more than half the roster is missing twice running, we will
+            ring you and change the day rather than keep turning up to an empty lot.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="enquire">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow">Get a quote</div>
+      <h2>Tell us what you run.</h2>
+      <p class="lede">A real number back the same working day, and a site visit before anything is
+        signed — we would rather look at the vans than guess at them.</p>
+    </div>
+    <div class="formcard">
+      <form id="flForm" novalidate>
+        <div class="row2">
+          <div class="fld"><label for="flCo">Company</label>
+            <input id="flCo" autocomplete="organization" placeholder="Your company name" required></div>
+          <div class="fld"><label for="flName">Your name</label>
+            <input id="flName" autocomplete="name" placeholder="First and last" required></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="flPhone">Phone</label>
+            <input id="flPhone" type="tel" autocomplete="tel" placeholder="(203) 555-0100" required></div>
+          <div class="fld"><label for="flEmail">Email</label>
+            <input id="flEmail" type="email" autocomplete="email" placeholder="you@company.com" required></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="flTown">Where are they kept</label>
+            <select id="flTown" required><option value="">Choose a town</option></select></div>
+          <div class="fld"><label for="flCount">How many vehicles</label>
+            <select id="flCount">
+              <option value="2-4">2 to 4</option>
+              <option value="5-9" selected>5 to 9</option>
+              <option value="10+">10 or more</option>
+              <option value="1">Just one, but often</option>
+            </select></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="flType">Mostly what</label>
+            <select id="flType">
+              <option>Cargo vans</option><option>Pickups</option>
+              <option>Company cars / sedans</option><option>SUVs</option>
+              <option>Box trucks</option><option>A mix</option>
+            </select></div>
+          <div class="fld"><label for="flFreq">How often</label>
+            <select id="flFreq">
+              <option value="weekly">Weekly</option>
+              <option value="biweekly" selected>Every 2 weeks</option>
+              <option value="monthly">Monthly</option>
+              <option value="unsure">Not sure — advise me</option>
+            </select></div>
+        </div>
+        <div class="fld"><label for="flSvc">Inside as well, or outside only</label>
+          <select id="flSvc">
+            <option value="full" selected>Both — Fleet Full</option>
+            <option value="ext">Outside only — Fleet Exterior</option>
+            <option value="unsure">Not sure yet</option>
+          </select></div>
+        <div class="fld"><label for="flNote">Anything else (optional)</label>
+          <textarea id="flNote" placeholder="Access hours, gate codes, what the vans get used for, what's driving you to sort this out."></textarea></div>
+
+        <input class="hp" type="text" id="flHp" name="fax" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        <div class="est" id="estBox">
+          <div class="el mono">Rough figure while you type</div>
+          <div class="ev" id="estVal">—</div>
+          <div class="en" id="estNote">Pick a size and a frequency and we'll show the published rate.</div>
+        </div>
+
+        <p class="err" id="flErr" hidden></p>
+        <button type="submit" class="btn p" id="flSend" style="width:100%;margin-top:18px">Send it over</button>
+        <p class="fine">Goes straight to Malik. No mailing list, no card, no obligation. If a fleet
+          contract isn't the right answer for you, you'll be told that instead.</p>
+      </form>
+
+      <div class="done" id="flDone" hidden>
+        <div class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>Got it.</h3>
+        <p>Reference <b id="flRef" class="mono">—</b>. You'll get a real number back the same working
+          day, and we'll come and look at the vehicles before anything is signed.</p>
+        <p class="fine">Sooner is fine too — <a href="tel:+12035929589">(203) 592-9589</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Cipher Auto Lab LLC · New Haven County, the Valley &amp; central CT · (203) 592-9589</span>
+    <span><a href="/">Consumer detailing</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></span>
+  </div>
+</footer>
+
+<script src="vehicles.js"></script>
+<script src="fleet.js" defer></script>
+</body>
+</html>

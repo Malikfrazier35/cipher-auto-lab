@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>On my way — Cipher Auto Lab</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--bg:#080A0C;--panel:#0E1318;--line:#1C242C;--ink:#E9EFF4;--body:#AEBAC4;
+  --mute:#7C8892;--acc:#A3E635;--bad:#F87171}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  padding:max(20px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom))}
+.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{color:var(--ink);font-size:21px;margin:0;letter-spacing:-.02em}
+.sub{font-size:13.5px;color:var(--mute);margin:0}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.who{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.who b{display:block;color:var(--ink);font-size:17px}
+.who span{display:block;font-size:13.5px;color:var(--mute);margin-top:3px}
+.now{border:1px solid rgba(163,230,53,.34);background:linear-gradient(180deg,#111A0E,#0C120A);
+  border-radius:12px;padding:18px;text-align:center}
+.now b{display:block;color:var(--ink);font-size:26px;letter-spacing:-.03em}
+.now span{display:block;font-size:13px;color:var(--mute);margin-top:4px}
+button{width:100%;border-radius:12px;padding:19px 16px;font:650 17px/1 inherit;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+button:active{transform:scale(.985)}
+button.p{background:var(--acc);color:#08110A;border-color:var(--acc);font-size:19px;padding:23px 16px}
+button.on{border-color:var(--acc);color:var(--acc)}
+button[disabled]{opacity:.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stop{border-color:#3A2326;color:var(--bad)}
+.msg{font-size:13.5px;line-height:1.6;padding:13px 15px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel);color:var(--body)}
+.msg.err{border-color:#4A2A2A;background:#170F10;color:#F0B4B4}
+.note{font-size:12.5px;color:var(--mute);line-height:1.6}
+.note b{color:var(--ink)}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>On my way</h1>
+    <p class="sub">Owner only. Don't send this link to the customer — theirs is different.</p>
+  </div>
+
+  <div class="who" id="who" hidden><b id="whoName">—</b><span id="whoWhat">—</span></div>
+
+  <div class="now" id="now" hidden><b id="nowVal">—</b><span id="nowSub"></span></div>
+
+  <button class="p" id="go">Start sharing my ETA</button>
+
+  <div class="grid">
+    <button id="bArrived">Arrived</button>
+    <button id="bWorking">Started work</button>
+  </div>
+  <div class="grid">
+    <button id="bDone">Finished</button>
+    <button id="bOff" class="stop">Stop sharing</button>
+  </div>
+
+  <p class="msg" id="msg" hidden></p>
+
+  <p class="note"><b>What they see:</b> "about 15 minutes away", and nothing else. Your coordinates
+    reach the server, get turned into one number, and are thrown away — they are never stored and
+    never shown. There is no map and no dot to follow.</p>
+  <p class="note">The ETA comes from distance to their town, not live traffic. It updates about once
+    a minute while this page is open. Lock the phone and it stops — that's deliberate.</p>
+</div>
+<script src="otw.js" defer></script>
+</body>
+</html>
