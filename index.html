@@ -3,9 +3,50 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cipher Auto Lab — Mobile Auto Detailing | New Haven County &amp; Central CT</title>
-<meta name="description" content="Mobile auto detailing across New Haven County and central Connecticut. We come to your driveway or office. Ceramic coating, paint correction, full interior and exterior detailing. New Haven, Hamden, Shelton, Ansonia, Waterbury, Meriden, Hartford and surrounding towns.">
+<title>Cipher Auto Lab — Tint &amp; Ceramic Coating | Windsor Locks, CT</title>
+<meta name="description" content="Window tint and ceramic coating at our Windsor Locks shop, minutes from Bradley Airport. Carbon tint from $169, ceramic tint from $269, every price published. Mobile detailing across Hartford County — Windsor, Enfield, Suffield, East Granby, Hartford and surrounding towns.">
 <link rel="canonical" href="https://cipherautolab.com/">
+<!-- Local search / map listing data. Keep the address, phone and hours identical to the Google Business Profile. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["AutoRepair", "LocalBusiness"],
+  "name": "Cipher Auto Lab",
+  "alternateName": "Cipher Auto Lab — Tint & Ceramic Coating",
+  "description": "Window tint and ceramic coating at the Windsor Locks shop, minutes from Bradley Airport, plus mobile auto detailing across Hartford County, Connecticut.",
+  "url": "https://cipherautolab.com/",
+  "telephone": "+1-203-592-9589",
+  "email": "hello@cipherautolab.com",
+  "priceRange": "$$",
+  "currenciesAccepted": "USD",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "523 Halfway House Rd",
+    "addressLocality": "Windsor Locks",
+    "addressRegion": "CT",
+    "postalCode": "06096",
+    "addressCountry": "US"
+  },
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+    "opens": "08:00",
+    "closes": "18:00"
+  }],
+  "areaServed": { "@type": "AdministrativeArea", "name": "Hartford County, Connecticut" },
+  "sameAs": ["https://www.facebook.com/cipherautolab"],
+  "makesOffer": [
+    { "@type": "Offer", "name": "Carbon window tint, full vehicle",
+      "priceSpecification": { "@type": "PriceSpecification", "minPrice": "169", "priceCurrency": "USD" } },
+    { "@type": "Offer", "name": "Ceramic window tint, full vehicle",
+      "priceSpecification": { "@type": "PriceSpecification", "minPrice": "269", "priceCurrency": "USD" } },
+    { "@type": "Offer", "name": "Ceramic coating",
+      "priceSpecification": { "@type": "PriceSpecification", "minPrice": "949", "priceCurrency": "USD" } },
+    { "@type": "Offer", "name": "Full detail, mobile",
+      "priceSpecification": { "@type": "PriceSpecification", "minPrice": "259", "priceCurrency": "USD" } }
+  ]
+}
+</script>
 <style>
 :root{
   --bg:#08090B; --panel:#0F1216; --panel2:#141920; --line:#212831;
@@ -681,23 +722,26 @@ select:disabled{opacity:.5;cursor:not-allowed}
 
 <!-- ===== LOGO SYMBOL ===== -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  <linearGradient id="bgrad" x1="10%" y1="0%" x2="90%" y2="100%">
-    <stop offset="0%" stop-color="#D9F99D"/><stop offset="45%" stop-color="#65D98A"/>
-    <stop offset="100%" stop-color="#059669"/>
+  <linearGradient id="bgrad" x1="6%" y1="0%" x2="94%" y2="100%">
+    <stop offset="0%" stop-color="#A8E63C"/><stop offset="46%" stop-color="#5FD86E"/>
+    <stop offset="100%" stop-color="#22B573"/>
   </linearGradient>
-  <radialGradient id="bhi" cx="34%" cy="26%" r="58%">
-    <stop offset="0%" stop-color="#fff" stop-opacity=".9"/>
-    <stop offset="42%" stop-color="#fff" stop-opacity=".2"/>
-    <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
-  </radialGradient>
+  <linearGradient id="bgrad2" x1="0%" y1="0%" x2="70%" y2="100%">
+    <stop offset="0%" stop-color="#B6EA46"/><stop offset="55%" stop-color="#5AD67F"/>
+    <stop offset="100%" stop-color="#28BA76"/>
+  </linearGradient>
+  <clipPath id="bLeft"><rect x="-4" y="-4" width="54" height="108"/></clipPath>
+  <clipPath id="bRight"><rect x="50" y="-4" width="54" height="108"/></clipPath>
   <symbol id="bead" viewBox="0 0 100 100">
-    <path d="M50 5 L88 27 L88 71 L50 93 L12 71 L12 27 Z" fill="none" stroke="url(#bgrad)" stroke-width="5.5" stroke-linejoin="round"/>
-    <path d="M34.5 65 C27.5 49 37 32 50 32 C63 32 72.5 49 65.5 65 Z" fill="url(#bgrad)"/>
-    <path d="M34.5 65 C27.5 49 37 32 50 32 C63 32 72.5 49 65.5 65 Z" fill="url(#bhi)"/>
-    <rect x="24" y="66.5" width="52" height="4" rx="1" fill="url(#bgrad)"/>
-    <g fill="url(#bgrad)">
-      <rect x="30" y="73" width="3.2" height="6" rx="1"/><rect x="42" y="73" width="3.2" height="6" rx="1"/>
-      <rect x="54" y="73" width="3.2" height="6" rx="1"/><rect x="66" y="73" width="3.2" height="6" rx="1"/>
+    <path d="M50 4 L89 26.5 L89 73.5 L50 96 L11 73.5 L11 26.5 Z"
+          fill="url(#bgrad)" stroke="url(#bgrad)" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#bLeft)">
+      <path d="M50 10.5 L83.5 29.8 L83.5 70.2 L50 89.5 L16.5 70.2 L16.5 29.8 Z"
+            fill="#2E343B" stroke="#2E343B" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M34.75 65.6 L34.75 46.9 A15.25 15.25 0 0 1 65.25 46.9 L65.25 65.6 Z" fill="url(#bgrad2)"/>
+    </g>
+    <g clip-path="url(#bRight)">
+      <path d="M34.75 65.6 L34.75 46.9 A15.25 15.25 0 0 1 65.25 46.9 L65.25 65.6 Z" fill="#07090A"/>
     </g>
   </symbol>
   <symbol id="ic-fb" viewBox="0 0 24 24">
@@ -717,9 +761,9 @@ select:disabled{opacity:.5;cursor:not-allowed}
     </a>
     <div class="hdr-r">
       <a class="navlink" href="#photoquote">Free quote</a>
-      <a class="navlink" href="#packages">Packages</a>
-      <a class="navlink" href="#addons">Add-ons</a>
-      <a class="navlink" href="#restoration">Restoration</a>
+      <a class="navlink" href="#tint">Tint</a>
+      <a class="navlink" href="#packages">Detailing</a>
+      <a class="navlink" href="#restoration">Coating</a>
       <a class="navlink" href="#how">How it works</a>
       <a class="navlink" href="#area">Service area</a>
       <a class="navlink" href="/fleet">Fleet</a>
@@ -736,20 +780,21 @@ select:disabled{opacity:.5;cursor:not-allowed}
 <div id="top" class="hero">
   <div class="heroimg" role="img" aria-label="Hyundai Sonata detailed in a driveway under a canopy"></div>
   <div class="wrap hero-in">
-    <div class="tag mono"><span class="dot"></span> Mobile service · New Haven County &amp; central CT</div>
-    <h1>Your car gets the <em>lab treatment</em>. In your own driveway.</h1>
-    <p class="sub">Fully mobile detailing and ceramic coating from New Haven and the Valley up through central Connecticut. We bring the water, the power, and a documented process — you don't move the car or lose your Saturday.</p>
+    <div class="tag mono"><span class="dot"></span> Windsor Locks shop · By appointment · Mobile detailing across Hartford County</div>
+    <h1>Your car gets the <em>lab treatment</em>. Tint, coating, detail.</h1>
+    <p class="sub">Window tint and ceramic coating at the shop on Halfway House Road in Windsor Locks, two minutes from Bradley. Detailing still comes to you — we bring the water, the power, and a documented process, so you don't lose your Saturday.</p>
     <div class="cta">
-      <a class="btn btn-p btn-lg" href="#photoquote">Get a free photo quote</a>
-      <a class="btn btn-o btn-lg" href="#quote">Book a slot</a>
+      <a class="btn btn-p btn-lg" href="#tint">See tint prices</a>
+      <a class="btn btn-o btn-lg" href="#photoquote">Get a free photo quote</a>
+      <a class="btn btn-o btn-lg" href="#quote">Book detailing</a>
     </div>
-    <p class="hnote">Owner-operated · Connecticut LLC, insured · Fixed price agreed before we start · 30+ towns covered</p>
+    <p class="hnote">Owner-operated · Connecticut LLC, insured · Fixed price agreed before we start · Shop tint &amp; coating, mobile detailing</p>
 
     <div class="trust">
-      <div class="ti"><b>100%</b><span>Mobile — we come to you</span></div>
+      <div class="ti"><b>$169+</b><span>Carbon tint, installed</span></div>
+      <div class="ti"><b>Shop + mobile</b><span>Windsor Locks · Hartford County</span></div>
       <div class="ti"><b>LLC &amp; insured</b><span>Certificate on request</span></div>
-      <div class="ti"><b>Self&#8209;contained</b><span>Own water &amp; power</span></div>
-      <div class="ti"><b>Tint soon</b><span>Launching 2026</span></div>
+      <div class="ti"><b>Lifetime film</b><span>Manufacturer warranty*</span></div>
     </div>
   </div>
 </div>
@@ -800,8 +845,9 @@ select:disabled{opacity:.5;cursor:not-allowed}
       <p>Not a range, not "starting from" — the actual price for your actual car, usually within the
         hour on a working day. We quote off what we can see rather than what you had to remember to
         mention, which is why the number doesn't move afterwards.</p>
-      <p class="pqfoot">No account, no card, no mailing list. If the answer is "your car doesn't need
-        that yet", you'll get that answer too.</p>
+      <p class="pqfoot">Works for tint too — send the same photos, say which windows you want done, and
+        you'll get the film price and the first appointment I have. No account, no card, no mailing list.
+        If the answer is "your car doesn't need that yet", you'll get that answer too.</p>
     </div>
 
     <div class="pqcols">
@@ -1176,26 +1222,24 @@ select:disabled{opacity:.5;cursor:not-allowed}
   <div class="wrap area">
     <div>
       <div class="eyebrow mono">Service area</div>
-      <h2>New Haven County, the Valley, and central CT.</h2>
-      <p class="lede">Fully mobile from the shoreline up through Hartford County. Not on the list? Ask anyway — if you're close to the edge of it, we'll usually make it work.</p>
+      <h2>The shop is in Windsor Locks. Detailing still comes to you.</h2>
+      <p class="lede">Tint and ceramic coating happen at <b>523 Halfway House Rd, Unit 9, Windsor Locks</b> — two minutes off Route 20, right by Bradley. It's <b>appointment only</b>: one car in the bay at a time, so there's no point dropping in. Detailing is still mobile across Hartford County. Not on the list? Ask anyway — if you're close to the edge of it, we'll usually make it work.</p>
     </div>
     <div class="towns">
-      <span class="areahead mono">New Haven County</span>
-      <span class="town hub">New Haven</span><span class="town hub">Hamden</span><span class="town hub">Milford</span>
-      <span class="town">West Haven</span><span class="town">East Haven</span><span class="town">North Haven</span>
-      <span class="town">Branford</span><span class="town">Guilford</span><span class="town">Orange</span>
-      <span class="town">Woodbridge</span><span class="town">Cheshire</span><span class="town">Wallingford</span>
-      <span class="town">Meriden</span>
-      <span class="areahead mono">Naugatuck Valley</span>
-      <span class="town hub">Shelton</span><span class="town hub">Ansonia</span>
-      <span class="town">Derby</span><span class="town">Seymour</span><span class="town">Oxford</span>
-      <span class="town">Beacon Falls</span><span class="town">Naugatuck</span><span class="town">Waterbury</span>
-      <span class="areahead mono">Central &amp; Hartford County</span>
-      <span class="town hub">Hartford</span>
-      <span class="town">West Hartford</span><span class="town">New Britain</span><span class="town">Berlin</span>
-      <span class="town">Southington</span><span class="town">Plainville</span><span class="town">Newington</span>
-      <span class="town">Wethersfield</span><span class="town">Rocky Hill</span><span class="town">Cromwell</span>
-      <span class="town">Middletown</span><span class="town">Farmington</span><span class="town">Glastonbury</span>
+      <span class="areahead mono">Right around the shop</span>
+      <span class="town hub">Windsor Locks</span><span class="town hub">Windsor</span><span class="town hub">Enfield</span>
+      <span class="town">Suffield</span><span class="town">East Granby</span><span class="town">East Windsor</span>
+      <span class="town">Granby</span><span class="town">Somers</span><span class="town">Bloomfield</span>
+      <span class="areahead mono">Greater Hartford</span>
+      <span class="town hub">Hartford</span><span class="town hub">Manchester</span>
+      <span class="town">West Hartford</span><span class="town">South Windsor</span><span class="town">Vernon</span>
+      <span class="town">Newington</span><span class="town">Wethersfield</span><span class="town">Rocky Hill</span>
+      <span class="town">Farmington</span><span class="town">Avon</span><span class="town">Simsbury</span>
+      <span class="town">Glastonbury</span>
+      <span class="areahead mono">A bit further out</span>
+      <span class="town">New Britain</span><span class="town">Berlin</span><span class="town">Southington</span>
+      <span class="town">Ellington</span><span class="town">Tolland</span><span class="town">Canton</span>
+      <span class="town">Middletown</span>
     </div>
   </div>
 </section>
@@ -1223,18 +1267,86 @@ select:disabled{opacity:.5;cursor:not-allowed}
 </section>
 
 <!-- ===== TINT ===== -->
-<section>
+<section id="tint">
   <div class="wrap">
-    <div class="tint">
-      <div class="txt">
-        <div class="eyebrow mono">Coming soon</div>
-        <h3>Window tinting joins the lab.</h3>
-        <p>Ceramic window film is landing at Cipher Auto Lab later this year — same mobile service, same driveway. Ask us to add you to the early list when you book.</p>
+    <div class="shead">
+      <div class="eyebrow mono">Window tint · open at the shop</div>
+      <h2>Tint that stops the heat, not just the light.</h2>
+      <p class="lede">Installed at the Windsor Locks shop, in United Auto Film. Two lines: <b>carbon</b>, colour-stable and matte, which kills glare and never turns purple, and <b>ceramic</b>, which blocks far more of the infrared heat you can't see — same look, cooler car. Every price below is the whole car, cut and fitted, with the film's lifetime warranty registered in your name.</p>
+    </div>
+
+    <div class="tscroll">
+      <table class="tiertbl">
+        <thead><tr><th>Vehicle</th><th>Carbon</th><th>Ceramic</th></tr></thead>
+        <tbody>
+          <tr><td>Coupe, 2 door</td><td>$199</td><td class="hi">$329</td></tr>
+          <tr><td>Sedan, 4 door</td><td>$229</td><td class="hi">$359</td></tr>
+          <tr><td>Truck, 2 door</td><td>$169</td><td class="hi">$269</td></tr>
+          <tr><td>Truck, 4 door</td><td>$229</td><td class="hi">$359</td></tr>
+          <tr><td>SUV, 5 window</td><td>$259</td><td class="hi">$389</td></tr>
+          <tr><td>SUV, 7 window</td><td>$289</td><td class="hi">$439</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="shead" style="margin-top:52px;margin-bottom:0">
+      <div class="eyebrow mono">Part of a car</div>
+      <h2 style="font-size:clamp(20px,3vw,26px)">Matching the fronts, or just the strip.</h2>
+      <p class="lede">Most people come in for one of these: two front windows to match factory glass in the back, a brow across the top of the windshield, or a clear ceramic windshield that cuts the heat without changing how it looks.</p>
+    </div>
+    <div class="tscroll">
+      <table class="tiertbl">
+        <thead><tr><th>Job</th><th>Carbon</th><th>Ceramic</th></tr></thead>
+        <tbody>
+          <tr><td>Front two windows</td><td>$99</td><td class="hi">$149</td></tr>
+          <tr><td>Windshield brow / visor strip</td><td>$49</td><td class="hi">$69</td></tr>
+          <tr><td>Sunroof or panoramic roof</td><td>$69</td><td class="hi">$99</td></tr>
+          <tr><td>Full windshield</td><td>—</td><td class="hi">$249</td></tr>
+          <tr><td>Removing old tint, one window</td><td colspan="2">$30</td></tr>
+          <tr><td>Removing old tint, whole car</td><td colspan="2">$149 &nbsp;· &nbsp;20% off when we re-tint the same day</td></tr>
+          <tr><td>Rear glass with defroster lines</td><td colspan="2">+$40 — it comes off slowly or it doesn't come off at all</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pk" style="margin-top:52px">
+      <div class="card">
+        <div class="pname mono">The law, plainly</div>
+        <p class="pfor">We fit legal tint by default. If you want darker up front, we'll tell you what it costs you at a traffic stop before we cut anything.</p>
+        <ul class="feats">
+          <li>Front side windows: 35% or lighter</li>
+          <li>Behind the driver: darker is allowed, with both side mirrors on the car</li>
+          <li>Windshield: a strip above the AS-1 line only</li>
+          <li>The film maker's label goes on every window we tint</li>
+          <li>Medical exemption? Bring the paperwork and we'll work to it</li>
+        </ul>
       </div>
-      <div class="fade">
-        <i style="opacity:1"></i><i style="opacity:.78"></i><i style="opacity:.56"></i><i style="opacity:.34"></i><i style="opacity:.16"></i>
+      <div class="card feat">
+        <div class="flag">In writing</div>
+        <div class="pname mono">What the warranty covers</div>
+        <p class="pfor">The film carries a lifetime manufacturer warranty. Here's the honest shape of it.</p>
+        <ul class="feats">
+          <li>Bubbling, peeling, cracking, colour change — covered</li>
+          <li>Registered in your name within 30 days of install</li>
+          <li>It covers the film, not the labour to redo it</li>
+          <li>It stays with you, not with the car when you sell it</li>
+          <li>We file the claim for you</li>
+        </ul>
+        <a class="btn btn-p" href="tel:+12035929589">Call or text to book tint</a>
+      </div>
+      <div class="card">
+        <div class="pname mono">The first week</div>
+        <p class="pfor">New tint looks slightly cloudy while the mounting solution dries out. That's normal and it clears on its own.</p>
+        <ul class="feats">
+          <li>Leave the windows up for 3–5 days</li>
+          <li>Haze and small water pockets fade as it cures</li>
+          <li>Sun speeds it up; a cold week slows it down</li>
+          <li>Clean with anything ammonia-free, once it's cured</li>
+          <li>Still seeing something after two weeks? Come back</li>
+        </ul>
       </div>
     </div>
+    <p class="lede" style="margin-top:16px;font-size:13.5px">Tint is done at the shop, not in a driveway — film goes on cleanly in a controlled, dust-free bay and nowhere else. Most cars are in and out the same day. Tint appointments are booked by phone for now — call or text <a href="tel:+12035929589" style="color:var(--acc)">(203) 592-9589</a>, or send photos through the <a href="#photoquote" style="color:var(--acc)">free photo quote</a> and we'll come back with a number and a slot.</p>
   </div>
 </section>
 
@@ -1257,7 +1369,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
         </div>
         <div class="cl">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <div><b>Where we work</b><span>New Haven County, the Valley &amp; central CT</span></div>
+          <div><b>The shop</b><span>523 Halfway House Rd, Unit 9, Windsor Locks, CT 06096 — tint &amp; coating here <b>by appointment</b>, detailing at your place across Hartford County</span></div>
         </div>
         <div class="cl">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
@@ -1621,7 +1733,7 @@ select:disabled{opacity:.5;cursor:not-allowed}
               <p><b>Results.</b> Correction reduces defects, it doesn't resurface the car: roughly 50–60% of light swirling in one stage, 80–90% in two. Anything deeper than the clear coat needs paint. Some stains and odours are permanent. Paint has a finite thickness and we stop while it's still safe to stop.</p>
               <p><b>Belongings.</b> Please empty the car, child seats included. We're not responsible for items left inside.</p>
               <p><b>Damage.</b> We're insured. If we damage something you'll hear it from us first and it gets covered. Report anything you think we caused within <b>48 hours</b>. Our liability is limited to what you paid for the job.</p>
-              <p><b>Law.</b> Connecticut, New Haven County. Version 1.0 — the version you sign is the one that governs your job.</p>
+              <p><b>Law.</b> Connecticut, Hartford County. Version 1.0 — the version you sign is the one that governs your job.</p>
             </div>
 
             <label class="agree" id="agreeBox">
@@ -1744,8 +1856,12 @@ select:disabled{opacity:.5;cursor:not-allowed}
         <p>A mobile slot is several hours plus travel, and a same-day cancellation can't be refilled — the deposit is the smallest amount that makes that sting a little instead of not at all. It's $25 to $150 depending on the service, it comes straight off your total rather than being an extra charge, and you get it back in full if you give 24 hours notice, if we reschedule for weather, or if we turn up, find something that changes the price and you'd rather not go ahead. You only lose it for a same-day cancellation or a no-show.</p></details>
       <details><summary>What if a stain won't come out?</summary>
         <p>Some won't. Dye transfer, old bleach spots, sun-cracked leather and ground-in salt damage are sometimes permanent, and no amount of product changes that. If it's visible going in you'll be told before the quote, and if it turns up mid-job we stop and talk to you rather than quietly charge for a result we can't deliver.</p></details>
-      <details><summary>When does window tinting start?</summary>
-        <p>We're targeting later this year. Mention it when you book and we'll add you to the early list — that group gets first appointments and launch pricing.</p></details>
+      <details><summary>Where does the tint get installed?</summary>
+        <p>At the shop, 523 Halfway House Rd in Windsor Locks — two minutes from Bradley. Film has to go on in a clean, still, dust-free bay, so it's the one thing we don't do in a driveway. Most cars are done the same day. Detailing still comes to you.</p></details>
+      <details><summary>How dark can I legally go in Connecticut?</summary>
+        <p>Your front side windows have to let at least 35% of the light through. Behind the driver you can go darker, provided the car has both side mirrors, and the windshield takes a tinted strip above the AS-1 line. We fit legal tint by default and put the film maker's label on every window we do. If you have a medical exemption, bring the paperwork and we'll work to it. If you want darker than the law allows anyway, we'll tell you plainly what that means at a traffic stop before we cut anything.</p></details>
+      <details><summary>Carbon or ceramic — is ceramic worth it?</summary>
+        <p>They look close to identical. The difference is heat: ceramic blocks much more of the infrared that makes a parked car unbearable, and it doesn't interfere with phone or radio signal. If the car lives outside, sits in the sun at work, or you're in it with kids, ceramic earns the difference back every August. If you mainly want glare and privacy, carbon is a solid film and we'll happily fit it.</p></details>
     </div>
   </div>
 </section>
@@ -1758,7 +1874,8 @@ select:disabled{opacity:.5;cursor:not-allowed}
         <svg><use href="#bead"/></svg>
         <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
       </a>
-      <p class="fnote">Owner-operated mobile auto detailing and ceramic coating serving New Haven County, the Naugatuck Valley and central Connecticut. Window tinting coming soon.</p>
+      <p class="fnote">Owner-operated window tint, ceramic coating and auto detailing. Tint and coating at the shop by appointment, 523 Halfway House Rd, Unit 9, Windsor Locks, CT 06096 — minutes from Bradley Airport. Mobile detailing across Hartford County.</p>
+      <p class="fnote" style="margin-top:10px"><a href="https://maps.google.com/?q=523+Halfway+House+Rd,+Windsor+Locks,+CT+06096" target="_blank" rel="noopener" style="color:var(--acc);text-decoration:none">523 Halfway House Rd, Unit 9, Windsor Locks, CT 06096</a><br>Mon–Sat 8am–6pm · Sunday by request · Appointments only</p>
     </div>
     <div class="fmeta">
       <p><a href="tel:+12035929589" style="text-decoration:none">(203) 592-9589</a></p>
