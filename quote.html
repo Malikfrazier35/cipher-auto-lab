@@ -496,6 +496,7 @@
           <div class="qh">Pick a day.</div>
           <div class="qs" id="leadnote">Mon–Sat, from two days out. Sundays by request only.</div>
           <div class="dates" id="dates"></div>
+          <button type="button" class="more-dates" id="moreDates" hidden>Show later dates</button>
 
           <div class="qh u-16">And a window.</div>
           <div class="qs">We'll confirm an arrival time the day before.</div>
@@ -507,15 +508,17 @@
 
           <div class="qh u-20">Where's the car?</div>
           <div class="qs">We bring our own water, power and canopy. All we need is about 15 feet of clear space around the vehicle.</div>
-          <div class="fld"><label for="btw">Town</label>
-            <select id="btw" required><option value="">Choose your town</option></select></div>
           <div class="fld"><label for="bad">Street address</label>
-            <input id="bad" placeholder="Where the car will be" autocomplete="address-line1" required>
-            <p class="fldnote" id="areaNote" hidden></p></div>
-          <div class="fld"><label for="bzip">ZIP code</label>
-            <input id="bzip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx" required></div>
+            <input id="bad" placeholder="House number and street" autocomplete="address-line1" required></div>
+          <div class="row addr">
+            <div class="fld"><label for="btw">Town</label>
+              <select id="btw" autocomplete="address-level2" required><option value="">Choose your town</option></select></div>
+            <div class="fld"><label for="bzip">ZIP</label>
+              <input id="bzip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx" required></div>
+          </div>
+          <p class="fldnote" id="areaNote" hidden></p>
 
-          <div class="err" id="e3">Pick a date, a town, an address and a Connecticut ZIP code to continue.</div>
+          <div class="err" id="e3" role="alert">Pick a date, a town, an address and a Connecticut ZIP code to continue.</div>
           <div class="navrow">
             <button type="button" class="btn ghost btn-lg" data-go="3">Back</button>
             <button type="button" class="btn btn-p btn-lg" data-go="5">Review terms</button>
@@ -526,14 +529,13 @@
              because you give your name in one place rather than two. -->
         <div class="pane" data-p="5">
           <div class="qh">Who are we coming to see?</div>
-          <div class="qs">Straight to us. No mailing list, and no card details are ever entered on this page.</div>
+          <div class="qs">Straight to us. No mailing list, and we only use these to confirm your slot.</div>
           <div class="row">
             <div class="fld"><label for="bnm">Name</label><input id="bnm" placeholder="First and last name" required></div>
             <div class="fld"><label for="bph">Phone</label><input id="bph" type="tel" placeholder="(203) 555-0100" required></div>
           </div>
           <div class="fld"><label for="bem">Email (optional)</label><input id="bem" type="email" placeholder="you@email.com"></div>
-          <input class="hp" type="text" id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <div class="err" id="e4">Enter a name and a 10-digit phone number.</div>
+          <div class="err" id="e4" role="alert">Enter a name and a 10-digit phone number.</div>
 
           <div class="qh u-21">Everything, in writing, before you agree.</div>
           <div class="qs">Read it. If any of this doesn't suit you, go back or call instead — nothing is committed yet.</div>
@@ -622,11 +624,11 @@
               <p class="sighint" id="sighint">Typing your name is your signature. We record the agreement version, your name, the date and time, and the IP address it came from. Your confirmation email is your copy.</p>
             </div>
           </div>
-          <div class="err" id="e5">Please agree to the Service Agreement and sign with your full name.</div>
+          <div class="err" id="e5" role="alert">Please agree to the Service Agreement and sign with your full name.</div>
 
           <div class="lock">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            No card details are entered on this site. We send a secure payment link after we confirm your slot.
+            <span id="lockNote">Nothing is charged yet. Next you hold the slot with a refundable deposit, paid securely through Stripe.</span>
           </div>
 
           <div class="navrow">

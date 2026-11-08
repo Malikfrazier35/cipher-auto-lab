@@ -70,9 +70,10 @@
                (names.length ? ', plus ' + names.join(', ') : '') +
                '. Menu total ' + money + ' before any travel fee, ' + hrs(mins) + '. My town: ';
     all('[data-sms]').forEach(function (a) { a.href = smsHref(body); });
-    all('[data-book]').forEach(function (a) {
-      a.href = 'quote.html' + (pkg ? '?svc=' + encodeURIComponent(pkg.value) : '') + '#quote';
-    });
+    // the booking form picks these up (js/preselect.js) and opens at the vehicle step
+    var q = pkg ? '?svc=' + encodeURIComponent(pkg.value) + '&size=' + encodeURIComponent(size) +
+            (keys.length ? '&adds=' + keys.map(encodeURIComponent).join(',') : '') + '&from=menu' : '';
+    all('[data-book]').forEach(function (a) { a.href = '/quote' + q + '#quote'; });
   }
 
   document.addEventListener('change', function (e) {

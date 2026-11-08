@@ -106,12 +106,17 @@ h2{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;font-we
 .bacap{font-size:13px;color:var(--mute);margin-bottom:34px;padding-left:14px;border-left:2px solid var(--acc)}
 .bacap b{color:var(--ink)}
 
-.work{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.work{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.work{grid-template-columns:1fr 1fr;gap:10px}}
 .shot{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
 .shot img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:3/4}
 .shot.wide{grid-column:span 2}
 .shot.wide img{aspect-ratio:4/3}
-@media(max-width:640px){.shot.wide{grid-column:span 1}}
+.shot img.op-top{object-position:50% 18%}
+@media(max-width:640px){
+  .work{gap:8px}
+  .shot span{font-size:11px;padding:22px 10px 9px}
+}
 .shot span{
   position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;font-size:12px;color:#E4EAF0;
   background:linear-gradient(transparent,rgba(6,8,10,.9));line-height:1.35;
@@ -219,7 +224,20 @@ ul.feats li::before{
 .opt .pz{font-size:13px;color:var(--acc);font-weight:650;margin-top:7px;display:block;
   font-family:ui-monospace,Menlo,monospace}
 
-.dates{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:9px;max-height:230px;overflow-y:auto;padding-right:4px}
+.dates{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:9px}
+@media(max-width:560px){.dates{grid-template-columns:repeat(4,1fr);gap:7px}}
+.dt[hidden]{display:none}
+.dates.bad{outline:1px solid #F87171;outline-offset:5px;border-radius:9px}
+.more-dates{margin-top:10px;background:none;border:0;padding:6px 0;color:var(--acc);font:inherit;font-size:13px;font-weight:650;cursor:pointer}
+.more-dates:hover{text-decoration:underline}
+#win{grid-template-columns:repeat(3,1fr);gap:9px}
+#win .opt{padding:13px 10px;text-align:center}
+#win .opt b{font-size:15px}
+#win .opt span{font-size:12px;white-space:nowrap}
+.row.addr{grid-template-columns:1fr 112px}
+@media(max-width:560px){.row.addr{grid-template-columns:1fr 96px;gap:10px}}
+#areaNote{margin-top:-4px}
+#areaNote b{color:var(--ink,#F4F6F8);font-weight:650}
 .dt{background:#0B0E12;border:1px solid #242C36;border-radius:8px;padding:11px 6px;text-align:center;
   cursor:pointer;font-family:inherit;color:var(--ink);transition:.14s}
 .dt:hover{border-color:#38434F}

@@ -101,7 +101,6 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var err = $('flErr');
-    if ($('flHp') && $('flHp').value) return;
     var co = $('flCo').value.trim(), name = $('flName').value.trim(), phone = $('flPhone').value.trim(),
         email = $('flEmail').value.trim(), where = town ? town.value : '';
     var ok = co.length > 1 && name.length > 1 && where && phone.replace(/\D/g, '').length === 10 &&

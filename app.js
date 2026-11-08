@@ -325,10 +325,18 @@
     o2.textContent='My town is not listed'; g2.appendChild(o2); sel.appendChild(g2);
 
     sel.addEventListener('change', function(){
-      var n=$('areaNote'), edge=(sel.value==='__ask');
-      n.hidden=!edge; n.classList.toggle('warn', edge);
-      if(edge) n.textContent='Not a problem — call (203) 560-3572 and we will tell you '
-        + 'straight away whether we can reach you. Close to the edge usually works.';
+      var n=$('areaNote'), v=sel.value, edge=(v==='__ask');
+      n.hidden=!v; n.classList.toggle('warn', edge);
+      if(edge){
+        n.textContent='Not a problem. Call or text (203) 560-3572 and we will tell you '
+          + 'straight away whether we can reach you. Close to the edge usually works.';
+      } else if(v){
+        n.innerHTML='';
+        var b=document.createElement('b'); b.textContent='We come to '+v+'. ';
+        n.appendChild(b);
+        n.appendChild(document.createTextNode('If a travel fee applies there, we text it to you '
+          + 'before your slot is confirmed. It is never added afterwards.'));
+      }
     });
   })();
 
@@ -366,15 +374,24 @@
       if(d.getDay()!==0){
         var b=document.createElement('button');
         b.type='button'; b.className='dt'; b.dataset.iso=d.toDateString();
+        if(made>=12) b.hidden=true;
         b.innerHTML='<em>'+DAY[d.getDay()]+'</em><b>'+d.getDate()+'</b><i>'+MON[d.getMonth()]+'</i>';
         box.appendChild(b); made++;
       }
       d.setDate(d.getDate()+1);
     }
+    var more=$('moreDates');
+    if(more){
+      more.hidden=false;
+      more.addEventListener('click',function(){
+        box.querySelectorAll('.dt[hidden]').forEach(function(o){ o.hidden=false });
+        more.hidden=true;
+      });
+    }
     box.addEventListener('click',function(ev){
       var b=ev.target.closest('.dt'); if(!b) return;
       box.querySelectorAll('.dt').forEach(function(o){o.classList.remove('sel')});
-      b.classList.add('sel'); S.date=b.dataset.iso; $('e3').style.display='none';
+      b.classList.add('sel'); S.date=b.dataset.iso; box.classList.remove('bad'); recheckWhere();
     });
   })();
 
@@ -416,14 +433,51 @@
   function digits(v){ return String(v).replace(/\D/g,'') }
   function phone10(v){ var d=digits(v); return d.length===11 && d.charAt(0)==='1' ? d.slice(1) : d }
   function bad(el,ok){ el.style.borderColor = ok ? '' : '#F87171'; return ok }
+  function firstGap(){
+    var el = !S.date ? $('dates') : ['bad','btw','bzip'].map($).filter(function(x){ return x.style.borderColor })[0];
+    if(!el) return;
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    if(el.focus && el.id!=='dates') el.focus({preventScroll:true});
+  }
 
+  function whereGaps(){
+    var gaps=[];
+    if(!S.date) gaps.push('pick a day');
+    if($('bad').value.trim().length<=3) gaps.push('add the street address');
+    var t=$('btw').value;
+    if(t==='__ask') gaps.push('call us about your town');
+    else if(t.trim().length<=1) gaps.push('choose your town');
+    var z=$('bzip').value.trim();
+    if(!/^06\d{3}$/.test(z)) gaps.push(z ? 'check the ZIP (Connecticut ZIPs start 06)' : 'add the ZIP');
+    return gaps;
+  }
   function validWhere(){
     var ok=!!S.date;
+    var dbox=$('dates'); if(dbox) dbox.classList.toggle('bad', !S.date);
     ok = bad($('btw'), $('btw').value.trim().length>1 && $('btw').value!=='__ask') && ok;
     ok = bad($('bad'), $('bad').value.trim().length>3) && ok;
     ok = bad($('bzip'), /^06\d{3}$/.test($('bzip').value.trim())) && ok;
+    var e3=$('e3'), gaps=whereGaps();
+    if(e3 && gaps.length){
+      var m=gaps.join(', '); e3.textContent='To continue, '+m.replace(/, ([^,]*)$/,' and $1')+'.';
+    }
     return ok;
   }
+  // once an error is showing, it updates as each field is fixed
+  function recheckWhere(){
+    var e3=$('e3'); if(!e3 || e3.style.display!=='block') return;
+    if(validWhere()) e3.style.display='none';
+  }
+  ['bad','btw','bzip'].forEach(function(id){
+    var el=$(id); if(!el) return;
+    el.addEventListener(id==='btw'?'change':'input', recheckWhere);
+  });
+  (function(){
+    var z=$('bzip'); if(!z) return;
+    z.addEventListener('input',function(){
+      var v=z.value.replace(/\D/g,'').slice(0,5); if(v!==z.value) z.value=v;
+    });
+  })();
   function validWho(){
     var ok=true;
     ok = bad($('bnm'), $('bnm').value.trim().length>1) && ok;
@@ -447,7 +501,7 @@
     var el=$(id); if(!el) return;
     ['input','change'].forEach(function(ev){ el.addEventListener(ev, function(){
       if($('e4').style.display!=='block') return;
-      if(validWho()){ $('e4').style.display='none' } else { $('e4').textContent=whoMessage() }
+      if(validWho()){ $('e4').style.display='none'; if(/^Check your details/.test($('e5').textContent)) $('e5').style.display='none' } else { $('e4').textContent=whoMessage() }
     }) });
   });
 
@@ -455,7 +509,7 @@
     var b=ev.target.closest('[data-go]'); if(!b) return;
     var n=+b.dataset.go;
     if(n===5){
-      if(!validWhere()){ $('e3').style.display='block'; return }
+      if(!validWhere()){ $('e3').style.display='block'; firstGap(); return }
       $('e3').style.display='none'; paint(); fill('s'); fill('b');
     }
     if(n===1){ S.date=null; $$('.dt').forEach(function(o){o.classList.remove('sel')}) }
@@ -653,20 +707,24 @@
   })();
 
   $('submitBk').addEventListener('click',function(){
-    if($('hp').value){ return }
     if(!validWho()){
       var e4=$('e4'); e4.textContent=whoMessage(); e4.style.display='block';
+      $('e5').textContent='Check your details at the top of this step: '+whoMessage().replace(/^./,function(c){return c.toLowerCase()});
+      $('e5').style.display='block';
       var first=['bnm','bph','bem'].map($).filter(function(el){ return el.style.borderColor })[0] || $('bnm');
       first.scrollIntoView({behavior:'smooth',block:'center'}); first.focus({preventScroll:true});
       return;
     }
     $('e4').style.display='none';
-    if(!validWhere()){ show(4); $('e3').style.display='block'; return }
+    if(!validWhere()){ show(4); $('e3').style.display='block'; setTimeout(firstGap,350); return }
     var sigEl=$('sig'), sigVal=(sigEl&&sigEl.value||'').trim();
     var okAgree=$('agree').checked;
     // a signature has to look like a name, not a keyboard mash or a single initial
     var okSig=sigVal.length>=3 && /^[A-Za-z][A-Za-z .'’-]*[A-Za-z.]$/.test(sigVal) && /\s/.test(sigVal);
     if(!okAgree || !okSig){
+      $('e5').textContent = !okAgree && !okSig ? 'Tick the box to agree, and type your full name to sign.'
+        : !okAgree ? 'Tick the box to agree to the Service Agreement.'
+        : 'Type your first and last name to sign.';
       $('e5').style.display='block';
       $('agreeBox').classList.toggle('bad', !okAgree);
       if(sigEl) sigEl.classList.toggle('bad', !okSig);
@@ -678,11 +736,14 @@
     S.signedAt=new Date().toISOString();
     S.photoOk=!!($('photoOk')&&$('photoOk').checked);
     S.ref=makeRef();
-    var body=summary();
-    $('refCode').textContent=S.ref;
-    $('sendSms').href='sms:+12035603572?&body='+encodeURIComponent(body);
-    $('sendMail').href='mailto:hello@cipherautolab.com?subject='
-      +encodeURIComponent('Booking '+S.ref+' — '+svcLabel()+' — '+S.date)+'&body='+encodeURIComponent(body);
+    // whatever happens while writing the summary, the customer still moves on to the deposit
+    try{
+      var body=summary();
+      $('refCode').textContent=S.ref;
+      $('sendSms').href='sms:+12035603572?&body='+encodeURIComponent(body);
+      $('sendMail').href='mailto:hello@cipherautolab.com?subject='
+        +encodeURIComponent('Booking '+S.ref+' — '+svcLabel()+' — '+S.date)+'&body='+encodeURIComponent(body);
+    }catch(err){ if(window.console) console.error('booking summary', err) }
     show(6);
     startPayment();
   });
@@ -693,5 +754,6 @@
     if(this.value.trim().length>=3){ this.classList.remove('bad'); if($('agree').checked) $('e5').style.display='none' }
   });
   if(cardsOn()){ var lb=document.querySelector('label[for="bem"]'); if(lb) lb.textContent='Email (for your receipt)'; }
+  else if($('lockNote')){ $('lockNote').textContent='Nothing is charged online. Next you send us the booking by text and we confirm your slot.'; }
   paint();
 })();

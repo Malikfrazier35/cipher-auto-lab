@@ -253,3 +253,11 @@ a.c-panel:hover{transform:translateY(-3px)}
 .pq-fine{margin-top:18px;font-size:12.5px;line-height:1.55;color:var(--dim)}
 .pq-fine a{color:var(--soft)}
 .c-screen.sm .c-tagline{display:none}
+
+/* booking: what was carried over from the menu or a Book button */
+.carry{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 18px;padding:14px 16px;
+  border:1px solid rgba(163,230,53,.4);border-radius:12px;background:rgba(163,230,53,.07)}
+.carry .k{display:block;font-family:JBM,ui-monospace,monospace;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--acc)}
+.carry b{display:block;margin-top:4px;font-size:16px;font-weight:800;color:var(--ink)}
+.carry span:last-child{display:block;margin-top:2px;font-size:13.5px;color:var(--soft)}
+.carry .btn{flex:none}

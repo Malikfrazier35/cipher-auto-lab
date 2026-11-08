@@ -14,6 +14,11 @@
     buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.size === size)); });
     prices.forEach(function (p) { var v = p.dataset[size]; if (v) p.textContent = '$' + v; });
     labels.forEach(function (l) { l.textContent = LABEL[size]; });
+    // the Book buttons carry the size into the booking form
+    document.querySelectorAll('.c-card a[href*="svc="]').forEach(function (a) {
+      var m = /svc=([a-z]+)/.exec(a.getAttribute('href'));
+      if (m) a.setAttribute('href', '/quote?svc=' + m[1] + '&size=' + size + '#quote');
+    });
   }
 
   buttons.forEach(function (b) { b.addEventListener('click', function () { pick(b.dataset.size); }); });
