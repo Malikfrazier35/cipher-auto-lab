@@ -1,8 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /api/
-
-Disallow: /job
-Disallow: /otw
 
 Sitemap: https://cipherautolab.com/sitemap.xml
