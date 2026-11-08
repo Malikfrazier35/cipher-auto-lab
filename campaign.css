@@ -153,3 +153,103 @@ h2{font-weight:900;letter-spacing:-.03em}
 
 /* nav gets crowded between tablet and desktop: drop the two least-used links there */
 @media(max-width:1180px){.navlink.wide{display:none}}
+
+/* =====================================================================
+   SCREENS: every page opens like the magnet and the postcard.
+   Mono kicker, heavy uppercase headline, lime "+" line, the tagline,
+   a short lime rule and the white card with the lime band.
+   ===================================================================== */
+.c-screen{border-bottom:1px solid var(--line)}
+.c-screen .wrap.solo{grid-template-columns:1fr}
+.c-tagline{margin-top:clamp(16px,2vw,22px);font-family:JBM,ui-monospace,monospace;font-size:clamp(11px,1.1vw,13px);
+  letter-spacing:.32em;text-transform:uppercase;color:var(--soft)}
+.c-rule{display:block;width:72px;height:4px;border-radius:2px;background:var(--acc);margin-top:18px}
+.c-screen .c-sub{margin-top:18px}
+/* the legal pages: same screen, smaller type */
+.c-screen.sm{padding:clamp(36px,5vw,64px) 0 clamp(30px,4vw,48px)}
+.c-screen.sm .c-h1 .l{font-size:clamp(40px,7vw,84px);font-size:min(10.5cqi,88px)}
+.c-screen.sm .c-sub{max-width:62ch;font-size:16.5px}
+
+/* white card with the lime band, like the magnet's menu panel */
+.c-panel{display:block;text-decoration:none;background:#fff;color:#08090B;border-radius:18px;overflow:hidden;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);transition:transform .2s}
+a.c-panel:hover{transform:translateY(-3px)}
+.c-panel .band{background:var(--acc);padding:14px 20px;font-weight:900;font-size:clamp(22px,2.4vw,28px);
+  letter-spacing:-.02em;text-align:center;text-transform:uppercase;color:#08090B}
+.c-panel .pb{padding:20px 22px 22px}
+.c-panel .k{display:block;text-align:center;font-family:JBM,ui-monospace,monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase}
+.c-panel .big{display:block;text-align:center;margin-top:6px;font-weight:900;letter-spacing:-.03em;white-space:nowrap;
+  font-size:clamp(24px,2.7vw,32px);font-variant-numeric:tabular-nums}
+.c-panel ul{list-style:none;margin:16px 0 0;padding:0;border-top:1px solid #E1E5E9}
+.c-panel li{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 2px;
+  border-bottom:1px solid #E1E5E9;font-size:14.5px;font-weight:600;color:#3A424A}
+.c-panel li b{font-weight:900;color:#08090B;text-align:right}
+.c-panel .foot{display:block;margin-top:16px;text-align:center;font-weight:800;font-size:15px}
+.c-panel .foot::after{content:" →";color:#4D7C0F}
+@media(max-width:860px){.c-panel{max-width:520px}}
+@media(prefers-reduced-motion:reduce){.c-panel{transition:none}}
+
+.c-fline{margin-top:14px;font-family:JBM,ui-monospace,monospace;font-size:11px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim)}
+
+/* package cards on the inner pages: postcard titles (uppercase, lime when featured) */
+.pk .card .pname{font-family:Inter,system-ui,sans-serif;font-size:19px;font-weight:800;letter-spacing:-.01em;
+  text-transform:uppercase;color:var(--ink)}
+.pk .card.feat{border:2px solid var(--acc)}
+.pk .card.feat .pname{color:var(--acc)}
+
+/* =====================================================================
+   PHOTO QUOTE, by text: guide on one side, three fields on the other,
+   and the message opens in the phone's own texts with the photos added there.
+   ===================================================================== */
+#photoquote{padding:clamp(52px,7vw,88px) 0;border-bottom:1px solid var(--line)}
+.pq-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(22px,3.4vw,44px);align-items:start}
+@media(max-width:900px){.pq-grid{grid-template-columns:1fr}}
+.pq-k{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-family:JBM,ui-monospace,monospace;
+  font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--soft)}
+.pq-k span{background:var(--acc);color:#14300A;border-radius:6px;padding:4px 7px;font-size:11px;letter-spacing:.08em}
+.pqshots{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:359px){.pqshots{grid-template-columns:1fr}}
+.pqshot{margin:0;background:var(--card);border:1px solid var(--card-line);border-radius:14px;padding:12px}
+.pqshot svg{display:block;width:100%;height:auto;background:#0B0E12;border-radius:9px}
+.pqshot .body{fill:#161B21;stroke:#E8EDF2;stroke-width:2.2}
+.pqshot .glass{fill:#0B0E12;stroke:#8B96A4;stroke-width:1.6}
+.pqshot .wheel{fill:#C9D1D9}
+.pqshot .ln{fill:none;stroke:#8B96A4;stroke-width:1.6;stroke-linecap:round}
+.pqshot .door{fill:none;stroke:#E8EDF2;stroke-width:2.2;stroke-linejoin:round}
+.pqshot .cone{fill:var(--acc);fill-opacity:.26;stroke:var(--acc);stroke-width:1.4;stroke-linejoin:round}
+.pqshot .cam{fill:var(--acc)}
+.pqshot .hatch path{fill:none;stroke:#3A444E;stroke-width:1.6;stroke-linecap:round}
+.pqshot .lens{fill:none;stroke:#E8EDF2;stroke-width:2.6}
+.pqshot .grip{fill:none;stroke:#E8EDF2;stroke-width:5;stroke-linecap:round}
+.pqshot .spark{fill:none;stroke:var(--acc);stroke-width:2.2;stroke-linecap:round}
+.pqshot figcaption{margin-top:10px;font-size:13px;line-height:1.5;color:var(--mute)}
+.pqshot figcaption b{display:block;margin-bottom:3px;color:var(--ink);font-size:13.5px;font-weight:800;text-transform:uppercase}
+.pqtip{margin-top:14px;padding-left:12px;border-left:3px solid var(--acc);font-size:14px;line-height:1.6;color:var(--mute)}
+.pqtip b{color:var(--ink)}
+.pq-card{background:var(--card);border:1px solid var(--card-line);border-radius:16px;padding:clamp(20px,3vw,28px)}
+#pqForm{background:none;border:0;border-radius:0;padding:0}
+#pqForm .pq-k:not(:first-child){margin-top:22px}
+.pqrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.pqrow{grid-template-columns:1fr}}
+.pq-card .fld{margin-bottom:12px}
+.pq-card label{display:block;margin-bottom:7px;font-family:JBM,ui-monospace,monospace;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.pq-card textarea{min-height:76px}
+.pq-card .bad{border-color:#F87171}
+.pq-go{width:100%;justify-content:center}
+.pq-how{margin-top:12px;text-align:center;font-size:14px;color:var(--soft)}
+.pq-how b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#08090B;font-size:14px;line-height:1}
+.pq-alt{margin-top:8px;text-align:center;font-size:13px;color:var(--dim)}
+.pq-alt a{color:var(--ink)}
+.pq-err{margin:0 0 12px;padding:11px 13px;border:1px solid #4A2A2A;border-radius:9px;background:#170F10;color:#F0B4B4;font-size:13.5px}
+.pq-err[hidden],.pq-done[hidden],#pqForm[hidden]{display:none}
+.pq-done{display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 4px;text-align:center}
+.pq-tick{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--acc)}
+.pq-tick svg{width:28px;height:28px;fill:none;stroke:#14300A;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.pq-done h3{font-size:26px;font-weight:900;letter-spacing:-.02em;text-transform:uppercase}
+.pq-done p{max-width:44ch;color:var(--soft);font-size:15px;line-height:1.6}
+.pq-again{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.pq-fine{margin-top:18px;font-size:12.5px;line-height:1.55;color:var(--dim)}
+.pq-fine a{color:var(--soft)}
+.c-screen.sm .c-tagline{display:none}

@@ -1,9 +1,12 @@
 {
-  "name": "cipher-auto-lab",
+  "name": "cipher-auto-lab-site",
   "private": true,
-  "version": "1.0.0",
-  "description": "Cipher Auto Lab — mobile detailing, New Haven County & central CT",
+  "type": "module",
+  "description": "cipherautolab.com: static pages plus three Vercel functions for Stripe deposits.",
   "dependencies": {
-    "stripe": "^18.5.0"
+    "stripe": "^23.0.0"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

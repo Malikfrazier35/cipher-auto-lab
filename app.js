@@ -6,7 +6,7 @@
   /* ------------------------------------------------------------------ prices
      Four tiers, because interior labour scales with seats and exterior labour
      scales with panel area — different curves. These must stay in step with the
-     table in index.html, the deposits in api/create-payment-intent.js and the
+     table in index.html, the server copy in api/_booking.js and the
      figures printed in terms.html. If they drift, someone gets charged something
      they were never shown, and that is the one promise this whole site is built on. */
   var SVC={
@@ -327,7 +327,7 @@
     sel.addEventListener('change', function(){
       var n=$('areaNote'), edge=(sel.value==='__ask');
       n.hidden=!edge; n.classList.toggle('warn', edge);
-      if(edge) n.textContent='Not a problem — call (203) 592-9589 and we will tell you '
+      if(edge) n.textContent='Not a problem — call (203) 560-3572 and we will tell you '
         + 'straight away whether we can reach you. Close to the edge usually works.';
     });
   })();
@@ -386,7 +386,7 @@
     });
     document.querySelector('.bk').scrollIntoView({behavior:'smooth',block:'start'});
   }
-  function where(){ return esc($('bad').value)+', '+esc($('btw').value)+', CT' }
+  function where(){ return esc($('bad').value)+', '+esc($('btw').value)+', CT '+esc($('bzip').value) }
 
   function addsText(){
     var list=activeAdds();
@@ -414,22 +414,42 @@
   }
 
   function digits(v){ return String(v).replace(/\D/g,'') }
+  function phone10(v){ var d=digits(v); return d.length===11 && d.charAt(0)==='1' ? d.slice(1) : d }
   function bad(el,ok){ el.style.borderColor = ok ? '' : '#F87171'; return ok }
 
   function validWhere(){
     var ok=!!S.date;
     ok = bad($('btw'), $('btw').value.trim().length>1 && $('btw').value!=='__ask') && ok;
     ok = bad($('bad'), $('bad').value.trim().length>3) && ok;
+    ok = bad($('bzip'), /^06\d{3}$/.test($('bzip').value.trim())) && ok;
     return ok;
   }
   function validWho(){
     var ok=true;
     ok = bad($('bnm'), $('bnm').value.trim().length>1) && ok;
-    ok = bad($('bph'), digits($('bph').value).length===10) && ok;
+    ok = bad($('bph'), phone10($('bph').value).length===10) && ok;
     var em=$('bem'), ev=em.value.trim();
-    ok = bad(em, !ev || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(ev)) && ok;
+    ok = bad(em, (!ev && !cardsOn()) || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(ev)) && ok;
     return ok;
   }
+  function whoMessage(){
+    var n=$('bnm').value.trim().length>1, p=phone10($('bph').value).length===10;
+    var ev=$('bem').value.trim(), e=(!ev && !cardsOn()) || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(ev);
+    if(!n && !p) return 'Enter your name and a 10-digit phone number.';
+    if(!n) return 'Enter your name.';
+    if(!p) return 'That phone number needs 10 digits, like (203) 555-0100.';
+    if(!e) return cardsOn() ? (ev ? 'That email doesn\u2019t look right.' : 'Add your email so the deposit receipt reaches you.')
+                            : 'That email doesn\u2019t look right. It\u2019s optional, so you can also leave it blank.';
+    return '';
+  }
+  // fix-as-you-type: the error and red borders clear as soon as the fields are right
+  ['bnm','bph','bem'].forEach(function(id){
+    var el=$(id); if(!el) return;
+    ['input','change'].forEach(function(ev){ el.addEventListener(ev, function(){
+      if($('e4').style.display!=='block') return;
+      if(validWho()){ $('e4').style.display='none' } else { $('e4').textContent=whoMessage() }
+    }) });
+  });
 
   document.addEventListener('click',function(ev){
     var b=ev.target.closest('[data-go]'); if(!b) return;
@@ -449,6 +469,8 @@
     for(var i=0;i<2;i++) x+=r[Math.floor(Math.random()*r.length)];
     return 'CAL-'+t+x;
   }
+  function cardsOn(){ return !!(window.Stripe && window.STRIPE_PK && !/REPLACE_ME/.test(window.STRIPE_PK)); }
+
   function summary(){
     var NL='\n', adds=addsText();
     return 'BOOKING REQUEST — Cipher Auto Lab'+NL
@@ -462,8 +484,10 @@
       +'Parked: '+$('bk2').value+NL
       +'Requested: '+S.date+' · '+S.win+NL+NL
       +'Estimated total: '+totalText()+NL
-      +'Deposit PAID: $'+deposit()+' (refundable, comes off total)'+NL
-      +'Balance after walk-around: '+money(bal())+NL+NL
+      +'Travel fee: by town, confirmed by text before the slot is held'+NL
+      +(cardsOn() ? 'Deposit PAID: $'+deposit()+' (refundable, comes off total)'
+                  : 'Deposit: none taken online — please hold the slot by text')+NL
+      +(cardsOn() ? 'Balance after walk-around: '+money(bal())+NL+NL : NL)
       +'Name: '+esc($('bnm').value)+NL
       +'Phone: '+esc($('bph').value)+NL
       +'Email: '+esc($('bem').value)+NL
@@ -479,9 +503,56 @@
 
   var stripe=null, elements=null, paying=false;
 
+  // Until online card deposits are switched on, the last step sends the booking by text
+  // (already written out in the sendSms link) and nothing is charged.
+  function textToHold(){
+    var wrap=$('payWrap'), safe=document.querySelector('.paysafe'), btn=$('payBtn'), sms=$('sendSms');
+    var head=document.querySelector('.payhead');
+    if(wrap) wrap.hidden=true;
+    if(safe) safe.hidden=true;
+    if(head) head.hidden=true;
+    var note=$('payNote');
+    if(!note){
+      note=document.createElement('p'); note.id='payNote'; note.className='paynote';
+      wrap.parentNode.insertBefore(note, wrap);
+    }
+    var sub=wrap.parentNode.querySelector('.qs');
+    if(sub) sub.textContent='No deposit online yet. We hold your slot by text.';
+    note.textContent='Your booking is already typed out. Send it and we reply with your arrival '
+      + 'window. Nothing is charged today.';
+    if(btn && sms){
+      btn.textContent='Text my booking';
+      btn.addEventListener('click', function(){ window.location.href = sms.href; });
+    }
+  }
+
   function payFail(msg){
     var e=$('e6'); e.textContent = msg || 'Payment could not be completed. Nothing has been charged — try again or call us.';
     e.style.display='block';
+  }
+
+  // Card deposits: a Stripe Checkout Session in "elements" mode. Stripe's Payment Element
+  // sits inside our own deposit step, styled to the site; card details go to Stripe only.
+  var checkout=null, actions=null, payEl=null;
+  var APPEARANCE={ theme:'night', variables:{
+    colorPrimary:'#A3E635', colorBackground:'#0B0E12', colorText:'#F0F4F8', colorTextSecondary:'#8B96A4',
+    colorDanger:'#F87171', fontFamily:'Inter, system-ui, sans-serif', borderRadius:'9px', spacingUnit:'4px'
+  }, rules:{ '.Input':{ border:'1px solid #2A3139' }, '.Tab':{ border:'1px solid #2A3139' },
+             '.Tab--selected':{ borderColor:'#A3E635' } } };
+
+  function remember(){
+    // kept for this tab only, so the page can show the booking again if a payment app sends
+    // the customer away and back
+    try{ sessionStorage.setItem('cal_booking', JSON.stringify({
+      ref:S.ref, sms:$('sendSms').href, mail:$('sendMail').href,
+      f:['1','2','3','4','5','6','7'].map(function(k){ var el=$('f'+k); return el?el.textContent:'' })
+    })) }catch(e){}
+  }
+
+  function booked(){
+    fill('f');
+    var f6=$('f6'); if(f6) f6.textContent='$'+deposit()+' paid';
+    show(7);
   }
 
   async function startPayment(){
@@ -490,40 +561,46 @@
     $('e6').style.display='none';
     $('payLoading').style.display='flex';
 
-    if(!window.Stripe || !window.STRIPE_PK || /REPLACE_ME/.test(window.STRIPE_PK)){
+    if(!cardsOn()){
       $('payLoading').style.display='none';
-      payFail('Card payments are not switched on yet. Call or text (203) 592-9589 and we will hold the slot.');
+      textToHold();
       return;
     }
     try{
-      var r = await fetch('/api/create-payment-intent',{
+      var r = await fetch('/api/create-checkout-session',{
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
           packageKey:S.key, paintKey:S.paint, tier:S.tier, addons:activeAdds().join(','),
           ref:S.ref,
           name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
           vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value,
-          date:S.date, window:S.win, address:$('bad').value, town:$('btw').value,
+          date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
           notes:$('bn').value, estTotal:totalText(),
           agreementVersion:AGREEMENT_VERSION, signature:S.sig, signedAt:S.signedAt,
           photoConsent:S.photoOk?'yes':'no'
         })
       });
-      var data = await r.json();
+      var data = {};
+      try{ data = await r.json() }catch(e){}
+      if(r.status===503){ $('payLoading').style.display='none'; textToHold(); return; }
       if(!r.ok || !data.clientSecret){ throw new Error(data.error||'setup failed') }
-      // The Job Card link is derived from the reference server-side, so it comes
-      // back with the payment setup and can be shown the moment the card clears.
-      S.jobUrl = data.jobUrl || '';
 
-      stripe = Stripe(window.STRIPE_PK);
-      elements = stripe.elements({
-        clientSecret: data.clientSecret,
-        appearance: { theme:'night', variables:{
-          colorPrimary:'#A3E635', colorBackground:'#0B0E12', colorText:'#F0F4F8',
-          colorDanger:'#F87171', fontFamily:'system-ui, sans-serif', borderRadius:'7px'
-        }}
+      fill('f'); remember();
+      stripe = stripe || Stripe(window.STRIPE_PK);
+      checkout = stripe.initCheckoutElementsSdk({ clientSecret:data.clientSecret, elementsOptions:{ appearance:APPEARANCE } });
+      // Stripe requires the page to show the amount it is about to charge, from the session itself
+      checkout.on('change', function(session){
+        if(session && session.total && session.total.total) $('payAmt').textContent=session.total.total.amount;
+        $('payBtn').disabled = !(session && session.canConfirm);
       });
-      elements.create('payment',{layout:'tabs'}).mount('#payment-element');
+      if(payEl){ try{ payEl.destroy() }catch(e){} }
+      payEl = checkout.createPaymentElement();
+      payEl.mount('#payment-element');
+      var loaded = await checkout.loadActions();
+      if(!loaded || loaded.type!=='success') throw new Error((loaded && loaded.error && loaded.error.message) || 'could not load');
+      actions = loaded.actions;
+      var sess = actions.getSession();
+      if(sess && sess.total && sess.total.total) $('payAmt').textContent = sess.total.total.amount;
       $('payLoading').style.display='none';
     }catch(err){
       $('payLoading').style.display='none';
@@ -532,35 +609,57 @@
   }
 
   $('payBtn').addEventListener('click', async function(){
-    if(paying || !elements) return;
-    paying=true; this.textContent='Processing…'; $('e6').style.display='none';
+    if(paying || !actions) return;
+    var btn=this;
+    paying=true; btn.textContent='Processing…'; $('e6').style.display='none';
     try{
-      // redirect:'if_required' keeps card payments entirely on this page
-      var res = await stripe.confirmPayment({ elements, redirect:'if_required' });
-      if(res.error){ throw new Error(res.error.message) }
-      var pi = res.paymentIntent;
-      if(pi && (pi.status==='succeeded' || pi.status==='processing')){
-        fill('f');
-        var box=$('jobBox');
-        if(box && S.jobUrl){
-          $('jobLink').href=S.jobUrl;
-          $('jobTown').textContent=esc($('btw').value)||'your town';
-          box.hidden=false;
-        }
-        show(7);
-      } else {
-        throw new Error('Payment did not complete.');
-      }
+      // stays on this page for cards; only payment apps that need to (some wallets, bank
+      // redirects) leave and come back to /quote?paid=1
+      var res = await actions.confirm({ redirect:'if_required', email:$('bem').value.trim() });
+      if(res && res.type==='error'){ throw new Error(res.error && res.error.message) }
+      booked();
     }catch(err){
       payFail(err && err.message);
     }finally{
-      paying=false; this.textContent='Pay deposit & book';
+      paying=false; btn.textContent='Pay deposit & book';
     }
   });
 
+  // back from a payment app: ask the server whether the deposit went through
+  (async function returning(){
+    var q=new URLSearchParams(location.search), id=q.get('session_id');
+    if(q.get('paid')!=='1' || !id) return;
+    var saved={}; try{ saved=JSON.parse(sessionStorage.getItem('cal_booking')||'{}') }catch(e){}
+    try{
+      var r=await fetch('/api/checkout-status?session_id='+encodeURIComponent(id));
+      var d=await r.json();
+      if(r.ok && d.status==='complete'){
+        $('refCode').textContent=d.ref||saved.ref||'';
+        if(saved.sms) $('sendSms').href=saved.sms;
+        if(saved.mail) $('sendMail').href=saved.mail;
+        (saved.f||[]).forEach(function(v,i){ var el=$('f'+(i+1)); if(el && v) el.textContent=v });
+        if($('f0')) $('f0').textContent=d.ref||saved.ref||'';
+        if($('f6') && d.amount) $('f6').textContent='$'+d.amount+' paid';
+        show(7);
+      } else {
+        var p1=document.querySelector('.pane[data-p="1"]'), n=document.createElement('p');
+        n.className='paynote';
+        n.textContent='That payment didn’t go through, so nothing was charged. Start the booking again, or call or text (203) 560-3572.';
+        if(p1) p1.insertBefore(n, p1.firstChild);
+        show(1);
+      }
+    }catch(e){}
+    history.replaceState(null,'',location.pathname+'#quote');
+  })();
+
   $('submitBk').addEventListener('click',function(){
     if($('hp').value){ return }
-    if(!validWho()){ $('e4').style.display='block'; return }
+    if(!validWho()){
+      var e4=$('e4'); e4.textContent=whoMessage(); e4.style.display='block';
+      var first=['bnm','bph','bem'].map($).filter(function(el){ return el.style.borderColor })[0] || $('bnm');
+      first.scrollIntoView({behavior:'smooth',block:'center'}); first.focus({preventScroll:true});
+      return;
+    }
     $('e4').style.display='none';
     if(!validWhere()){ show(4); $('e3').style.display='block'; return }
     var sigEl=$('sig'), sigVal=(sigEl&&sigEl.value||'').trim();
@@ -581,7 +680,7 @@
     S.ref=makeRef();
     var body=summary();
     $('refCode').textContent=S.ref;
-    $('sendSms').href='sms:+12035929589?&body='+encodeURIComponent(body);
+    $('sendSms').href='sms:+12035603572?&body='+encodeURIComponent(body);
     $('sendMail').href='mailto:hello@cipherautolab.com?subject='
       +encodeURIComponent('Booking '+S.ref+' — '+svcLabel()+' — '+S.date)+'&body='+encodeURIComponent(body);
     show(6);
@@ -593,5 +692,6 @@
   $('sig').addEventListener('input',function(){
     if(this.value.trim().length>=3){ this.classList.remove('bad'); if($('agree').checked) $('e5').style.display='none' }
   });
+  if(cardsOn()){ var lb=document.querySelector('label[for="bem"]'); if(lb) lb.textContent='Email (for your receipt)'; }
   paint();
 })();

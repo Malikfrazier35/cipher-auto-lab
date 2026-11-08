@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,42 +6,85 @@
 <title>Service Agreement — Cipher Auto Lab</title>
 <meta name="description" content="The service agreement signed at booking: authority, access, condition, re-quotes, deposits, results, liability and photo consent.">
 <link rel="canonical" href="https://cipherautolab.com/agreement">
+<meta name="theme-color" content="#08090B">
+<link rel="preload" href="fonts/inter-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="campaign.css">
 <link rel="stylesheet" href="legal.css">
 </head>
 <body>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  <linearGradient id="bgrad" x1="10%" y1="0%" x2="90%" y2="100%">
-    <stop offset="0%" stop-color="#D9F99D"/><stop offset="45%" stop-color="#65D98A"/>
-    <stop offset="100%" stop-color="#059669"/>
+<!-- ===== LOGO SYMBOL ===== -->
+<svg class="u-1" width="0" height="0" aria-hidden="true"><defs>
+  <linearGradient id="bgrad" x1="6%" y1="0%" x2="94%" y2="100%">
+    <stop offset="0%" stop-color="#A8E63C"/><stop offset="46%" stop-color="#5FD86E"/>
+    <stop offset="100%" stop-color="#22B573"/>
   </linearGradient>
+  <linearGradient id="bgrad2" x1="0%" y1="0%" x2="70%" y2="100%">
+    <stop offset="0%" stop-color="#B6EA46"/><stop offset="55%" stop-color="#5AD67F"/>
+    <stop offset="100%" stop-color="#28BA76"/>
+  </linearGradient>
+  <clipPath id="bLeft"><rect x="-4" y="-4" width="54" height="108"/></clipPath>
+  <clipPath id="bRight"><rect x="50" y="-4" width="54" height="108"/></clipPath>
   <symbol id="bead" viewBox="0 0 100 100">
-    <path d="M50 5 L88 27 L88 71 L50 93 L12 71 L12 27 Z" fill="none" stroke="url(#bgrad)" stroke-width="5.5" stroke-linejoin="round"/>
-    <path d="M34.5 65 C27.5 49 37 32 50 32 C63 32 72.5 49 65.5 65 Z" fill="url(#bgrad)"/>
-    <rect x="24" y="66.5" width="52" height="4" rx="1" fill="url(#bgrad)"/>
-    <g fill="url(#bgrad)">
-      <rect x="30" y="73" width="3.2" height="6" rx="1"/><rect x="42" y="73" width="3.2" height="6" rx="1"/>
-      <rect x="54" y="73" width="3.2" height="6" rx="1"/><rect x="66" y="73" width="3.2" height="6" rx="1"/>
+    <path d="M50 4 L89 26.5 L89 73.5 L50 96 L11 73.5 L11 26.5 Z"
+          fill="url(#bgrad)" stroke="url(#bgrad)" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#bLeft)">
+      <path d="M50 10.5 L83.5 29.8 L83.5 70.2 L50 89.5 L16.5 70.2 L16.5 29.8 Z"
+            fill="#2E343B" stroke="#2E343B" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M34.75 65.6 L34.75 46.9 A15.25 15.25 0 0 1 65.25 46.9 L65.25 65.6 Z" fill="url(#bgrad2)"/>
     </g>
+    <g clip-path="url(#bRight)">
+      <path d="M34.75 65.6 L34.75 46.9 A15.25 15.25 0 0 1 65.25 46.9 L65.25 65.6 Z" fill="#07090A"/>
+    </g>
+  </symbol>
+  <symbol id="ic-fb" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/>
+  </symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2.6l2.9 5.88 6.5.95-4.7 4.58 1.11 6.47L12 17.43l-5.81 3.05 1.11-6.47-4.7-4.58 6.5-.95L12 2.6Z"/>
   </symbol>
 </defs></svg>
 
+<!-- ===== HEADER ===== -->
 <header>
-  <div class="hdr">
-    <a class="brand" href="/">
+  <div class="wrap hdr">
+    <a class="brand" href="index.html" aria-label="Cipher Auto Lab home">
       <svg><use href="#bead"/></svg>
       <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
     </a>
-    <a class="back" href="/">← Back to the site</a>
+    <div class="hdr-r">
+      <a class="navlink" href="detailing.html">Detailing</a>
+      <a class="navlink" href="menu.html">Detail menu</a>
+      <a class="navlink wide" href="detailing.html#restoration">Ceramic coating</a>
+      <a class="navlink" href="index.html#area">Across CT</a>
+      <a class="navlink wide" href="/fleet">Fleet</a>
+      <a class="navlink minor" href="tint.html">Window tint</a>
+      <a class="soc-hdr" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me" aria-label="Cipher Auto Lab on Facebook" title="Facebook">
+        <svg><use href="#ic-fb"/></svg>
+      </a>
+      <a class="btn btn-o btn-sm call" href="tel:+12035603572">(203) 560-3572</a>
+      <a class="btn btn-p btn-sm" href="quote.html#quote">Book a detail</a>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
-  <div class="eyebrow mono">AGREEMENT</div>
-  <h1>Service Agreement</h1>
-  <p class="updated mono">Version 1.0 · effective 21 August 2026</p>
+<main>
+<!-- ===== SCREEN ===== -->
+<section class="c-hero c-screen sm">
+  <div class="wrap solo">
+    <div>
+      <div class="c-eyebrow"><span class="dot"></span>Agreement · Version 1.0 · effective 21 August 2026</div>
+      <h1 class="c-h1"><span class="l">Service</span><span class="l">Agreement</span></h1>
+      <p class="c-tagline">We come to you · Home or work</p>
+      <span class="c-rule" aria-hidden="true"></span>
+      <p class="c-sub">This is the agreement you sign when you book. It exists so that both of us know exactly what was promised before anyone touches the car — not so we can point at fine print afterwards.</p>
+      
+    </div>
+  </div>
+</section>
 
-  <p class="lede">This is the agreement you sign when you book. It exists so that both of us know exactly what was promised before anyone touches the car — not so we can point at fine print afterwards.</p>
+<section class="legal">
+  <div class="wrap">
 
   <div class="card">
     <p><strong>The version you signed is the one that governs your job.</strong> Your confirmation email records the version number, the name you signed with, and the date and time. If this page is later updated, your booking is still governed by the version in force when you signed.</p>
@@ -125,22 +168,54 @@
 
   <div class="card">
     <p><strong>Questions before you sign?</strong> Ask now rather than after.<br>
-    <a href="tel:+12035929589">(203) 592-9589</a> · <a href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a></p>
+    <a href="tel:+12035603572">(203) 560-3572</a> · <a href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a></p>
   </div>
+  </div>
+</section>
 </main>
 
-<footer>
+<!-- ===== CALL OR TEXT ===== -->
+<section class="c-call" aria-label="Call or text">
   <div class="wrap">
-    <div class="fl">
-      <a href="/">Home</a>
-      <a href="/agreement">Service Agreement</a>
-      <a href="/terms">Terms of Service</a>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="tel:+12035929589">(203) 592-9589</a>
+    <div class="c-kicker">Call or text</div>
+    <a class="c-num" href="tel:+12035603572">(203) 560-3572</a>
+    <div class="alt"><a href="quote.html#photoquote">Text a photo of your car</a><span>Mobile across CT</span><span>Travel fee by town</span></div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <a class="brand" href="index.html" aria-label="Cipher Auto Lab home">
+        <svg><use href="#bead"/></svg>
+        <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
+      </a>
+      <p class="fnote">Mobile detailing, ceramic coating and window tint across Connecticut. We come to you, home or work. Travel fee by town, quoted before you book. Owner-operated.</p>
+      <p class="fnote u-12">Mon–Sat 8am–6pm · Sunday by request · Appointments only</p>
+      <p class="c-fline">Mobile across CT · Insured · Connecticut LLC</p>
     </div>
-    <p class="fnote">Cipher Auto Lab LLC · Connecticut · © 2026 · Licensed &amp; insured</p>
+    <div class="fmeta">
+      <p class="fcall">Call or text</p>
+      <p><a class="fnum" href="tel:+12035603572">(203) 560-3572</a></p>
+      <p><a class="u-14" href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a></p>
+      <div class="socrow">
+        <!-- EDIT THESE TWO URLS. Delete the Google line entirely until the listing is live. -->
+        <a class="soc" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me">
+          <svg><use href="#ic-fb"/></svg><span>Facebook</span></a>
+        <a class="soc" href="https://g.page/cipher-auto-lab" target="_blank" rel="noopener me">
+          <svg><use href="#ic-star"/></svg><span>Review us on Google</span></a>
+      </div>
+      <p class="u-15">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
+      <p class="flegal"><a href="/fleet">Fleet</a> · <a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
+    </div>
   </div>
 </footer>
 
+<div class="stickybar">
+  <a class="btn btn-o" href="tel:+12035603572">Call</a>
+  <a class="btn btn-o" href="sms:+12035603572">Text</a>
+  <a class="btn btn-p" href="quote.html#quote">Book</a>
+</div>
 </body>
 </html>

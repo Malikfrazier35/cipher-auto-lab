@@ -2,223 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fleet maintenance — Cipher Auto Lab</title>
-<meta name="description" content="Scheduled interior and exterior maintenance for work vans, trucks and company cars across New Haven County, the Valley and central Connecticut. One invoice, a named day, a photographed condition report on every vehicle.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fleet Detailing for Vans, Trucks &amp; Company Cars — Across CT | Cipher Auto Lab</title>
+<meta name="description" content="Scheduled interior and exterior maintenance for work vans, trucks and company cars across Connecticut. One invoice, a named day, a photographed condition report on every vehicle.">
 <link rel="canonical" href="https://cipherautolab.com/fleet">
-<meta name="theme-color" content="#080A0C">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080A0C'/%3E%3Cpath d='M16 7l7 4v10l-7 4-7-4V11z' fill='none' stroke='%23A3E635' stroke-width='2'/%3E%3C/svg%3E">
-<style>
-:root{
-  --bg:#080A0C; --panel:#0E1318; --raise:#131A21; --sunk:#0B0E12; --line:#1C242C;
-  --ink:#E9EFF4; --body:#AEBAC4; --mute:#7C8892; --dim:#5A6570;
-  --acc:#A3E635; --acc-dk:#14300A; --warn:#E0A458; --bad:#F87171; --r:13px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:80px}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--bg);color:var(--body);
-  font:16px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.wrap{max-width:900px;margin:0 auto;padding:0 22px}
-.narrow{max-width:66ch}
-a{color:var(--acc)}
-h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.022em;text-wrap:balance}
-:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
-[hidden]{display:none !important}
-p{margin:0}
-
-header{border-bottom:1px solid var(--line);background:rgba(11,14,18,.9);
-  backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
-header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
-.brand svg{width:27px;height:27px;color:var(--acc)}
-.brand b{font-size:14.5px;font-weight:750;letter-spacing:.02em;display:block;line-height:1.1}
-.brand i{display:block;font-style:normal;font-size:8.5px;letter-spacing:.34em;color:var(--mute);margin-top:2px}
-.hnav{display:flex;align-items:center;gap:16px}
-.hnav a.nl{font-size:13.5px;color:var(--body);text-decoration:none}
-.hnav a.nl:hover{color:var(--ink)}
-@media(max-width:640px){.hnav a.nl{display:none}}
-.hbtn{background:var(--acc);color:var(--acc-dk);border-radius:9px;padding:9px 15px;
-  font-size:13.5px;font-weight:700;text-decoration:none;white-space:nowrap}
-
-section{padding:clamp(46px,6vw,72px) 0;border-bottom:1px solid var(--line)}
-section:last-of-type{border-bottom:none}
-.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);
-  display:flex;align-items:center;gap:9px}
-.eyebrow::before{content:"";width:20px;height:2px;background:var(--acc);border-radius:2px}
-h1{font-size:clamp(31px,6.4vw,52px);line-height:1.04;margin:16px 0 0}
-h2{font-size:clamp(23px,3.6vw,32px);line-height:1.12}
-h3{font-size:17px}
-.lede{font-size:clamp(16.5px,2vw,18.5px);line-height:1.62;color:var(--body);margin-top:18px}
-.shead{margin-bottom:26px}
-.shead .lede{max-width:66ch}
-strong{color:var(--ink);font-weight:600}
-em{font-style:normal;color:var(--ink)}
-
-.hero .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
-  background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
-  margin-top:32px}
-.hero .st{background:var(--panel);padding:18px 19px}
-.hero .st b{display:block;font-size:22px;color:var(--ink);letter-spacing:-.03em;
-  font-family:ui-monospace,Menlo,monospace}
-.hero .st span{display:block;font-size:12.5px;color:var(--mute);margin-top:4px;line-height:1.5}
-.cta{display:flex;gap:11px;flex-wrap:wrap;margin-top:28px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;
-  padding:14px 22px;font:700 15px/1 inherit;text-decoration:none;cursor:pointer;
-  border:1px solid var(--line);color:var(--ink);background:none}
-.btn:hover{border-color:#2C3742}
-.btn.p{background:var(--acc);color:var(--acc-dk);border-color:var(--acc)}
-.btn.p:hover{background:#B4EF4F;border-color:#B4EF4F}
-.btn[disabled]{opacity:.55;cursor:progress}
-
-.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:720px){.split{grid-template-columns:1fr}}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px}
-.card.bad{border-color:#33262A;background:#120E10}
-.card .tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
-.card.bad .tag{color:var(--bad)}
-.card.good .tag{color:var(--acc)}
-.card h3{margin:9px 0 10px}
-.card p{font-size:14.5px;line-height:1.6;color:var(--body)}
-.card .num{font-family:ui-monospace,Menlo,monospace;font-size:26px;color:var(--ink);
-  letter-spacing:-.03em;margin:4px 0 8px;display:block}
-
-.svc{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:720px){.svc{grid-template-columns:1fr}}
-.svc .card{display:flex;flex-direction:column}
-.svc .from{font-family:ui-monospace,Menlo,monospace;font-size:24px;color:var(--acc);
-  letter-spacing:-.03em;margin:6px 0 2px}
-.svc .from em{font-size:12px;color:var(--mute);font-style:normal;letter-spacing:0}
-.svc ul{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
-.svc li{display:grid;grid-template-columns:16px 1fr;gap:10px;font-size:14px;line-height:1.5}
-.svc li svg{width:13px;height:13px;stroke:var(--acc);stroke-width:2.8;fill:none;margin-top:4px}
-.svc li.no svg{stroke:var(--dim)}
-.svc li.no{color:var(--dim)}
-.svc .mins{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
-  font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
-
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
-table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
-th,td{padding:14px 16px;text-align:right;border-bottom:1px solid var(--line)}
-th:first-child,td:first-child{text-align:left}
-thead th{font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:600;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
-tbody td{font-family:ui-monospace,Menlo,monospace;color:var(--ink);font-variant-numeric:tabular-nums}
-tbody td:first-child{font-family:inherit;color:var(--body)}
-tbody tr:last-child td{border-bottom:none}
-tbody tr.hl td{background:rgba(163,230,53,.05)}
-.tcap{font-size:13.5px;line-height:1.6;color:var(--mute);margin-top:14px}
-.tcap b{color:var(--ink)}
-.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.tab{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 16px;
-  font:650 13.5px/1 inherit;color:var(--body);cursor:pointer}
-.tab.on{border-color:var(--acc);color:var(--acc);background:rgba(163,230,53,.07)}
-
-.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
-  background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.fi{background:var(--panel);padding:20px}
-.fi svg{width:20px;height:20px;stroke:var(--acc);stroke-width:1.8;fill:none;
-  stroke-linecap:round;stroke-linejoin:round}
-.fi b{display:block;font-size:14.5px;color:var(--ink);margin:11px 0 5px}
-.fi span{display:block;font-size:13.5px;color:var(--mute);line-height:1.55}
-
-.spot{background:linear-gradient(180deg,#111A0E,#0B100A);border:1px solid rgba(163,230,53,.28);
-  border-radius:var(--r);padding:clamp(22px,3.4vw,32px)}
-.spot .eyebrow{color:var(--acc)}
-.spot h2{margin-top:14px;font-size:clamp(21px,3vw,28px)}
-.spot p{margin-top:14px;font-size:15.5px;line-height:1.65;max-width:62ch}
-
-.nots{display:flex;flex-direction:column;gap:2px}
-.not{display:grid;grid-template-columns:22px 1fr;gap:14px;padding:16px 0;
-  border-bottom:1px solid var(--line);align-items:start}
-.not:last-child{border-bottom:none}
-.not svg{width:17px;height:17px;stroke:var(--dim);stroke-width:2.2;fill:none;margin-top:4px}
-.not b{color:var(--ink)}
-.not p{font-size:14.5px;color:var(--mute);line-height:1.6;margin-top:3px}
-
-/* ---- form ---- */
-.formcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
-  padding:clamp(22px,3vw,30px)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:560px){.row2{grid-template-columns:1fr}}
-.fld{margin-top:14px}
-.fld:first-child{margin-top:0}
-.row2 .fld{margin-top:0}
-.fld label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--mute);margin-bottom:7px}
-.fld input,.fld select,.fld textarea{width:100%;background:var(--sunk);border:1px solid var(--line);
-  border-radius:9px;padding:13px 14px;color:var(--ink);font:15px/1.5 inherit;
-  -webkit-appearance:none;appearance:none}
-.fld textarea{resize:vertical;min-height:82px}
-.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%237C8892' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 14px center;background-size:11px;padding-right:36px}
-.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--acc)}
-.fld input.bad,.fld select.bad{border-color:var(--bad)}
-.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
-.est{margin-top:18px;padding:16px 18px;border:1px solid rgba(163,230,53,.26);border-radius:11px;
-  background:#0F1509}
-.est .el{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc)}
-.est .ev{font-family:ui-monospace,Menlo,monospace;font-size:25px;color:var(--ink);
-  letter-spacing:-.03em;margin:5px 0 4px}
-.est .en{font-size:12.5px;color:var(--mute);line-height:1.55}
-.err{margin-top:14px;font-size:13.5px;color:#F0B4B4;background:#170F10;border:1px solid #4A2A2A;
-  border-radius:9px;padding:12px 14px;line-height:1.5}
-.fine{margin-top:14px;font-size:12.5px;color:var(--dim);line-height:1.6}
-.done{text-align:center;padding:20px 6px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.tick{width:52px;height:52px;border-radius:50%;background:var(--acc);display:grid;place-items:center}
-.tick svg{width:26px;height:26px;fill:none;stroke:var(--acc-dk);stroke-width:2.6;
-  stroke-linecap:round;stroke-linejoin:round}
-.done h3{font-size:22px}
-.done p{font-size:15px;color:var(--body);max-width:46ch;line-height:1.6}
-
-footer{border-top:1px solid var(--line);background:var(--sunk);padding:34px 0 44px}
-footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  font-size:13px;color:var(--dim)}
-footer a{color:var(--mute);text-decoration:none}
-footer a:hover{color:var(--ink)}
-</style>
+<meta name="theme-color" content="#08090B">
+<link rel="preload" href="fonts/inter-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="campaign.css">
+<link rel="stylesheet" href="fleet.css">
 </head>
 <body>
+<!-- ===== LOGO SYMBOL ===== -->
+<svg class="u-1" width="0" height="0" aria-hidden="true"><defs>
+  <linearGradient id="bgrad" x1="6%" y1="0%" x2="94%" y2="100%">
+    <stop offset="0%" stop-color="#A8E63C"/><stop offset="46%" stop-color="#5FD86E"/>
+    <stop offset="100%" stop-color="#22B573"/>
+  </linearGradient>
+  <linearGradient id="bgrad2" x1="0%" y1="0%" x2="70%" y2="100%">
+    <stop offset="0%" stop-color="#B6EA46"/><stop offset="55%" stop-color="#5AD67F"/>
+    <stop offset="100%" stop-color="#28BA76"/>
+  </linearGradient>
+  <clipPath id="bLeft"><rect x="-4" y="-4" width="54" height="108"/></clipPath>
+  <clipPath id="bRight"><rect x="50" y="-4" width="54" height="108"/></clipPath>
+  <symbol id="bead" viewBox="0 0 100 100">
+    <path d="M50 4 L89 26.5 L89 73.5 L50 96 L11 73.5 L11 26.5 Z"
+          fill="url(#bgrad)" stroke="url(#bgrad)" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#bLeft)">
+      <path d="M50 10.5 L83.5 29.8 L83.5 70.2 L50 89.5 L16.5 70.2 L16.5 29.8 Z"
+            fill="#2E343B" stroke="#2E343B" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M34.75 65.6 L34.75 46.9 A15.25 15.25 0 0 1 65.25 46.9 L65.25 65.6 Z" fill="url(#bgrad2)"/>
+    </g>
+    <g clip-path="url(#bRight)">
+      <path d="M34.75 65.6 L34.75 46.9 A15.25 15.25 0 0 1 65.25 46.9 L65.25 65.6 Z" fill="#07090A"/>
+    </g>
+  </symbol>
+  <symbol id="ic-fb" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/>
+  </symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2.6l2.9 5.88 6.5.95-4.7 4.58 1.11 6.47L12 17.43l-5.81 3.05 1.11-6.47-4.7-4.58 6.5-.95L12 2.6Z"/>
+  </symbol>
+</defs></svg>
 
+<!-- ===== HEADER ===== -->
 <header>
-  <div class="wrap">
-    <a class="brand" href="/">
-      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M16 4l10.4 6v12L16 28 5.6 22V10z"/><circle cx="16" cy="16" r="3.4"/></svg>
-      <div><b>CIPHER</b><i>AUTO LAB</i></div>
+  <div class="wrap hdr">
+    <a class="brand" href="index.html" aria-label="Cipher Auto Lab home">
+      <svg><use href="#bead"/></svg>
+      <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
     </a>
-    <nav class="hnav">
-      <a class="nl" href="/">Consumer detailing</a>
-      <a class="nl" href="#prices">Prices</a>
-      <a class="hbtn" href="#enquire">Get a fleet quote</a>
-    </nav>
+    <div class="hdr-r">
+      <a class="navlink" href="detailing.html">Detailing</a>
+      <a class="navlink" href="menu.html">Detail menu</a>
+      <a class="navlink wide" href="detailing.html#restoration">Ceramic coating</a>
+      <a class="navlink" href="index.html#area">Across CT</a>
+      <a class="navlink wide" aria-current="page" href="/fleet">Fleet</a>
+      <a class="navlink minor" href="tint.html">Window tint</a>
+      <a class="soc-hdr" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me" aria-label="Cipher Auto Lab on Facebook" title="Facebook">
+        <svg><use href="#ic-fb"/></svg>
+      </a>
+      <a class="btn btn-o btn-sm call" href="tel:+12035603572">(203) 560-3572</a>
+      <a class="btn btn-p btn-sm" href="quote.html#quote">Book a detail</a>
+    </div>
   </div>
 </header>
 
-<main>
-
-<section class="hero">
+<main class="fleet">
+<!-- ===== SCREEN ===== -->
+<section class="c-hero c-screen">
   <div class="wrap">
-    <div class="narrow">
-      <div class="eyebrow">Fleet maintenance</div>
-      <h1>A dirty van with your name on it is advertising too.</h1>
-      <p class="lede">Scheduled interior and exterior maintenance for work vans, trucks and company
-        cars across New Haven County, the Valley and central Connecticut. A named day, one invoice a
-        month, and a photographed condition report on every vehicle so you know what state your fleet
-        is actually in.</p>
+    <div>
+      <div class="c-eyebrow"><span class="dot"></span>For businesses · Mobile across CT</div>
+      <h1 class="c-h1"><span class="l">Fleet</span><span class="l">Detailing</span><span class="plus">+ Vans, trucks &amp; cars</span></h1>
+      <p class="c-tagline">We come to you · Home or work</p>
+      <span class="c-rule" aria-hidden="true"></span>
+      <p class="c-sub">Scheduled interior and exterior maintenance on your lot. A named day, one invoice a month, and a photographed condition report on every vehicle.</p>
+      <div class="c-cta"><a class="btn btn-p btn-lg" href="#enquire">Get a fleet quote</a><a class="btn btn-o btn-lg" href="#prices">See fleet prices</a></div>
     </div>
-    <div class="stats">
-      <div class="st"><b>2+</b><span>Vehicles at one site is enough to start</span></div>
-      <div class="st"><b>Net 15</b><span>One monthly invoice, not a card per wash</span></div>
-      <div class="st"><b>COI</b><span>Certificate of insurance, you named as additional insured</span></div>
-      <div class="st"><b>Every visit</b><span>Photographed condition report per vehicle</span></div>
-    </div>
-    <div class="cta">
-      <a class="btn p" href="#enquire">Get a fleet quote</a>
-      <a class="btn" href="tel:+12035929589">Call (203) 592-9589</a>
-    </div>
+    <a class="c-panel" href="#enquire">
+      <div class="band">Fleet</div>
+      <div class="pb">
+        <span class="k">One invoice a month</span>
+        <b class="big">On your lot</b>
+        <ul><li><span>Vehicles to start</span><b>2+</b></li><li><span>Invoicing</span><b>Net 15</b></li><li><span>Insurance</span><b>COI on request</b></li><li><span>Every visit</span><b>Photo report</b></li></ul>
+        <span class="foot">Get a fleet quote</span>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -323,7 +193,7 @@ footer a:hover{color:var(--ink)}
     </div>
     <p class="tcap">
       Sedans, company cars and small vans. <b>Cargo vans and pickups +$10</b> per vehicle;
-      box trucks and anything over 10,000 lb by quote.
+      box trucks and anything over 10,000 lb by quote. Travel fee by town, built into the contract price.
       <b>Minimum $180 per visit</b> — a two-van weekly stop does not pay for the drive, so small
       fleets usually land on biweekly or monthly, and we will say so rather than sell you the wrong
       frequency.
@@ -493,7 +363,7 @@ footer a:hover{color:var(--ink)}
         </div>
 
         <p class="err" id="flErr" hidden></p>
-        <button type="submit" class="btn p" id="flSend" style="width:100%;margin-top:18px">Send it over</button>
+        <button type="submit" class="btn btn-p btn-lg btn-block" id="flSend">Send it over</button>
         <p class="fine">Goes straight to Malik. No mailing list, no card, no obligation. If a fleet
           contract isn't the right answer for you, you'll be told that instead.</p>
       </form>
@@ -503,7 +373,7 @@ footer a:hover{color:var(--ink)}
         <h3>Got it.</h3>
         <p>Reference <b id="flRef" class="mono">—</b>. You'll get a real number back the same working
           day, and we'll come and look at the vehicles before anything is signed.</p>
-        <p class="fine">Sooner is fine too — <a href="tel:+12035929589">(203) 592-9589</a>.</p>
+        <p class="fine">Sooner is fine too — <a href="tel:+12035603572">(203) 560-3572</a>.</p>
       </div>
     </div>
   </div>
@@ -511,13 +381,49 @@ footer a:hover{color:var(--ink)}
 
 </main>
 
-<footer>
+<!-- ===== CALL OR TEXT ===== -->
+<section class="c-call" aria-label="Call or text">
   <div class="wrap">
-    <span>Cipher Auto Lab LLC · New Haven County, the Valley &amp; central CT · (203) 592-9589</span>
-    <span><a href="/">Consumer detailing</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></span>
+    <div class="c-kicker">Call or text</div>
+    <a class="c-num" href="tel:+12035603572">(203) 560-3572</a>
+    <div class="alt"><a href="quote.html#photoquote">Text a photo of your car</a><span>Mobile across CT</span><span>Travel fee by town</span></div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <a class="brand" href="index.html" aria-label="Cipher Auto Lab home">
+        <svg><use href="#bead"/></svg>
+        <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
+      </a>
+      <p class="fnote">Mobile detailing, ceramic coating and window tint across Connecticut. We come to you, home or work. Travel fee by town, quoted before you book. Owner-operated.</p>
+      <p class="fnote u-12">Mon–Sat 8am–6pm · Sunday by request · Appointments only</p>
+      <p class="c-fline">Mobile across CT · Insured · Connecticut LLC</p>
+    </div>
+    <div class="fmeta">
+      <p class="fcall">Call or text</p>
+      <p><a class="fnum" href="tel:+12035603572">(203) 560-3572</a></p>
+      <p><a class="u-14" href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a></p>
+      <div class="socrow">
+        <!-- EDIT THESE TWO URLS. Delete the Google line entirely until the listing is live. -->
+        <a class="soc" href="https://www.facebook.com/cipherautolab" target="_blank" rel="noopener me">
+          <svg><use href="#ic-fb"/></svg><span>Facebook</span></a>
+        <a class="soc" href="https://g.page/cipher-auto-lab" target="_blank" rel="noopener me">
+          <svg><use href="#ic-star"/></svg><span>Review us on Google</span></a>
+      </div>
+      <p class="u-15">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
+      <p class="flegal"><a href="/fleet">Fleet</a> · <a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
+    </div>
   </div>
 </footer>
 
+<div class="stickybar">
+  <a class="btn btn-o" href="tel:+12035603572">Call</a>
+  <a class="btn btn-o" href="sms:+12035603572">Text</a>
+  <a class="btn btn-p" href="quote.html#quote">Book</a>
+</div>
 <script src="vehicles.js"></script>
 <script src="fleet.js" defer></script>
 </body>

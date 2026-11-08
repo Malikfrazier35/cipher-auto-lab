@@ -12,4 +12,4 @@
    inline <script> blocks. An inline key would silently never run.
    --------------------------------------------------------------- */
 
-window.STRIPE_PK = "pk_test_REPLACE_ME";
+window.STRIPE_PK = "pk_live_51UZZWSFV7MSauZaGG2VZqF1275Eqfiri4YgaZVgkBfvWOjkUBYhSkKRtzwGpjvmH1cF4OEYG0tX23SmhzA5UiVe000oRgvgucl";

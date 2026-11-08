@@ -68,7 +68,7 @@
     var body = 'Hi Cipher Auto Lab, I’d like to book ' + (/^[AEIOU]/i.test(item) ? 'an ' : 'a ') + item +
                ' for my ' + SIZE[size][2] +
                (names.length ? ', plus ' + names.join(', ') : '') +
-               '. Menu total ' + money + ', ' + hrs(mins) + '. My town: ';
+               '. Menu total ' + money + ' before any travel fee, ' + hrs(mins) + '. My town: ';
     all('[data-sms]').forEach(function (a) { a.href = smsHref(body); });
     all('[data-book]').forEach(function (a) {
       a.href = 'quote.html' + (pkg ? '?svc=' + encodeURIComponent(pkg.value) : '') + '#quote';

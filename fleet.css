@@ -1,0 +1,106 @@
+/* Fleet page components, scoped so they sit on top of styles.css + campaign.css. */
+main.fleet{--bg:#080A0C; --panel:#0E1318; --raise:#131A21; --sunk:#0B0E12; --line:#1C242C;
+  --ink:#E9EFF4; --body:#AEBAC4; --mute:#7C8892; --dim:#5A6570;
+  --acc:#A3E635; --acc-dk:#14300A; --warn:#E0A458; --bad:#F87171; --r:13px;}
+main.fleet section:not(.c-hero){padding:clamp(46px,6vw,72px) 0;border-bottom:1px solid var(--line)}
+main.fleet section:last-of-type{border-bottom:none}
+main.fleet em{font-style:normal;color:var(--ink)}
+main.fleet .cta{display:flex;gap:11px;flex-wrap:wrap;margin-top:28px}
+main.fleet .split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){main.fleet .split{grid-template-columns:1fr}}
+main.fleet .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+main.fleet .card.bad{border-color:#33262A;background:#120E10}
+main.fleet .card .tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+main.fleet .card.bad .tag{color:var(--bad)}
+main.fleet .card.good .tag{color:var(--acc)}
+main.fleet .card h3{margin:9px 0 10px}
+main.fleet .card p{font-size:14.5px;line-height:1.6;color:var(--body)}
+main.fleet .card .num{font-family:JBM,ui-monospace,Menlo,monospace;font-size:26px;color:var(--ink);
+  letter-spacing:-.03em;margin:4px 0 8px;display:block}
+main.fleet .svc{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){main.fleet .svc{grid-template-columns:1fr}}
+main.fleet .svc .card{display:flex;flex-direction:column}
+main.fleet .svc .from{font-family:JBM,ui-monospace,Menlo,monospace;font-size:24px;color:var(--acc);
+  letter-spacing:-.03em;margin:6px 0 2px}
+main.fleet .svc .from em{font-size:12px;color:var(--mute);font-style:normal;letter-spacing:0}
+main.fleet .svc ul{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+main.fleet .svc li{display:grid;grid-template-columns:16px 1fr;gap:10px;font-size:14px;line-height:1.5}
+main.fleet .svc li svg{width:13px;height:13px;stroke:var(--acc);stroke-width:2.8;fill:none;margin-top:4px}
+main.fleet .svc li.no svg{stroke:var(--dim)}
+main.fleet .svc li.no{color:var(--dim)}
+main.fleet .svc .mins{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+main.fleet .tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+main.fleet table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
+main.fleet th,main.fleet td{padding:14px 16px;text-align:right;border-bottom:1px solid var(--line)}
+main.fleet th:first-child,main.fleet td:first-child{text-align:left}
+main.fleet thead th{font-family:JBM,ui-monospace,Menlo,monospace;font-size:10px;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+main.fleet tbody td{font-family:JBM,ui-monospace,Menlo,monospace;color:var(--ink);font-variant-numeric:tabular-nums}
+main.fleet tbody td:first-child{font-family:inherit;color:var(--body)}
+main.fleet tbody tr:last-child td{border-bottom:none}
+main.fleet tbody tr.hl td{background:rgba(163,230,53,.05)}
+main.fleet .tcap{font-size:13.5px;line-height:1.6;color:var(--mute);margin-top:14px}
+main.fleet .tcap b{color:var(--ink)}
+main.fleet .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+main.fleet .tab{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 16px;
+  font:650 13.5px/1 inherit;color:var(--body);cursor:pointer}
+main.fleet .tab.on{border-color:var(--acc);color:var(--acc);background:rgba(163,230,53,.07)}
+main.fleet .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+main.fleet .fi{background:var(--panel);padding:20px}
+main.fleet .fi svg{width:20px;height:20px;stroke:var(--acc);stroke-width:1.8;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+main.fleet .fi b{display:block;font-size:14.5px;color:var(--ink);margin:11px 0 5px}
+main.fleet .fi span{display:block;font-size:13.5px;color:var(--mute);line-height:1.55}
+main.fleet .spot{background:linear-gradient(180deg,#111A0E,#0B100A);border:1px solid rgba(163,230,53,.28);
+  border-radius:var(--r);padding:clamp(22px,3.4vw,32px)}
+main.fleet .spot .eyebrow{color:var(--acc)}
+main.fleet .spot h2{margin-top:14px;font-size:clamp(21px,3vw,28px)}
+main.fleet .spot p{margin-top:14px;font-size:15.5px;line-height:1.65;max-width:62ch}
+main.fleet .nots{display:flex;flex-direction:column;gap:2px}
+main.fleet .not{display:grid;grid-template-columns:22px 1fr;gap:14px;padding:16px 0;
+  border-bottom:1px solid var(--line);align-items:start}
+main.fleet .not:last-child{border-bottom:none}
+main.fleet .not svg{width:17px;height:17px;stroke:var(--dim);stroke-width:2.2;fill:none;margin-top:4px}
+main.fleet .not b{color:var(--ink)}
+main.fleet .not p{font-size:14.5px;color:var(--mute);line-height:1.6;margin-top:3px}
+main.fleet .formcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:clamp(22px,3vw,30px)}
+main.fleet .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){main.fleet .row2{grid-template-columns:1fr}}
+main.fleet .fld{margin-top:14px}
+main.fleet .fld:first-child{margin-top:0}
+main.fleet .row2 .fld{margin-top:0}
+main.fleet .fld label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mute);margin-bottom:7px}
+main.fleet .fld input,main.fleet .fld select,main.fleet .fld textarea{width:100%;background:var(--sunk);border:1px solid var(--line);
+  border-radius:9px;padding:13px 14px;color:var(--ink);font:15px/1.5 inherit;
+  -webkit-appearance:none;appearance:none}
+main.fleet .fld textarea{resize:vertical;min-height:82px}
+main.fleet .fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%237C8892' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:11px;padding-right:36px}
+main.fleet .fld input:focus,main.fleet .fld select:focus,main.fleet .fld textarea:focus{outline:none;border-color:var(--acc)}
+main.fleet .fld input.bad,main.fleet .fld select.bad{border-color:var(--bad)}
+main.fleet .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+main.fleet .est{margin-top:18px;padding:16px 18px;border:1px solid rgba(163,230,53,.26);border-radius:11px;
+  background:#0F1509}
+main.fleet .est .el{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc)}
+main.fleet .est .ev{font-family:JBM,ui-monospace,Menlo,monospace;font-size:25px;color:var(--ink);
+  letter-spacing:-.03em;margin:5px 0 4px}
+main.fleet .est .en{font-size:12.5px;color:var(--mute);line-height:1.55}
+main.fleet .err{margin-top:14px;font-size:13.5px;color:#F0B4B4;background:#170F10;border:1px solid #4A2A2A;
+  border-radius:9px;padding:12px 14px;line-height:1.5}
+main.fleet .fine{margin-top:14px;font-size:12.5px;color:var(--dim);line-height:1.6}
+main.fleet .done{text-align:center;padding:20px 6px;display:flex;flex-direction:column;align-items:center;gap:12px}
+main.fleet .tick{width:52px;height:52px;border-radius:50%;background:var(--acc);display:grid;place-items:center}
+main.fleet .tick svg{width:26px;height:26px;fill:none;stroke:var(--acc-dk);stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round}
+main.fleet .done h3{font-size:22px}
+main.fleet .done p{font-size:15px;color:var(--body);max-width:46ch;line-height:1.6}
+main.fleet form{background:none;border:0;padding:0;border-radius:0}
+main.fleet .fld{margin-bottom:0}
+main.fleet .err{display:block}
+main.fleet [hidden]{display:none!important}
+main.fleet .btn-block{width:100%;margin-top:18px}
+main.fleet .card h3{font-weight:800}

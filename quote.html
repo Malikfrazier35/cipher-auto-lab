@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Book Mobile Detailing — Free Photo Quote | Cipher Auto Lab</title>
-<meta name="description" content="Book mobile detailing across Connecticut, or send four photos and get a real price back, usually within the hour. Window tint by appointment in Windsor Locks.">
+<meta name="description" content="Book mobile detailing across Connecticut, or text four photos and get a real price back, usually within the hour. We come to you, home or work. Travel fee by town, quoted before you book.">
 <link rel="canonical" href="https://cipherautolab.com/quote.html">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="campaign.css">
@@ -65,25 +65,41 @@
     </div>
   </div>
 </header>
+<!-- ===== SCREEN ===== -->
+<section class="c-hero c-screen">
+  <div class="wrap">
+    <div>
+      <div class="c-eyebrow"><span class="dot"></span>Book online · Or text a photo</div>
+      <h1 class="c-h1"><span class="l">Book a</span><span class="l">Detail</span><span class="plus">+ Or text a photo</span></h1>
+      <p class="c-tagline">We come to you · Home or work</p>
+      <span class="c-rule" aria-hidden="true"></span>
+      <p class="c-sub">Pick a package, a day and a window below, or text us four photos and get a real price back. Anywhere in Connecticut. Travel fee by town, quoted before you book.</p>
+      <div class="c-cta"><a class="btn btn-p btn-lg" href="#quote">Book a slot</a><a class="btn btn-o btn-lg" href="#photoquote">Text a photo</a></div>
+    </div>
+    <a class="c-panel" href="#photoquote" aria-label="Get a photo quote by text">
+      <div class="band">Text a photo</div>
+      <div class="pb">
+        <span class="k">Call or text</span>
+        <b class="big">(203) 560-3572</b>
+        <ul><li><span>Send</span><b>4 photos</b></li><li><span>Get back</span><b>A real price</b></li><li><span>Usually</span><b>Within the hour</b></li></ul>
+        <span class="foot">Mon–Sat · 8am–6pm</span>
+      </div>
+    </a>
+  </div>
+</section>
+
 <!-- ===== PHOTO QUOTE ===== -->
 <section id="photoquote">
-  <div class="wrap pqwrap">
-
-    <div class="pqhead">
-      <div class="pqeyebrow mono">Free photo quote</div>
-      <h2>Send four photos. Get a real number back.</h2>
-      <p>Not a range, not "starting from" — the actual price for your actual car, usually within the
-        hour on a working day. We quote off what we can see rather than what you had to remember to
-        mention, which is why the number doesn't move afterwards.</p>
-      <p class="pqfoot">Works for tint too — send the same photos, say which windows you want done, and
-        you'll get the film price and the first appointment I have. No account, no card, no mailing list.
-        If the answer is "your car doesn't need that yet", you'll get that answer too.</p>
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow mono">Free photo quote</div>
+      <h2>Text a photo. Get a real price.</h2>
+      <p class="lede">Not a range, not "starting from". The actual price for your car, travel fee included,
+        usually within the hour on a working day. It goes by text straight to our phone: no app, no account, no upload.</p>
     </div>
-
-    <div class="pqcols">
-
-      <div class="pqguide">
-        <div class="pqgh mono">What to send</div>
+    <div class="pq-grid">
+      <div class="pq-guide">
+        <div class="pq-k"><span>01</span>Shoot these four</div>
         <div class="pqshots">
 
           <figure class="pqshot">
@@ -157,69 +173,47 @@
           </figure>
 
         </div>
-        <p class="pqtip"><b>Daylight, not a garage.</b> Swirls and water spots are invisible under
+        <p class="pqtip"><b>Daylight beats a garage.</b> Swirls and water spots are invisible under
           fluorescent light and obvious in the sun. If you can only shoot at night, say so and we'll
           quote conservatively rather than optimistically.</p>
       </div>
-
-      <div class="pqform">
+      <div class="pq-card">
         <form id="pqForm" novalidate>
-          <div class="pqfh">
-            <span class="pqstep mono">01</span>
-            <label for="pqFiles">Your photos</label>
-          </div>
-          <div class="pqdrop" id="pqDrop">
-            <input type="file" id="pqFiles" accept="image/jpeg,image/png,image/webp,image/heic"
-                   multiple capture="environment">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17V6a2 2 0 012-2h3l1.6-2h4.8L18 4h3a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" transform="translate(-1 1)"/><circle cx="11" cy="12" r="4"/></svg>
-            <b id="pqDropLead">Tap to add photos</b>
-            <span>Up to six. They're shrunk on your phone before sending, so it won't eat your data.</span>
-          </div>
-          <div class="pqthumbs" id="pqThumbs"></div>
-
-          <div class="pqfh"><span class="pqstep mono">02</span><label for="pqPhone">How to reach you</label></div>
+          <div class="pq-k"><span>02</span>Tell us what it is</div>
           <div class="pqrow">
-            <div class="pqfld"><input id="pqName" placeholder="Your name" autocomplete="name" required></div>
-            <div class="pqfld"><input id="pqPhone" type="tel" placeholder="(203) 555-0100" autocomplete="tel" required></div>
+            <div class="fld"><label for="pqName">Your name</label>
+              <input id="pqName" autocomplete="given-name" placeholder="First name is fine"></div>
+            <div class="fld"><label for="pqTown">Town</label>
+              <select id="pqTown" required><option value="">Choose your town</option></select></div>
           </div>
-          <div class="pqfld"><select id="pqTown" required><option value="">Your town</option></select></div>
-
-          <div class="pqfh"><span class="pqstep mono">03</span><label for="pqSvc">What are you thinking?</label></div>
-          <div class="pqfld">
-            <select id="pqSvc">
-              <option value="Not sure — tell me what it needs">Not sure — tell me what it needs</option>
-              <option value="Exterior Detail">Exterior Detail</option>
-              <option value="Interior Detail">Interior Detail</option>
-              <option value="Full Detail">Full Detail</option>
-              <option value="Paint correction or ceramic">Paint correction or ceramic</option>
-              <option value="Headlights">Headlights</option>
-            </select>
-          </div>
-          <div class="pqfld">
-            <textarea id="pqNote" rows="3" placeholder="Anything worth knowing — the car, the timing, the thing in the back seat you'd rather we knew about first."></textarea>
-          </div>
-
-          <input class="hp" type="text" id="pqHp" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
-
-          <p class="pqerr" id="pqErr" hidden></p>
-          <button type="submit" class="btn btn-p btn-lg pqsubmit" id="pqSend">Send for a price</button>
-          <p class="pqfine">Your photos go to us and nowhere else. We only use them for your quote —
-            if we ever want to put one on the site, we ask first. <a href="/privacy">Privacy policy</a></p>
+          <div class="fld"><label for="pqCar">The car</label>
+            <input id="pqCar" autocomplete="off" placeholder="e.g. 2017 Honda CR-V"></div>
+          <div class="fld"><label for="pqSvc">What you're after</label>
+            <select id="pqSvc"><option value="Not sure, tell me what it needs">Not sure, tell me what it needs</option><option value="Exterior Detail">Exterior Detail</option><option value="Interior Detail">Interior Detail</option><option value="Full Detail">Full Detail</option><option value="Paint correction or ceramic coating">Paint correction or ceramic coating</option><option value="Headlight restoration">Headlight restoration</option><option value="Window tint">Window tint</option></select></div>
+          <div class="fld"><label for="pqNote">Anything else (optional)</label>
+            <textarea id="pqNote" rows="3" placeholder="Pet hair, a coffee spill, swirls on the hood, when suits you."></textarea></div>
+          <div class="pq-k"><span>03</span>Send it with your photos</div>
+          <p class="pq-err" id="pqErr" hidden></p>
+          <button type="submit" class="btn btn-p btn-lg pq-go" id="pqSend">Open my texts</button>
+          <p class="pq-how">Your message opens with all of this typed out. Tap <b>+</b>, add your photos, send.</p>
+          <p class="pq-alt">On a computer? <a id="pqMail" href="mailto:hello@cipherautolab.com">Email it instead</a> and attach the photos.</p>
         </form>
-
-        <div class="pqdone" id="pqDone" hidden>
-          <div class="pqtick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <h3>Got it.</h3>
-          <p>Reference <b id="pqRef" class="mono">—</b>. We'll come back with a real number — usually
-            within the hour Monday to Saturday, first thing if you sent this overnight.</p>
-          <p class="pqfine">Want it faster? Call or text <a href="tel:+12035603572">(203) 560-3572</a>
-            — the same photos by text work just as well.</p>
+        <div class="pq-done" id="pqDone" hidden>
+          <div class="pq-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>Now add your photos.</h3>
+          <p>Your text to (203) 560-3572 is written. Attach the four shots and send it, and we'll reply with a real number,
+            usually within the hour Monday to Saturday.</p>
+          <div class="pq-again"><a class="btn btn-p" id="pqAgain" href="sms:+12035603572">Open my texts again</a>
+            <a class="btn btn-o" id="pqMail2" href="mailto:hello@cipherautolab.com">Email instead</a></div>
+          <p class="pq-fine">Didn't open? Text the photos to <a href="sms:+12035603572">(203) 560-3572</a> with your town and the car.</p>
         </div>
       </div>
-
     </div>
+    <p class="pq-fine">Your photos are only used for your quote. If we'd ever like to show one on the site, we ask first.
+      <a href="/privacy">Privacy policy</a></p>
   </div>
 </section>
+
 
 
 <!-- ===== TINT APPOINTMENT ===== -->
@@ -242,7 +236,7 @@
         </div>
         <div class="cl">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <div><b>The shop</b><span>523 Halfway House Rd, Unit 9, Windsor Locks, CT 06096 — tint &amp; coating here <b>by appointment</b>, detailing at your place, anywhere across CT</span></div>
+          <div><b>Travel</b><span>Anywhere in Connecticut. Depending on your town a travel fee may apply, and it's confirmed by text before your slot is held.</span></div>
         </div>
         <div class="cl">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
@@ -516,10 +510,12 @@
           <div class="fld"><label for="btw">Town</label>
             <select id="btw" required><option value="">Choose your town</option></select></div>
           <div class="fld"><label for="bad">Street address</label>
-            <input id="bad" placeholder="Where the car will be" autocomplete="street-address" required>
+            <input id="bad" placeholder="Where the car will be" autocomplete="address-line1" required>
             <p class="fldnote" id="areaNote" hidden></p></div>
+          <div class="fld"><label for="bzip">ZIP code</label>
+            <input id="bzip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx" required></div>
 
-          <div class="err" id="e3">Pick a date, a town and an address to continue.</div>
+          <div class="err" id="e3">Pick a date, a town, an address and a Connecticut ZIP code to continue.</div>
           <div class="navrow">
             <button type="button" class="btn ghost btn-lg" data-go="3">Back</button>
             <button type="button" class="btn btn-p btn-lg" data-go="5">Review terms</button>
@@ -635,14 +631,14 @@
 
           <div class="navrow">
             <button type="button" class="btn ghost btn-lg" data-go="4">Back</button>
-            <button type="button" class="btn btn-p btn-lg" id="submitBk">Agree &amp; continue to deposit</button>
+            <button type="button" class="btn btn-p btn-lg" id="submitBk">Agree &amp; continue</button>
           </div>
         </div>
 
         <!-- STEP 6 — DEPOSIT -->
         <div class="pane" data-p="6">
           <div class="qh">Hold the slot.</div>
-          <div class="qs">Paid here on this page — you are not sent anywhere else. Refundable under the terms you just agreed.</div>
+          <div class="qs">Refundable under the terms you just agreed.</div>
 
           <div class="payhead">
             <div><div class="pl mono">Refundable deposit</div><div class="pv" id="payAmt">$40</div></div>
@@ -657,7 +653,7 @@
 
           <div class="paysafe">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            <span>Card details go straight to Stripe and never touch our servers. We only ever see the last four digits.</span>
+            <span>Payments are handled by Stripe. Your card number goes to Stripe only and is never stored on this site.</span>
           </div>
 
           <div class="navrow">
@@ -673,7 +669,7 @@
             <h3>Booked.</h3>
             <div class="ref mono" id="refCode">CAL-000000</div>
             <p class="u-24">Deposit received and your slot is held. We'll confirm the arrival window by text the day before.</p>
-            <p class="u-25">A Stripe receipt is on its way to your email. Send us the summary below too if you'd like it on record — and text photos of the vehicle any time, they help us come prepared.</p>
+            <p class="u-25">A receipt is on its way to your email. Send us the summary below too if you'd like it on record — and text photos of the vehicle any time, they help us come prepared.</p>
             <div class="jobcard" id="jobBox" hidden>
               <div class="jc-l mono">Your booking page</div>
               <p>We watch the National Weather Service forecast for <b id="jobTown">your town</b> and
@@ -711,7 +707,7 @@
     <div class="shead">
       <div class="eyebrow mono">Booking tint</div>
       <h2>Tint is booked by phone.</h2>
-      <p class="lede">The form below books mobile detailing. For tint, text a photo of your car to
+      <p class="lede">The booking form above is for detailing. For tint, text a photo of your car to
         <a class="u-2" href="tel:+12035603572">(203) 560-3572</a> and you'll get a firm price and
         the first appointment I have — usually within the hour on a working day.</p>
     </div>
@@ -752,6 +748,8 @@
         <p>About 15 feet around the vehicle — roughly a standard driveway or two parking spaces. Covered parking is a bonus in bad weather but not required.</p></details>
       <details><summary>What happens if it rains?</summary>
         <p>Light rain is usually fine for interior work. For exterior polishing or ceramic coating we'll reschedule, at no charge, to protect the result. We'll call you the morning of if the forecast turns.</p></details>
+      <details><summary>Do you charge for travel?</summary>
+        <p>Sometimes. We cover all of Connecticut, and depending on how far your town is, a travel fee may apply. It's always part of the price you agree to before you book, never added afterwards.</p></details>
       <details><summary>Do I need to be home?</summary>
         <p>Not necessarily. Plenty of clients leave the keys and go to work. We'll send photos when we start and when we finish, and the walk-around can happen by video if you'd rather.</p></details>
       <details><summary>Why is it "starting at"?</summary>
@@ -762,13 +760,22 @@
         <p>A mobile slot is several hours plus travel, and a same-day cancellation can't be refilled — the deposit is the smallest amount that makes that sting a little instead of not at all. It's $25 to $150 depending on the service, it comes straight off your total rather than being an extra charge, and you get it back in full if you give 24 hours notice, if we reschedule for weather, or if we turn up, find something that changes the price and you'd rather not go ahead. You only lose it for a same-day cancellation or a no-show.</p></details>
       <details><summary>What if a stain won't come out?</summary>
         <p>Some won't. Dye transfer, old bleach spots, sun-cracked leather and ground-in salt damage are sometimes permanent, and no amount of product changes that. If it's visible going in you'll be told before the quote, and if it turns up mid-job we stop and talk to you rather than quietly charge for a result we can't deliver.</p></details>
-      <details><summary>Where does the tint get installed?</summary>
-        <p>At the shop, 523 Halfway House Rd in Windsor Locks — two minutes from Bradley. Film has to go on in a clean, still, dust-free bay, so it's the one thing we don't do in a driveway. Most cars are done the same day. Detailing still comes to you.</p></details>
+      <details><summary>Do you come to me for tint too?</summary>
+        <p>Yes. Tint is mobile like everything else. Film needs still air and as little dust as possible, so when you text us we'll ask where the car will be and confirm the spot works before you book. Most cars are done the same day.</p></details>
       <details><summary>How dark can I legally go in Connecticut?</summary>
         <p>Your front side windows have to let at least 35% of the light through. Behind the driver you can go darker, provided the car has both side mirrors, and the windshield takes a tinted strip above the AS-1 line. We fit legal tint by default and put the film maker's label on every window we do. If you have a medical exemption, bring the paperwork and we'll work to it. If you want darker than the law allows anyway, we'll tell you plainly what that means at a traffic stop before we cut anything.</p></details>
       <details><summary>Carbon or ceramic — is ceramic worth it?</summary>
         <p>They look close to identical. The difference is heat: ceramic blocks much more of the infrared that makes a parked car unbearable, and it doesn't interfere with phone or radio signal. If the car lives outside, sits in the sun at work, or you're in it with kids, ceramic earns the difference back every August. If you mainly want glare and privacy, carbon is a solid film and we'll happily fit it.</p></details>
     </div>
+  </div>
+</section>
+
+<!-- ===== CALL OR TEXT ===== -->
+<section class="c-call" aria-label="Call or text">
+  <div class="wrap">
+    <div class="c-kicker">Call or text</div>
+    <a class="c-num" href="tel:+12035603572">(203) 560-3572</a>
+    <div class="alt"><a href="quote.html#photoquote">Text a photo of your car</a><span>Mobile across CT</span><span>Travel fee by town</span></div>
   </div>
 </section>
 
@@ -780,8 +787,9 @@
         <svg><use href="#bead"/></svg>
         <div><div class="bn">CIPHER</div><div class="bs mono">AUTO&nbsp;LAB</div></div>
       </a>
-      <p class="fnote">Mobile detailing and ceramic coating across Connecticut. We come to you, home or work. Window tint by appointment in Windsor Locks. Owner-operated.</p>
+      <p class="fnote">Mobile detailing, ceramic coating and window tint across Connecticut. We come to you, home or work. Travel fee by town, quoted before you book. Owner-operated.</p>
       <p class="fnote u-12">Mon–Sat 8am–6pm · Sunday by request · Appointments only</p>
+      <p class="c-fline">Mobile across CT · Insured · Connecticut LLC</p>
     </div>
     <div class="fmeta">
       <p class="fcall">Call or text</p>
@@ -805,7 +813,7 @@
   <a class="btn btn-o" href="sms:+12035603572">Text</a>
   <a class="btn btn-p" href="quote.html#quote">Book</a>
 </div>
-<script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.stripe.com/endive/stripe.js"></script>
 <script src="config.js"></script>
 <script src="vehicles.js"></script>
 <script src="app.js" defer></script>
