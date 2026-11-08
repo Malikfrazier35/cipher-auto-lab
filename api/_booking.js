@@ -70,6 +70,8 @@ export function parseBooking(b) {
       zip: /^06\d{3}$/.test(clean(b.zip, 5)) ? clean(b.zip, 5) : '',
       agreementVersion: clean(b.agreementVersion, 10), signature: clean(b.signature, 80),
       signedAt: clean(b.signedAt, 40), photoConsent: b.photoConsent === 'yes' ? 'yes' : 'no',
+      // which booking flow it came from: the Detail Menu (QR codes, magnets, postcards) or the site
+      source: b.source === 'menu' ? 'menu' : 'site',
     },
   };
 }
@@ -119,6 +121,7 @@ export function bookingMetadata(bk) {
     vehicle: bk.vehicle, condition: bk.condition, parked: bk.parked, date: bk.date, window: bk.window,
     address: bk.address, town: bk.town, zip: bk.zip, notes: bk.notes, agreement_version: bk.agreementVersion,
     signed_name: bk.signature, signed_at: bk.signedAt, photo_consent: bk.photoConsent,
+    booking_source: bk.source || 'site',
   };
   for (const k of Object.keys(m)) m[k] = String(m[k] ?? '').slice(0, 500);
   return m;

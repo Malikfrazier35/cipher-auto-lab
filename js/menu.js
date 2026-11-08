@@ -10,6 +10,9 @@
   var SIZE = { sedan: ['sedan', 'Sedan', 'sedan'], suv: ['SUV', 'SUV (5 seats)', 'SUV (5 seats)'],
                suv3: ['3-row', '3-row SUV / minivan', '3-row SUV / minivan'], truck: ['truck/van', 'Truck or van', 'truck or van'] };
   var BUNDLE = { keys: ['iron', 'clay'], price: 119 };        // iron decon + clay bar together
+  // inside jobs need the interior in the package, outside jobs the exterior (same rule as the booking)
+  var INSIDE = ['shampoo', 'leather', 'stain', 'pethair'];
+  var COVERS = { full: { int: true, ext: true }, exterior: { int: false, ext: true }, interior: { int: true, ext: false } };
 
   var bar = document.querySelector('.m-bar');
   var what = document.querySelector('[data-sum-what]');
@@ -40,6 +43,21 @@
       var word = card.querySelector('[data-size-word]');
       if (price && p.dataset[size]) price.firstChild.nodeValue = '$' + p.dataset[size];
       if (word) word.textContent = SIZE[size][0];
+    });
+
+    // grey out add-ons the chosen package can't take, so the total always matches the booking
+    var cover = COVERS[pkg ? pkg.value : 'full'] || COVERS.full;
+    all('input[name="add"]').forEach(function (a) {
+      var inside = INSIDE.indexOf(a.value) > -1, ok = inside ? cover.int : cover.ext;
+      var row = a.closest('.m-add');
+      a.disabled = !ok;
+      if (!ok) a.checked = false;
+      if (row) {
+        row.classList.toggle('off', !ok);
+        var t = row.querySelector('.m-add-t'), note = row.querySelector('.m-only');
+        if (t && !note) { note = document.createElement('span'); note.className = 'm-only'; t.appendChild(note); }
+        if (note) note.textContent = inside ? 'With Interior or Full Detail' : 'With Exterior or Full Detail';
+      }
     });
 
     var adds = all('input[name="add"]:checked');

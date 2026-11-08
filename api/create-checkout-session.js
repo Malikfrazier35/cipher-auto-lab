@@ -12,6 +12,10 @@ import { parseBooking, depositFor, serviceLabel, bookingMetadata, json } from '.
 // A fixed label so these sessions can be told apart in the Stripe Dashboard.
 const INTEGRATION_ID = 'cipher_booking_deposit_qhxwmtzr';
 
+// A deposit should settle on the spot. Apple Pay and Google Pay (shown first on the page), card and
+// Cash App Pay do; these either settle days later or split a $25-150 deposit into instalments.
+const EXCLUDED_METHODS = ['klarna', 'amazon_pay', 'pay_by_bank'];
+
 const ALLOWED_ORIGINS = ['https://cipherautolab.com', 'https://www.cipherautolab.com'];
 const allowedOrigin = (o) =>
   ALLOWED_ORIGINS.includes(o) || /^https:\/\/cipher-auto-lab[a-z0-9-]*\.vercel\.app$/.test(o);
@@ -67,7 +71,9 @@ export async function createCheckout(request, stripe) {
           description: `Deposit ${booking.ref}: ${serviceLabel(booking)}`,
           metadata,
         },
-        return_url: `${origin}/quote?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+        excluded_payment_method_types: EXCLUDED_METHODS,
+        // payment apps that leave the page come back to the flow they started in
+        return_url: `${origin}/${booking.source === 'menu' ? 'menu' : 'quote'}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
         integration_identifier: INTEGRATION_ID,
       },
       { idempotencyKey: `deposit-${booking.ref}` },

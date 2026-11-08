@@ -555,7 +555,7 @@
       +'Photo consent: '+(S.photoOk?'yes':'no')+NL;
   }
 
-  var stripe=null, elements=null, paying=false;
+  var paying=false;
 
   // Until online card deposits are switched on, the last step sends the booking by text
   // (already written out in the sendSms link) and nothing is charged.
@@ -585,14 +585,9 @@
     e.style.display='block';
   }
 
-  // Card deposits: a Stripe Checkout Session in "elements" mode. Stripe's Payment Element
-  // sits inside our own deposit step, styled to the site; card details go to Stripe only.
-  var checkout=null, actions=null, payEl=null;
-  var APPEARANCE={ theme:'night', variables:{
-    colorPrimary:'#A3E635', colorBackground:'#0B0E12', colorText:'#F0F4F8', colorTextSecondary:'#8B96A4',
-    colorDanger:'#F87171', fontFamily:'Inter, system-ui, sans-serif', borderRadius:'9px', spacingUnit:'4px'
-  }, rules:{ '.Input':{ border:'1px solid #2A3139' }, '.Tab':{ border:'1px solid #2A3139' },
-             '.Tab--selected':{ borderColor:'#A3E635' } } };
+  // Card deposits: a Stripe Checkout Session in "elements" mode, mounted by js/deposit.js
+  // inside our own deposit step; card details go to Stripe only.
+  var payUI=null;
 
   function remember(){
     // kept for this tab only, so the page can show the booking again if a payment app sends
@@ -640,21 +635,16 @@
       if(!r.ok || !data.clientSecret){ throw new Error(data.error||'setup failed') }
 
       fill('f'); remember();
-      stripe = stripe || Stripe(window.STRIPE_PK);
-      checkout = stripe.initCheckoutElementsSdk({ clientSecret:data.clientSecret, elementsOptions:{ appearance:APPEARANCE } });
-      // Stripe requires the page to show the amount it is about to charge, from the session itself
-      checkout.on('change', function(session){
-        if(session && session.total && session.total.total) $('payAmt').textContent=session.total.total.amount;
-        $('payBtn').disabled = !(session && session.canConfirm);
+      // Apple Pay / Google Pay first, card and Cash App Pay below (js/deposit.js)
+      payUI = window.CALDeposit.mount({
+        clientSecret:data.clientSecret, express:'#express-checkout', payment:'#payment-element', theme:'dark',
+        onAmount:function(t){ $('payAmt').textContent=t },
+        onCanPay:function(ok){ $('payBtn').disabled=!ok },
+        onWallets:function(any){ var sep=$('paySep'); if(sep) sep.hidden=!any },
+        onPaid:booked,
+        onError:function(m){ payFail(m) }
       });
-      if(payEl){ try{ payEl.destroy() }catch(e){} }
-      payEl = checkout.createPaymentElement();
-      payEl.mount('#payment-element');
-      var loaded = await checkout.loadActions();
-      if(!loaded || loaded.type!=='success') throw new Error((loaded && loaded.error && loaded.error.message) || 'could not load');
-      actions = loaded.actions;
-      var sess = actions.getSession();
-      if(sess && sess.total && sess.total.total) $('payAmt').textContent = sess.total.total.amount;
+      await payUI.ready;
       $('payLoading').style.display='none';
     }catch(err){
       $('payLoading').style.display='none';
@@ -663,20 +653,11 @@
   }
 
   $('payBtn').addEventListener('click', async function(){
-    if(paying || !actions) return;
+    if(paying || !payUI) return;
     var btn=this;
     paying=true; btn.textContent='Processing…'; $('e6').style.display='none';
-    try{
-      // stays on this page for cards; only payment apps that need to (some wallets, bank
-      // redirects) leave and come back to /quote?paid=1
-      var res = await actions.confirm({ redirect:'if_required', email:$('bem').value.trim() });
-      if(res && res.type==='error'){ throw new Error(res.error && res.error.message) }
-      booked();
-    }catch(err){
-      payFail(err && err.message);
-    }finally{
-      paying=false; btn.textContent='Pay deposit & book';
-    }
+    // stays on this page for cards; only payment apps that need to leave come back to /quote?paid=1
+    try{ await payUI.pay() }finally{ paying=false; btn.textContent='Pay deposit & book' }
   });
 
   // back from a payment app: ask the server whether the deposit went through

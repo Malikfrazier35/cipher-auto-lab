@@ -213,6 +213,167 @@
   </div>
 </div>
 
+<!-- ===== DETAIL MENU BOOKING =====
+     Only reachable from this menu (the QR codes, magnets and postcards all open /menu).
+     Full-screen, one decision per screen, in the campaign's look. js/menu-book.js runs it;
+     without JavaScript the Book buttons still go to the regular booking page. -->
+<div class="qb" id="qb" hidden role="dialog" aria-modal="true" aria-labelledby="qbTitle">
+  <div class="qb-top">
+    <div class="qb-brand"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bead"/></svg><span>Detail Menu<b>Booking</b></span></div>
+    <span class="qb-ref" id="qbRef" hidden></span>
+    <button type="button" class="qb-x" data-qb-close aria-label="Close and go back to the menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="qb-prog" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+  <div class="qb-body">
+    <!-- 0 · the pass -->
+    <section class="qb-s" data-s="0">
+      <p class="qb-k"><span class="m-dot"></span>From the Detail Menu</p>
+      <h2 class="qb-h" id="qbTitle" tabindex="-1">Your detail, <em>at menu price.</em></h2>
+      <div class="qb-pass">
+        <div class="qb-pass-band">DETAIL MENU</div>
+        <div class="qb-pass-in">
+          <div class="qb-pass-row qb-pass-main"><b id="qbPkg">Full Detail</b><span id="qbPkgP">$259</span></div>
+          <p class="qb-pass-size" id="qbSize">Sedan or coupe · about 5 hrs</p>
+          <ul class="qb-pass-adds" id="qbAdds"></ul>
+        </div>
+        <div class="qb-pass-cut" aria-hidden="true"></div>
+        <div class="qb-pass-in qb-pass-foot">
+          <div class="qb-pass-row"><span>Total</span><b class="qb-pass-total" id="qbTotal">$259</b></div>
+          <div class="qb-pass-row qb-pass-dep"><span>Refundable deposit today</span><b id="qbDep">$40</b></div>
+          <p class="qb-pass-fine">Comes off the total. Travel fee by town, texted to you before your slot is confirmed. Unusual condition (heavy pet hair, smoke, years of neglect) is re-quoted on arrival, before anything is touched.</p>
+        </div>
+      </div>
+      <button type="button" class="qb-link" data-qb-close>Change something on the menu</button>
+    </section>
+
+    <!-- 1 · when -->
+    <section class="qb-s" data-s="1">
+      <p class="qb-k">01 / 05 · When</p>
+      <h2 class="qb-h" tabindex="-1">Pick a <em>day.</em></h2>
+      <p class="qb-sub">Mon–Sat, from two days out. We confirm an arrival time the day before.</p>
+      <div class="qb-card">
+        <div class="qb-dates" id="qbDates"></div>
+        <button type="button" class="qb-more" id="qbMore">Show later dates</button>
+        <p class="qb-lbl">Arrival window</p>
+        <div class="qb-wins" id="qbWins">
+          <button type="button" class="sel" data-win="Morning · 8–11am"><b>Morning</b><span>8–11am</span></button>
+          <button type="button" data-win="Midday · 11am–2pm"><b>Midday</b><span>11am–2pm</span></button>
+          <button type="button" data-win="Afternoon · 2–5pm"><b>Afternoon</b><span>2–5pm</span></button>
+        </div>
+      </div>
+      <p class="qb-err" id="qbE1" role="alert" hidden></p>
+    </section>
+
+    <!-- 2 · where -->
+    <section class="qb-s" data-s="2">
+      <p class="qb-k">02 / 05 · Where</p>
+      <h2 class="qb-h" tabindex="-1">Where's the <em>car?</em></h2>
+      <p class="qb-sub">Home or work. We bring water, power and a canopy, and need about 15 feet around the car.</p>
+      <div class="qb-card">
+        <label class="qb-f"><span>Your car</span><input id="qbCar" placeholder="2019 Honda CR-V" autocomplete="off" maxlength="80"></label>
+        <label class="qb-f"><span>Street address</span><input id="qbStreet" placeholder="House number and street" autocomplete="address-line1" maxlength="120"></label>
+        <div class="qb-row">
+          <label class="qb-f"><span>Town</span><select id="qbTown" autocomplete="address-level2"><option value="">Choose your town</option></select></label>
+          <label class="qb-f qb-zip"><span>ZIP</span><input id="qbZip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx"></label>
+        </div>
+        <p class="qb-note" id="qbTownNote" hidden></p>
+        <label class="qb-f"><span>Anything we should know? <i>Optional</i></span><input id="qbNotes" placeholder="Gate code, parking, pets" maxlength="200"></label>
+      </div>
+      <p class="qb-err" id="qbE2" role="alert" hidden></p>
+    </section>
+
+    <!-- 3 · you -->
+    <section class="qb-s" data-s="3">
+      <p class="qb-k">03 / 05 · You</p>
+      <h2 class="qb-h" tabindex="-1">Who are we <em>meeting?</em></h2>
+      <p class="qb-sub">Used for this booking only: your arrival time and your receipt.</p>
+      <div class="qb-card">
+        <label class="qb-f"><span>Name</span><input id="qbName" placeholder="First and last name" autocomplete="name" maxlength="80"></label>
+        <label class="qb-f"><span>Mobile</span><input id="qbPhone" type="tel" placeholder="(203) 555-0100" autocomplete="tel" maxlength="20"></label>
+        <label class="qb-f"><span>Email, for your receipt</span><input id="qbEmail" type="email" placeholder="you@email.com" autocomplete="email" maxlength="120"></label>
+      </div>
+      <p class="qb-err" id="qbE3" role="alert" hidden></p>
+    </section>
+
+    <!-- 4 · terms -->
+    <section class="qb-s" data-s="4">
+      <p class="qb-k">04 / 05 · Terms</p>
+      <h2 class="qb-h" tabindex="-1">The fine print, <em>in plain English.</em></h2>
+      <div class="qb-card qb-terms">
+        <p><b>Price.</b> Menu price for the size you picked. If the car needs more than you booked, we quote it on arrival and you approve it or get your deposit back.</p>
+        <p><b>Deposit.</b> Comes off your total. Refunded in full with 24 hours notice, if we reschedule (weather included), or if you decline a re-quote. Kept only for a same-day cancellation or a no-show.</p>
+        <p><b>Condition.</b> We photograph the car on arrival and aren't responsible for damage that was already there.</p>
+        <p><b>Belongings.</b> Please empty the car, child seats included.</p>
+        <p><b>Damage.</b> We're insured. Tell us within 48 hours if you think we caused something.</p>
+        <p class="qb-terms-full">The <a href="agreement.html" target="_blank" rel="noopener">full Service Agreement</a> (v1.0, Connecticut law) is what you sign.</p>
+      </div>
+      <div class="qb-card qb-sign">
+        <label class="qb-check" id="qbAgreeBox"><input type="checkbox" id="qbAgree"><span>I agree to the Service Agreement, and I own this car or have the owner's permission.</span></label>
+        <label class="qb-check qb-opt"><input type="checkbox" id="qbPhoto"><span>Optional: you may photograph my car for your portfolio (plate removed, no address).</span></label>
+        <label class="qb-f"><span>Type your full name to sign</span><input id="qbSig" placeholder="Your full name" autocomplete="name" spellcheck="false" maxlength="80"></label>
+      </div>
+      <p class="qb-err" id="qbE4" role="alert" hidden></p>
+    </section>
+
+    <!-- 5 · deposit -->
+    <section class="qb-s" data-s="5">
+      <p class="qb-k">05 / 05 · Deposit</p>
+      <h2 class="qb-h" tabindex="-1">Hold your <em>slot.</em></h2>
+      <div class="qb-dep">
+        <div><span>Refundable deposit</span><b id="qbPayAmt">$40</b></div>
+        <p>Comes off your total. <b id="qbPayBal">$219</b> after the walk-around.</p>
+      </div>
+      <div class="qb-card qb-paycard" id="qbPayCard">
+        <p class="qb-wait" id="qbPayWait"><span class="qb-spin"></span>Setting up secure payment…</p>
+        <div id="qbExpress"></div>
+        <div class="qb-sep" id="qbSep" hidden><span>or pay with card</span></div>
+        <div id="qbPayment"></div>
+        <button type="button" class="qb-pay" id="qbPayBtn" disabled>Pay deposit &amp; book</button>
+        <p class="qb-safe">Payments by Stripe. Your card number goes to Stripe only and is never stored by us.</p>
+      </div>
+      <div class="qb-card qb-texthold" id="qbTextHold" hidden>
+        <p>Card deposits are paused right now, so we hold your slot by text instead. Your booking is already typed out: send it and we reply with your arrival window. Nothing is charged today.</p>
+        <a class="m-btn lime" id="qbSms" href="sms:+12035603572">Text my booking</a>
+      </div>
+      <p class="qb-err" id="qbE5" role="alert" hidden></p>
+    </section>
+
+    <!-- 6 · booked -->
+    <section class="qb-s" data-s="6">
+      <p class="qb-k qb-k-done"><span class="m-dot"></span>Booked</p>
+      <h2 class="qb-h" tabindex="-1">You're <em>booked.</em></h2>
+      <div class="qb-pass qb-pass-done">
+        <div class="qb-pass-band">CIPHER AUTO LAB</div>
+        <div class="qb-pass-in">
+          <p class="qb-pass-lbl">Booking</p>
+          <p class="qb-pass-ref" id="qbDoneRef">CAL-000000</p>
+          <div class="qb-pass-grid">
+            <div><span>Detail</span><b id="qbDoneWhat">Full Detail</b></div>
+            <div><span>Day</span><b id="qbDoneDay">Tue Nov 10</b></div>
+            <div><span>Window</span><b id="qbDoneWin">Morning · 8–11am</b></div>
+            <div><span>Deposit</span><b id="qbDoneDep">$40 paid</b></div>
+          </div>
+          <p class="qb-pass-where" id="qbDoneWhere"></p>
+        </div>
+        <div class="qb-pass-cut" aria-hidden="true"></div>
+        <div class="qb-pass-in qb-pass-foot">
+          <p class="qb-pass-fine">We text you an arrival time the day before. Your receipt is on its way to your email. Questions: (203) 560-3572.</p>
+        </div>
+      </div>
+      <a class="m-btn ghost qb-done-btn" href="sms:+12035603572" id="qbDoneSms">Text us about this booking</a>
+      <button type="button" class="m-btn ghost qb-done-btn" data-qb-close>Back to the menu</button>
+    </section>
+  </div>
+
+  <div class="qb-bar" id="qbBar">
+    <div class="qb-bar-in">
+      <div class="qb-bar-sum"><b id="qbBarWhat">Full Detail · Sedan</b><span><b id="qbBarTotal">$259</b> · <span id="qbBarDep">$40 deposit</span></span></div>
+      <button type="button" class="m-btn lime" id="qbNext">Pick a day</button>
+    </div>
+  </div>
+</div>
+
 <footer class="m-foot">
   <div class="m-wrap">
     <p><b>Cipher Auto Lab LLC</b> · Mobile detailing &amp; ceramic coating across CT · Travel fee by town · Insured</p>
@@ -220,5 +381,6 @@
   </div>
 </footer>
 <script src="js/menu.js" defer></script>
+<script src="js/menu-book.js" defer></script>
 </body>
 </html>
