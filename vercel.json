@@ -35,7 +35,7 @@
         },
         {
           "key": "Content-Security-Policy-Report-Only",
-          "value": "default-src 'self'; script-src 'self' https://*.stripe.com https://maps.googleapis.com; style-src 'self'; img-src 'self' data: blob: https://*.stripe.com; font-src 'self'; connect-src 'self' https://*.stripe.com https://maps.googleapis.com; frame-src https://*.stripe.com https://*.link.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+          "value": "default-src 'self'; script-src 'self' https://*.stripe.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self'; img-src 'self' data: blob: https://*.stripe.com https://maps.gstatic.com https://*.googleapis.com; font-src 'self'; connect-src 'self' https://*.stripe.com https://*.googleapis.com https://maps.gstatic.com; frame-src https://*.stripe.com https://*.link.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         }
       ]
     },

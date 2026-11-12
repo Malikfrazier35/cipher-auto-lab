@@ -271,14 +271,39 @@
       <h2 class="qb-h" tabindex="-1">Where's the <em>car?</em></h2>
       <p class="qb-sub">Home or work. We bring water, power and a canopy, and need about 15 feet around the car.</p>
       <div class="qb-card">
-        <label class="qb-f"><span>Your car</span><input id="qbCar" placeholder="2019 Honda CR-V" autocomplete="off" maxlength="80"></label>
-        <label class="qb-f"><span>Street address</span><input id="qbStreet" placeholder="House number and street" autocomplete="address-line1" maxlength="120"></label>
+        <p class="qb-lbl qb-lbl-top">Your car <i>tap to pick</i></p>
+        <div id="qbCarPick">
+          <div class="qb-chips" id="qbMakes"></div>
+          <select class="qb-sel" id="qbMakeAll" aria-label="All makes" hidden><option value="">Choose the make</option></select>
+          <p class="qb-lbl" id="qbModelsLbl" hidden>Model</p>
+          <div class="qb-chips" id="qbModels" hidden></div>
+        </div>
+        <div class="qb-carsel" id="qbCarSel" hidden>
+          <b id="qbCarName">Honda Civic</b>
+          <select class="qb-sel qb-year" id="qbYear" aria-label="Year, optional"><option value="">Year</option></select>
+          <button type="button" class="qb-change" id="qbCarChange">Change</button>
+        </div>
+        <label class="qb-f qb-cartype" id="qbCarType" hidden><span>Type your car</span><input id="qbCar" placeholder="2019 Honda CR-V" autocomplete="off" maxlength="80"></label>
+      </div>
+      <div class="qb-card qb-card-2">
+        <label class="qb-f qb-addr"><span>Street address</span><input id="qbStreet" name="address-line1" placeholder="House number and street" autocomplete="address-line1" maxlength="120"></label>
         <div class="qb-row">
-          <label class="qb-f"><span>Town</span><select id="qbTown" autocomplete="address-level2"><option value="">Choose your town</option></select></label>
-          <label class="qb-f qb-zip"><span>ZIP</span><input id="qbZip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx"></label>
+          <label class="qb-f"><span>Town</span><select id="qbTown" name="address-level2" autocomplete="address-level2"><option value="">Choose your town</option></select></label>
+          <label class="qb-f qb-zip"><span>ZIP</span><input id="qbZip" name="postal-code" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx"></label>
         </div>
         <p class="qb-note" id="qbTownNote" hidden></p>
-        <label class="qb-f"><span>Anything we should know? <i>Optional</i></span><input id="qbNotes" placeholder="Gate code, parking, pets" maxlength="200"></label>
+        <p class="qb-lbl">Where it's parked <i>optional, tap any</i></p>
+        <div class="qb-chips qb-chips-sm" id="qbSpots">
+          <button type="button" data-note="Driveway">Driveway</button>
+          <button type="button" data-note="Street parking">Street</button>
+          <button type="button" data-note="Parking lot">Parking lot</button>
+          <button type="button" data-note="Garage">Garage</button>
+          <button type="button" data-note="Gated, will send the code">Gated</button>
+          <button type="button" data-note="Pets at home">Pets at home</button>
+          <button type="button" data-note="Call when you arrive">Call on arrival</button>
+        </div>
+        <button type="button" class="qb-more" id="qbNoteAdd">Add a note</button>
+        <label class="qb-f qb-notef" id="qbNoteWrap" hidden><span>Note</span><input id="qbNotes" placeholder="Anything else we should know" maxlength="200"></label>
       </div>
       <p class="qb-err" id="qbE2" role="alert" hidden></p>
     </section>
@@ -287,11 +312,11 @@
     <section class="qb-s" data-s="3">
       <p class="qb-k">03 / 05 · You</p>
       <h2 class="qb-h" tabindex="-1">Who are we <em>meeting?</em></h2>
-      <p class="qb-sub">Used for this booking only: your arrival time and your receipt.</p>
+      <p class="qb-sub">Used for this booking only: your arrival time and your receipt. Your phone can fill these in for you.</p>
       <div class="qb-card">
-        <label class="qb-f"><span>Name</span><input id="qbName" placeholder="First and last name" autocomplete="name" maxlength="80"></label>
-        <label class="qb-f"><span>Mobile</span><input id="qbPhone" type="tel" placeholder="(203) 555-0100" autocomplete="tel" maxlength="20"></label>
-        <label class="qb-f"><span>Email, for your receipt</span><input id="qbEmail" type="email" placeholder="you@email.com" autocomplete="email" maxlength="120"></label>
+        <label class="qb-f"><span>Name</span><input id="qbName" name="name" placeholder="First and last name" autocomplete="name" maxlength="80"></label>
+        <label class="qb-f"><span>Mobile</span><input id="qbPhone" name="tel" type="tel" inputmode="tel" placeholder="(203) 555-0100" autocomplete="tel" maxlength="20"></label>
+        <label class="qb-f"><span>Email, for your receipt</span><input id="qbEmail" name="email" type="email" inputmode="email" placeholder="you@email.com" autocomplete="email" maxlength="120"></label>
       </div>
       <p class="qb-err" id="qbE3" role="alert" hidden></p>
     </section>
@@ -311,7 +336,8 @@
       <div class="qb-card qb-sign">
         <label class="qb-check" id="qbAgreeBox"><input type="checkbox" id="qbAgree"><span>I agree to the Service Agreement, and I own this car or have the owner's permission.</span></label>
         <label class="qb-check qb-opt"><input type="checkbox" id="qbPhoto"><span>Optional: you may photograph my car for your portfolio (plate removed, no address).</span></label>
-        <label class="qb-f"><span>Type your full name to sign</span><input id="qbSig" placeholder="Your full name" autocomplete="name" spellcheck="false" maxlength="80"></label>
+        <button type="button" class="qb-signas" id="qbSignAs" hidden><span>Tap to sign as</span><b id="qbSignName">Your name</b></button>
+        <label class="qb-f qb-sigf"><span id="qbSigLbl">Type your full name to sign</span><input id="qbSig" placeholder="Your full name" autocomplete="off" spellcheck="false" maxlength="80"></label>
       </div>
       <p class="qb-err" id="qbE4" role="alert" hidden></p>
     </section>

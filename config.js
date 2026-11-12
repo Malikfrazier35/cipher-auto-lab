@@ -13,3 +13,12 @@
    --------------------------------------------------------------- */
 
 window.STRIPE_PK = "pk_live_51UZZWSFV7MSauZaGG2VZqF1275Eqfiri4YgaZVgkBfvWOjkUBYhSkKRtzwGpjvmH1cF4OEYG0tX23SmhzA5UiVe000oRgvgucl";
+
+/* Google address suggestions (js/address.js). Paste a Google Maps BROWSER key here,
+   restricted in Google Cloud to:
+     - Websites: cipherautolab.com/*, www.cipherautolab.com/*
+     - APIs: Maps JavaScript API and Places API (New)
+   Like the Stripe key above it is public by design; the website restriction is what
+   stops anyone else using it. Leave it empty and the address boxes simply use the
+   browser's own autofill. */
+window.GMAPS_KEY = "";

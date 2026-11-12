@@ -1,0 +1,67 @@
+/* Cipher Merch (merch.html): product cards and the waitlist, on top of styles.css + campaign.css. */
+.mx-panel .pb{padding-top:12px}
+.mx-panel-img{display:block;width:100%;max-width:300px;height:auto;margin:0 auto;aspect-ratio:1/1;background:#E9E7E2;border-radius:12px}
+.mx-panel ul{margin-top:14px}
+
+main.merch section{padding:clamp(46px,6vw,76px) 0;border-bottom:1px solid var(--line)}
+main.merch section:last-of-type{border-bottom:none}
+
+/* the pieces */
+.mx-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media(max-width:1000px){.mx-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.mx-grid{grid-template-columns:1fr}}
+.mx-card{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.mx-shot{background:#E9E7E2;aspect-ratio:1/1}
+.mx-shot img{display:block;width:100%;height:100%;object-fit:contain}
+.mx-body{display:flex;flex-direction:column;gap:8px;padding:18px 18px 20px;flex:1}
+.mx-tag{align-self:flex-start;font-family:JBM,ui-monospace,monospace;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:#14300A;background:var(--acc);border-radius:999px;padding:5px 10px}
+.mx-locked .mx-tag{background:transparent;color:var(--acc);border:1px solid rgba(163,230,53,.5)}
+.mx-body h3{font-size:19px;font-weight:850;letter-spacing:-.01em;margin-top:4px}
+.mx-body p{font-size:14px;line-height:1.5;color:var(--mute);flex:1}
+.mx-add{margin-top:6px;min-height:46px;border-radius:10px;border:1.5px solid var(--acc);background:transparent;color:var(--ink);
+  font:inherit;font-weight:800;font-size:14.5px;cursor:pointer}
+.mx-add .mx-add-on{display:none}
+.mx-add[aria-pressed="true"]{background:var(--acc);color:#14300A}
+.mx-add[aria-pressed="true"] .mx-add-off{display:none}
+.mx-add[aria-pressed="true"] .mx-add-on{display:inline}
+.mx-add[aria-pressed="true"] .mx-add-on::before{content:"\2713  "}
+.mx-add:focus-visible,.mx-chips button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.mx-link{margin-top:6px;font-weight:800;font-size:14.5px;color:var(--acc);text-decoration:none}
+.mx-link::after{content:" \2192"}
+
+/* the waitlist */
+.mx-join{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,64px);align-items:start}
+@media(max-width:860px){.mx-join{grid-template-columns:1fr}}
+.mx-join h2{margin-top:10px}
+.mx-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:14px}
+.mx-steps li{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;font-size:15.5px;line-height:1.45;color:var(--soft,#C9D1D9)}
+.mx-steps b{font-family:JBM,ui-monospace,monospace;font-size:13px;color:var(--acc);border-top:2px solid var(--acc);padding-top:6px}
+.mx-form{background:#fff;color:#0B0E11;border-radius:18px;padding:clamp(18px,3vw,26px);display:grid;gap:16px;position:relative}
+.mx-fs{border:0;margin:0;padding:0;min-width:0}
+.mx-fs legend,.mx-f label{display:block;font-family:JBM,ui-monospace,monospace;font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#5D6772;margin-bottom:8px;padding:0}
+.mx-f label i{font-style:normal;letter-spacing:.04em;text-transform:none;color:#8A949E}
+.mx-chips{display:flex;flex-wrap:wrap;gap:8px}
+.mx-chips button{min-height:44px;padding:0 15px;border:1.5px solid #E3E7E4;border-radius:999px;background:#fff;color:#0B0E11;font:inherit;font-weight:750;font-size:14.5px;cursor:pointer}
+.mx-sizes button{min-width:52px}
+.mx-chips button[aria-pressed="true"]{background:#0B0E11;border-color:#0B0E11;color:#fff;box-shadow:inset 0 -3px 0 var(--acc)}
+.mx-chips.bad{outline:2px solid #DC2626;outline-offset:6px;border-radius:12px}
+.mx-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.mx-row{grid-template-columns:1fr}}
+.mx-f input{width:100%;box-sizing:border-box;min-height:50px;border:1.5px solid #E3E7E4;border-radius:12px;padding:0 14px;font:inherit;font-size:16px;font-weight:600;color:#0B0E11;background:#fff}
+.mx-f input::placeholder{color:#9AA3AC;font-weight:500}
+.mx-f input:focus{outline:none;border-color:#0B0E11;box-shadow:0 0 0 3px #EEF8D9}
+.mx-f input.bad{border-color:#DC2626}
+.mx-err{font-size:14px;font-weight:650;color:#B91C1C}
+.mx-err a{color:#0B0E11}
+.mx-err[hidden],.mx-done[hidden]{display:none}
+.mx-submit{width:100%;justify-content:center}
+.mx-fine{font-size:12.5px;color:#5D6772;text-align:center}
+.mx-fine a{color:#0B0E11}
+.mx-done{position:absolute;inset:0;background:#fff;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:10px;padding:28px;outline:none}
+.mx-done h3{font-size:30px;font-weight:900;letter-spacing:-.02em}
+.mx-done p{font-size:15px;color:#3A424B;max-width:34ch}
+.mx-done .btn{margin-top:8px;color:#0B0E11;border-color:#0B0E11}
+.mx-tick{width:56px;height:56px;border-radius:50%;background:var(--acc);color:#14300A;display:grid;place-items:center}
+.mx-tick svg{width:28px;height:28px}

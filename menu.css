@@ -328,3 +328,56 @@ html.qb-open,html.qb-open body{overflow:hidden}
 .m-add.off .m-only{display:block}
 .qb button.m-btn{cursor:pointer;font-family:var(--font)}
 .qb button.m-btn:not(.ghost){border:0}
+
+/* tap pickers: car, parking, one-tap signature, address suggestions */
+.qb-lbl i{font-style:normal;letter-spacing:.06em;text-transform:none;color:#8A949E;margin-left:4px}
+.qb-lbl-top{margin-top:0;margin-bottom:10px}
+.qb-card-2{margin-top:12px}
+.qb-chips{display:flex;flex-wrap:wrap;gap:7px}
+.qb-chips button{min-height:44px;padding:0 15px;border:1.5px solid var(--hair);border-radius:999px;background:#fff;
+  font:700 14.5px var(--font);color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.qb-chips button.sel{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:inset 0 -3px 0 var(--lime)}
+.qb-chips button:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.qb-chips[hidden]{display:none}
+.qb-chips.bad{outline:2px solid #DC2626;outline-offset:6px;border-radius:12px}
+.qb-chips-sm{margin-top:8px}
+.qb-chips-sm button{min-height:40px;padding:0 13px;font-size:13.5px}
+#qbModels{margin-top:2px}
+.qb-sel{margin-top:10px;width:100%;min-height:50px;border:1.5px solid var(--hair);border-radius:12px;padding:0 38px 0 14px;font:700 16px var(--font);color:var(--ink);
+  -webkit-appearance:none;appearance:none;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B0E11' stroke-width='2.4'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/16px}
+.qb-sel[hidden]{display:none}
+.qb-carsel{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--lime-soft);border-radius:14px;padding:8px 8px 8px 14px}
+.qb-carsel[hidden]{display:none}
+.qb-carsel b{font-size:18px;font-weight:900;letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qb-carsel .qb-year{margin-top:0;width:auto;min-height:42px;font-size:15px;padding:0 32px 0 12px;background-position:right 10px center}
+.qb-change{background:none;border:0;font:700 13.5px var(--font);color:var(--grn);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px 4px}
+.qb-cartype[hidden],.qb-notef[hidden],#qbCarPick[hidden]{display:none}
+.qb-signas{display:block;width:100%;margin-top:16px;text-align:left;border:1.5px dashed #9AA3AC;border-radius:14px;background:#fff;padding:12px 16px;cursor:pointer;color:var(--ink)}
+.qb-signas span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.qb-signas b{display:block;margin-top:4px;font:italic 800 24px/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.01em}
+.qb-signas.done{border-style:solid;border-color:var(--ink);background:var(--lime-soft);box-shadow:inset 0 -4px 0 var(--lime)}
+.qb-signas.done span::after{content:" \2713  signed"}
+.qb-signas[hidden]{display:none}
+.qb-sign .qb-sigf{margin-top:14px}
+.qb-addr{position:relative}
+.addr-sug{position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5;background:#fff;border:1.5px solid var(--ink);border-radius:14px;
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.45);overflow:hidden}
+.addr-sug[hidden]{display:none}
+.addr-sug button{display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid var(--hair);padding:12px 14px;cursor:pointer;font-family:var(--font);color:var(--ink)}
+.addr-sug button b{display:block;font-size:15.5px;font-weight:800}
+.addr-sug button span{display:block;font-size:12.5px;color:var(--mute);margin-top:1px}
+.addr-sug button:hover,.addr-sug button.on{background:var(--lime-soft)}
+.addr-by{padding:7px 14px;font-size:11px;color:#8A949E;text-align:right}
+
+/* small phones (iPhone SE and similar) */
+.qb-bar-sum > span{white-space:nowrap}
+@media(max-width:400px){
+  .qb-carsel{grid-template-columns:1fr auto}
+  .qb-carsel b{grid-column:1/-1}
+  .qb-carsel .qb-year{width:100%}
+  .qb-bar .m-btn{min-width:0;padding:0 15px;font-size:15px}
+  .qb-bar-sum > span > b{font-size:18px}
+  .qb-top:has(.qb-ref:not([hidden])) .qb-brand span{display:none}
+  .qb-h{font-size:clamp(32px,10.5vw,58px)}
+}

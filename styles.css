@@ -93,18 +93,6 @@ h2{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;font-we
 .shead{margin-bottom:44px}
 
 /* ---------- WORK ---------- */
-.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-@media(max-width:640px){.ba{grid-template-columns:1fr}}
-.ba figure{margin:0;position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
-.ba img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:4/5;max-height:540px}
-.ba figcaption{
-  position:absolute;top:12px;left:12px;font-size:10px;font-weight:750;letter-spacing:.18em;
-  text-transform:uppercase;padding:5px 11px;border-radius:100px;backdrop-filter:blur(6px);
-}
-.ba .b figcaption{background:rgba(10,12,15,.82);color:#E4EAF0;border:1px solid rgba(255,255,255,.18)}
-.ba .a figcaption{background:rgba(163,230,53,.92);color:#14300A}
-.bacap{font-size:13px;color:var(--mute);margin-bottom:34px;padding-left:14px;border-left:2px solid var(--acc)}
-.bacap b{color:var(--ink)}
 
 .work{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:900px){.work{grid-template-columns:1fr 1fr;gap:10px}}
@@ -587,3 +575,39 @@ select:disabled{opacity:.5;cursor:not-allowed}
 
 .paynote{margin:14px 0 4px;padding:14px 16px;border:1px solid rgba(163,230,53,.35);border-radius:10px;background:rgba(163,230,53,.07);color:#E8EDF2;font-size:14.5px;line-height:1.5}
 .payhead[hidden],.paysafe[hidden],#payWrap[hidden]{display:none}
+
+/* address suggestions (js/address.js) on the booking page */
+.fld.addr{position:relative}
+.addr-sug{position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5;background:#0F1216;border:1px solid #A3E635;border-radius:10px;
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.8);overflow:hidden}
+.addr-sug[hidden]{display:none}
+.addr-sug button{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid #242C36;padding:11px 14px;cursor:pointer;color:var(--ink);font:inherit}
+.addr-sug button b{display:block;font-size:14.5px;font-weight:700}
+.addr-sug button span{display:block;font-size:12px;color:var(--mute)}
+.addr-sug button:hover,.addr-sug button.on{background:rgba(163,230,53,.08)}
+.addr-by{padding:6px 14px;font-size:10.5px;color:var(--dim);text-align:right}
+
+/* featured job (home page, replaces the old before/after pair) */
+.feat-job{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:34px}
+.feat-job figure{margin:0;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#0B0E12}
+.feat-job img{display:block;width:100%;height:100%;object-fit:cover}
+.feat-job img{aspect-ratio:4/3}
+.feat-job figcaption{position:absolute;top:14px;left:14px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.fj-main figcaption{background:rgba(163,230,53,.94);color:#14300A}
+.fj-side figcaption{background:rgba(10,12,15,.82);color:#E4EAF0;border:1px solid rgba(255,255,255,.18)}
+.fj-info{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:28px;align-items:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px}
+.fj-info h3{font-size:26px;font-weight:850;letter-spacing:-.02em;margin:6px 0 6px;line-height:1.1}
+.fj-info p{font-size:14px;color:var(--mute);line-height:1.5}
+.fj-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.fj-steps li{font-size:13px;font-weight:650;line-height:1.3;border-top:2px solid var(--acc);padding-top:8px}
+.fj-steps b{display:block;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;color:var(--acc);letter-spacing:.12em;margin-bottom:3px}
+@media(max-width:980px){
+  .fj-info{grid-template-columns:1fr;gap:18px}
+  .fj-info .btn{justify-self:start}
+}
+@media(max-width:640px){
+  .feat-job{grid-template-columns:1fr;gap:10px}
+  .fj-steps{grid-template-columns:1fr 1fr}
+}

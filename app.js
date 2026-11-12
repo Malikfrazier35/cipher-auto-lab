@@ -472,6 +472,17 @@
     var el=$(id); if(!el) return;
     el.addEventListener(id==='btw'?'change':'input', recheckWhere);
   });
+  // address suggestions from Google (js/address.js), once a Maps key is in config.js
+  window.addEventListener('load',function(){
+    if(!window.CALAddress || !window.CALAddress.enabled()) return;
+    $('bad').placeholder='Start typing, then tap your address';
+    window.CALAddress.attach({ input:$('bad'), onPick:function(a){
+      $('bad').value=a.street;
+      var t=$('btw'); if(a.town && t.querySelector('option[value="'+a.town.replace(/"/g,'')+'"]')){ t.value=a.town; t.dispatchEvent(new Event('change')) }
+      if(a.zip) $('bzip').value=a.zip;
+      recheckWhere();
+    } });
+  });
   (function(){
     var z=$('bzip'); if(!z) return;
     z.addEventListener('input',function(){

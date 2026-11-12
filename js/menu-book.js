@@ -16,7 +16,7 @@
   var SIZES = { sedan: ['Sedan or coupe', 'sedan'], suv: ['SUV, 5 seats', 'suv5'], suv3: ['3-row SUV or minivan', 'suv7'], truck: ['Truck or van', 'truck'] };
   var DEPOSIT = { exterior: 25, interior: 30, full: 40 };            // same as api/_booking.js
   var SERVER_ADD = { shampoo: 'extract', spray: 'cspray', headlights: 'headlight' };
-  var STEP_CTA = ['Pick a day', 'Next: where', 'Next: you', 'Next: the terms', 'Agree & continue', '', ''];
+  var STEP_CTA = ['Pick a day', 'Next: where', 'Next: you', 'Next: terms', 'Agree & continue', '', ''];
 
   var B = { step: 0, date: '', win: 'Morning · 8–11am', ref: '', paid: false, depth: 0 };
   var payUI = null, paying = false, assets = null;
@@ -86,7 +86,9 @@
         window.TOWNS ? null : load('vehicles.js').then(fillTowns),
         window.STRIPE_PK !== undefined ? null : load('config.js'),
         window.Stripe ? null : load('https://js.stripe.com/endive/stripe.js'),
-      ]).then(function () { return window.CALDeposit ? null : load('js/deposit.js'); });
+      ]).then(function () {
+        return Promise.all([window.CALDeposit ? null : load('js/deposit.js'), window.CALAddress ? null : load('js/address.js')]);
+      }).then(wirePickers);
       assets.catch(function () { assets = null; });
     }
     return assets;
@@ -121,8 +123,26 @@
     if (n < 5 && !B.paid && payUI) {     // stepping back from the deposit: start a fresh payment next time
       payUI = null; $('qbExpress').innerHTML = ''; $('qbPayment').innerHTML = ''; $('qbSep').hidden = true;
     }
+    if (n === 4) offerSign();
+    if (n === 2 && !wired) {             // car list didn't load (offline?): let them type it
+      Promise.resolve(loadAssets()).catch(function () {}).then(function () { if (!wired) typeCar(''); });
+    }
     if (n === 5) startDeposit();
   }
+  function offerSign() {
+    var nm = $('qbName').value.trim().replace(/\s+/g, ' ');
+    var ok = nm.length >= 3 && /\s/.test(nm) && /^[A-Za-z][A-Za-z .'’-]*[A-Za-z.]$/.test(nm);
+    $('qbSignAs').hidden = !ok;
+    if (ok) {
+      $('qbSignName').textContent = nm;
+      $('qbSignAs').classList.toggle('done', $('qbSig').value.trim() === nm);
+      $('qbSigLbl').textContent = 'Or type your full name to sign';
+    }
+  }
+  $('qbSignAs').addEventListener('click', function () {
+    $('qbSig').value = $('qbSignName').textContent; this.classList.add('done');
+    $('qbSig').classList.remove('bad'); recheck();
+  });
 
   function go(n) {                     // forward: a history entry per screen, so Back steps back
     history.pushState({ qb: n }, '', '#book');
@@ -210,6 +230,105 @@
     });
   })();
 
+  /* ------------------------------------------- 2 · the car, picked with taps */
+  var POPULAR = [['Toyota'], ['Honda'], ['Ford'], ['Chevrolet', 'Chevy'], ['Nissan'], ['Hyundai'], ['Jeep'], ['Subaru'],
+                 ['Kia'], ['Tesla'], ['BMW'], ['Mercedes-Benz', 'Mercedes']];
+  var CAR = { make: '', model: '', year: '' };
+  var wired = false;
+
+  function chip(label, data) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+    Object.keys(data || {}).forEach(function (k) { b.dataset[k] = data[k]; });
+    return b;
+  }
+  function models(make) { return ((window.VEHICLES || {})[make]) || ((window.EXOTICS || {})[make]) || []; }
+  function years(make, model) {
+    var now = new Date().getFullYear() + 1, w = ((window.MODEL_YEARS || {})[make] || {})[model], out = [];
+    for (var y = now; y >= 1990; y--) {
+      if (!w || w.some(function (r) { return y >= r[0] && y <= (r[1] || now); })) out.push(y);
+    }
+    return out;
+  }
+  function carText() {
+    if (!$('qbCarType').hidden) return $('qbCar').value.trim();
+    return [CAR.year, CAR.make, CAR.model].filter(Boolean).join(' ');
+  }
+  function syncCar() { if ($('qbCarType').hidden) $('qbCar').value = carText(); }
+  function typeCar(prefill) {
+    $('qbCarPick').hidden = true; $('qbCarSel').hidden = true; $('qbCarType').hidden = false;
+    $('qbCar').value = prefill || ''; $('qbCar').focus();
+  }
+  function pickMake(make) {
+    CAR.make = make; CAR.model = ''; CAR.year = '';
+    all('button', $('qbMakes')).forEach(function (b) { b.classList.toggle('sel', b.dataset.make === make); });
+    var box = $('qbModels'); box.innerHTML = '';
+    models(make).forEach(function (m) { box.appendChild(chip(m, { model: m })); });
+    box.appendChild(chip('Not listed', { model: '__type' }));
+    box.hidden = false; $('qbModelsLbl').hidden = false;
+    $('qbModelsLbl').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function pickModel(model) {
+    if (model === '__type') { typeCar(CAR.make === 'Other' ? '' : CAR.make + ' '); return; }
+    CAR.model = model;
+    $('qbCarName').textContent = CAR.make + ' ' + model;
+    var ys = $('qbYear'); ys.innerHTML = '<option value="">Year</option>';
+    years(CAR.make, model).forEach(function (y) { var o = document.createElement('option'); o.value = o.textContent = y; ys.appendChild(o); });
+    $('qbCarPick').hidden = true; $('qbCarSel').hidden = false;
+    syncCar(); recheck();
+  }
+
+  function wirePickers() {
+    if (wired) return; wired = true;
+    var mk = $('qbMakes');
+    POPULAR.forEach(function (p) { if (models(p[0]).length) mk.appendChild(chip(p[1] || p[0], { make: p[0] })); });
+    mk.appendChild(chip('Other make', { make: '__more' }));
+    var allMakes = Object.keys(window.VEHICLES || {}).concat(Object.keys(window.EXOTICS || {}))
+      .filter(function (m, i, a) { return m !== 'Other' && a.indexOf(m) === i; }).sort();
+    allMakes.forEach(function (m) { var o = document.createElement('option'); o.value = o.textContent = m; $('qbMakeAll').appendChild(o); });
+    var o2 = document.createElement('option'); o2.value = '__type'; o2.textContent = 'Not listed: type it'; $('qbMakeAll').appendChild(o2);
+
+    if (window.CALAddress && window.CALAddress.enabled()) {
+      $('qbStreet').placeholder = 'Start typing, then tap your address';
+      window.CALAddress.attach({ input: $('qbStreet'), onPick: function (a) {
+        $('qbStreet').value = a.street;
+        if (a.town && $('qbTown').querySelector('option[value="' + a.town.replace(/"/g, '') + '"]')) {
+          $('qbTown').value = a.town; $('qbTown').dispatchEvent(new Event('change'));
+        }
+        if (a.zip) $('qbZip').value = a.zip;
+        recheck();
+      } });
+    }
+  }
+  $('qbMakes').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.make === '__more') {
+      all('button', this).forEach(function (x) { x.classList.toggle('sel', x === b); });
+      $('qbMakeAll').hidden = false; $('qbModels').hidden = true; $('qbModelsLbl').hidden = true;
+      $('qbMakeAll').focus();
+      return;
+    }
+    $('qbMakeAll').hidden = true;
+    pickMake(b.dataset.make);
+  });
+  $('qbMakeAll').addEventListener('change', function () {
+    if (this.value === '__type') { typeCar(''); return; }
+    if (this.value) pickMake(this.value);
+  });
+  $('qbModels').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pickModel(b.dataset.model); });
+  $('qbYear').addEventListener('change', function () { CAR.year = this.value; syncCar(); });
+  $('qbCarChange').addEventListener('click', function () {
+    CAR.model = ''; CAR.year = ''; $('qbCar').value = '';
+    $('qbCarSel').hidden = true; $('qbCarPick').hidden = false;
+  });
+
+  /* parking: taps, with an optional typed note */
+  $('qbSpots').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) b.classList.toggle('sel'); });
+  $('qbNoteAdd').addEventListener('click', function () { this.hidden = true; $('qbNoteWrap').hidden = false; $('qbNotes').focus(); });
+  function notes() {
+    return all('#qbSpots button.sel').map(function (b) { return b.dataset.note; })
+      .concat($('qbNotes').value.trim() ? [$('qbNotes').value.trim()] : []).join('. ');
+  }
+
   /* ------------------------------------------------------- 2 · where, 3 · you */
   $('qbTown').addEventListener('change', function () {
     var n = $('qbTownNote'), v = this.value;
@@ -239,7 +358,10 @@
     2: function () {
       var gaps = [], first = null;
       function need(el, ok, say) { mark(el, ok); if (!ok) { gaps.push(say); first = first || el; } }
-      need($('qbCar'), $('qbCar').value.trim().length > 2, 'tell us the car');
+      syncCar();
+      var carOk = $('qbCar').value.trim().length > 2 && ($('qbCarType').hidden ? !!CAR.model : true);
+      mark($('qbCarSel').hidden && $('qbCarType').hidden ? $('qbMakes') : $('qbCar'), carOk);
+      if (!carOk) { gaps.push('pick your car'); first = first || ($('qbCarType').hidden ? $('qbMakes') : $('qbCar')); }
       need($('qbStreet'), $('qbStreet').value.trim().length > 3, 'add the street address');
       var t = $('qbTown').value;
       need($('qbTown'), t.length > 1 && t !== '__ask', t === '__ask' ? 'call us about your town' : 'choose your town');
@@ -267,6 +389,10 @@
       return true;
     },
   };
+  function recheck() {
+    var s = B.step; if (!CHECKS[s]) return;
+    var e = $('qbE' + s); if (!e.hidden && CHECKS[s]()) e.hidden = true;
+  }
   // errors clear as each field is fixed
   ['qbCar', 'qbStreet', 'qbTown', 'qbZip', 'qbName', 'qbPhone', 'qbEmail', 'qbSig'].forEach(function (id) {
     $(id).addEventListener(id === 'qbTown' ? 'change' : 'input', function () {
@@ -275,7 +401,8 @@
       if (CHECKS[s]()) e.hidden = true;
     });
   });
-  $('qbAgree').addEventListener('change', function () { if (this.checked) $('qbAgreeBox').classList.remove('bad'); });
+  $('qbAgree').addEventListener('change', function () { if (this.checked) $('qbAgreeBox').classList.remove('bad'); recheck(); });
+  $('qbSig').addEventListener('input', function () { $('qbSignAs').classList.toggle('done', this.value.trim() === $('qbSignName').textContent); });
 
   $('qbNext').addEventListener('click', function () {
     var n = B.step;
@@ -320,7 +447,7 @@
       name: $('qbName').value, phone: $('qbPhone').value, email: $('qbEmail').value.trim(),
       vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: '',
       date: B.date, window: B.win, address: $('qbStreet').value, town: $('qbTown').value, zip: $('qbZip').value,
-      notes: $('qbNotes').value, estTotal: money(b.total) + (b.plus ? '+' : ''),
+      notes: notes(), estTotal: money(b.total) + (b.plus ? '+' : ''),
       agreementVersion: AGREEMENT_VERSION, signature: $('qbSig').value.trim(), signedAt: B.signedAt,
       photoConsent: $('qbPhoto').checked ? 'yes' : 'no',
     };
