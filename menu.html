@@ -72,6 +72,20 @@
     </div>
   </section>
 
+  <!-- Winter: shown November to March (js/season.js hides it the rest of the year) -->
+  <section class="m-card m-winter" aria-labelledby="h-winter" data-season="winter">
+    <div class="m-winter-band"><span class="m-dot"></span>Winter in CT · November to March</div>
+    <div class="m-in">
+      <h2 id="h-winter">Road salt keeps working <em>after the snow melts.</em></h2>
+      <p class="m-lede">Salt and brine pack into the wheel wells, rockers and door seams, and keep working on the metal long after the roads dry. That's where winter rust starts.</p>
+      <ul class="m-winter-list">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"/></svg><b>Salt neutralizer, included</b><span>Every Exterior and Full Detail, November to March: wheels, wheel wells, rockers, lower doors and jambs.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.2 4.1 5.5 7.3 5.5 10.2a5.5 5.5 0 0 1-11 0c0-2.9 2.3-6.1 5.5-10.2z"/><path d="M4 20 20 4"/></svg><b>Rinseless at 35°F and colder</b><span>Same shine, engineered to not need a water hose. Nothing left to freeze on your driveway.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4M8.5 14.5l2.2 2.2 4.8-4.8"/></svg><b>Best right after a storm</b><span>Once the roads dry, before the next round of salt goes down.</span></li>
+      </ul>
+    </div>
+  </section>
+
   <section class="m-sec" aria-labelledby="h-pkg">
     <h2 id="h-pkg"><span class="m-step">01</span> Choose a package</h2>
     <fieldset class="m-pkgs">
@@ -94,7 +108,7 @@
           <span class="m-pkg-top"><b>Exterior Detail</b><span class="m-time">ABOUT 2 HRS</span></span>
           <span class="m-price" data-pkg-price>$109<small data-size-word>sedan</small></span>
           <span class="m-alt">SUV $125 · 3-row $135 · Truck $139</span>
-          <span class="m-inc"><ul><li>Two-bucket hand wash, top down</li><li>Wheels, barrels, tires and wells</li><li>Door jambs and sills</li><li>Spray protection, tire dressing</li><li>Streak-free exterior glass</li></ul></span>
+          <span class="m-inc"><ul><li>Two-bucket hand wash, top down</li><li>Wheels, barrels, tires and wells</li><li>Door jambs and sills</li><li>Spray protection, tire dressing</li><li>Streak-free exterior glass</li><li class="m-salt">Winter salt neutralizer, Nov–Mar</li></ul></span>
           <span class="m-pick" aria-hidden="true"></span>
         </span>
       </label>
@@ -251,16 +265,23 @@
     <section class="qb-s" data-s="1">
       <p class="qb-k">01 / 05 · When</p>
       <h2 class="qb-h" tabindex="-1">Pick a <em>day.</em></h2>
-      <p class="qb-sub">Mon–Sat, from two days out. We confirm an arrival time the day before.</p>
+      <p class="qb-sub">Mon–Sat, from two days out. The windows are built around your detail, so it's finished before dark.</p>
       <div class="qb-card">
         <div class="qb-dates" id="qbDates"></div>
         <button type="button" class="qb-more" id="qbMore">Show later dates</button>
         <p class="qb-lbl">Arrival window</p>
         <div class="qb-wins" id="qbWins">
-          <button type="button" class="sel" data-win="Morning · 8–11am"><b>Morning</b><span>8–11am</span></button>
-          <button type="button" data-win="Midday · 11am–2pm"><b>Midday</b><span>11am–2pm</span></button>
-          <button type="button" data-win="Afternoon · 2–5pm"><b>Afternoon</b><span>2–5pm</span></button>
+          <button type="button" class="sel" data-win="Morning · 8–11am" data-wk="morning"><b>Morning</b><span>8–11am</span><span class="qb-wx" hidden></span></button>
+          <button type="button" data-win="Midday · 11am–2pm" data-wk="midday"><b>Midday</b><span>11am–2pm</span><span class="qb-wx" hidden></span></button>
+          <button type="button" data-win="Afternoon · 2–5pm" data-wk="afternoon"><b>Afternoon</b><span>2–5pm</span><span class="qb-wx" hidden></span></button>
         </div>
+        <div class="tl" id="qbTl" hidden></div>
+        <div class="qb-plan" id="qbPlan"></div>
+        <button type="button" class="qb-garage" id="qbGarage" aria-pressed="false">
+          <span class="qb-gbox" aria-hidden="true"></span>
+          <span class="qb-gtxt"><b>I have a garage you can work in</b><small>Rain or shine, and you can work until 6pm. I'm fine with a wash or rinseless wash inside it.</small></span>
+        </button>
+        <p class="qb-wxsrc" id="qbWxSrc" hidden></p>
       </div>
       <p class="qb-err" id="qbE1" role="alert" hidden></p>
     </section>
@@ -292,6 +313,7 @@
           <label class="qb-f qb-zip"><span>ZIP</span><input id="qbZip" name="postal-code" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="06xxx"></label>
         </div>
         <p class="qb-note" id="qbTownNote" hidden></p>
+        <p class="qb-note qb-wxwhere" id="qbWxWhere" hidden></p>
         <p class="qb-lbl">Where it's parked <i>optional, tap any</i></p>
         <div class="qb-chips qb-chips-sm" id="qbSpots">
           <button type="button" data-note="Driveway">Driveway</button>
@@ -312,7 +334,7 @@
     <section class="qb-s" data-s="3">
       <p class="qb-k">03 / 05 · You</p>
       <h2 class="qb-h" tabindex="-1">Who are we <em>meeting?</em></h2>
-      <p class="qb-sub">Used for this booking only: your arrival time and your receipt. Your phone can fill these in for you.</p>
+      <p class="qb-sub">Used for this booking only: your arrival time and your receipt. We text from (203) 592-9589 or (203) 560-3572.</p>
       <div class="qb-card">
         <label class="qb-f"><span>Name</span><input id="qbName" name="name" placeholder="First and last name" autocomplete="name" maxlength="80"></label>
         <label class="qb-f"><span>Mobile</span><input id="qbPhone" name="tel" type="tel" inputmode="tel" placeholder="(203) 555-0100" autocomplete="tel" maxlength="20"></label>
@@ -384,7 +406,7 @@
         </div>
         <div class="qb-pass-cut" aria-hidden="true"></div>
         <div class="qb-pass-in qb-pass-foot">
-          <p class="qb-pass-fine">We text you an arrival time the day before. Your receipt is on its way to your email. Questions: (203) 560-3572.</p>
+          <p class="qb-pass-fine">We text you an arrival time the day before. Texts may come from <b>(203) 592-9589</b> or <b>(203) 560-3572</b>: both are us, so save both. Your receipt is on its way to your email.</p>
         </div>
       </div>
       <a class="m-btn ghost qb-done-btn" href="sms:+12035603572" id="qbDoneSms">Text us about this booking</a>
@@ -406,7 +428,10 @@
     <p><a href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a> · <a href="index.html">cipherautolab.com</a> · <a href="detailing.html">Full detailing page</a></p>
   </div>
 </footer>
+<script src="js/season.js" defer></script>
 <script src="js/menu.js" defer></script>
+<script src="js/weather.js" defer></script>
+<script src="js/schedule.js" defer></script>
 <script src="js/menu-book.js" defer></script>
 </body>
 </html>

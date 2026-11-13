@@ -261,3 +261,18 @@ a.c-panel:hover{transform:translateY(-3px)}
 .carry b{display:block;margin-top:4px;font-size:16px;font-weight:800;color:var(--ink)}
 .carry span:last-child{display:block;margin-top:2px;font-size:13.5px;color:var(--soft)}
 .carry .btn{flex:none}
+
+/* ---- winter: road salt (js/season.js shows it November to March) */
+.c-winter{padding:clamp(30px,5vw,54px) 0;background:linear-gradient(180deg,#08090B,#0A1015 60%,#08090B)}
+.c-winter[hidden]{display:none}
+.c-winter-in{border:1px solid #1D2A33;border-radius:18px;padding:clamp(20px,4vw,34px);background:rgba(125,211,252,.03);
+  display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.c-winter-in{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center}
+  .c-winter-in .btn{grid-column:1/-1;justify-self:start}}
+.c-winter-head h2{font-size:clamp(26px,4vw,40px);line-height:1.05}
+.c-winter-head p{margin-top:12px;color:var(--mute);font-size:15.5px;line-height:1.55;max-width:46ch}
+.c-winter-list{list-style:none;display:grid;gap:10px}
+.c-winter-list li{display:grid;grid-template-columns:34px 1fr;column-gap:12px;align-items:start;background:#0F1419;border:1px solid #1D2A33;border-radius:12px;padding:13px 14px}
+.c-winter-list svg{grid-row:span 2;width:34px;height:34px;padding:6px;border-radius:9px;background:rgba(163,230,53,.1);stroke:var(--acc);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.c-winter-list b{font-size:15px;font-weight:750;color:var(--ink)}
+.c-winter-list span{font-size:13.5px;color:var(--mute);line-height:1.45;margin-top:2px}

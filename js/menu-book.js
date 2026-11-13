@@ -47,10 +47,13 @@
       sizeLabel: size[0], tier: size[1], lines: lines, total: total, plus: plus, dep: dep,
       time: 'about ' + h + ' hr' + (h === 1 ? '' : 's') + (m ? ' ' + m + ' min' : ''),
       serverAdds: keys.map(function (k) { return SERVER_ADD[k] || k; }),
+      job: window.CALSchedule ? window.CALSchedule.job(pkgKey, keys, '') : null,
+      salt: !!(window.CALSchedule && pkgKey !== 'interior' && window.CALSchedule.salty(todayYmd())),
       names: adds.map(function (a) { return a.dataset.name; }),
     };
   }
 
+  function todayYmd() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function paintPass(b) {
     $('qbPkg').textContent = b.pkgName;
     $('qbPkgP').textContent = money(b.base);
@@ -63,6 +66,12 @@
       p.textContent = '+' + money(l.price) + (l.plus ? '+' : '');
       li.appendChild(t); li.appendChild(p); ul.appendChild(li);
     });
+    if (b.salt) {          // November to March, every exterior: shown on the pass, at no charge
+      var li = document.createElement('li'), t = document.createElement('div'), p = document.createElement('span'), sm = document.createElement('small');
+      li.className = 'qb-salt'; t.textContent = 'Winter salt neutralizer';
+      sm.textContent = 'Wheels, wells, rockers, lower doors, jambs'; t.appendChild(sm);
+      p.textContent = 'Included'; li.appendChild(t); li.appendChild(p); ul.appendChild(li);
+    }
     $('qbTotal').textContent = money(b.total) + (b.plus ? '+' : '');
     $('qbDep').textContent = money(b.dep);
     $('qbBarWhat').textContent = b.pkgName + ' · ' + b.sizeLabel + (b.names.length ? ' + ' + b.names.length + ' add-on' + (b.names.length > 1 ? 's' : '') : '');
@@ -123,6 +132,7 @@
     if (n < 5 && !B.paid && payUI) {     // stepping back from the deposit: start a fresh payment next time
       payUI = null; $('qbExpress').innerHTML = ''; $('qbPayment').innerHTML = ''; $('qbSep').hidden = true;
     }
+    if (n === 1 || n === 2) paintDay();
     if (n === 4) offerSign();
     if (n === 2 && !wired) {             // car list didn't load (offline?): let them type it
       Promise.resolve(loadAssets()).catch(function () {}).then(function () { if (!wired) typeCar(''); });
@@ -154,6 +164,7 @@
     if (!checked('pkg')) return false;
     var b = build();
     paintPass(b);
+    B.job = b.job;
     B.paid = false; B.ref = ''; payUI = null;
     qb.hidden = false;
     document.documentElement.classList.add('qb-open');
@@ -208,6 +219,7 @@
       if (d.getDay() !== 0) {
         var b = document.createElement('button');
         b.type = 'button'; b.dataset.iso = d.toDateString(); b.dataset.label = DAY[d.getDay()] + ' ' + MON[d.getMonth()] + ' ' + d.getDate();
+        b.dataset.ymd = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         b.innerHTML = '<em>' + DAY[d.getDay()] + '</em><b>' + d.getDate() + '</b><i>' + MON[d.getMonth()] + '</i>';
         if (made >= 12) b.hidden = true;
         box.appendChild(b); made++;
@@ -217,18 +229,88 @@
     box.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       all('button', box).forEach(function (x) { x.classList.remove('sel'); });
-      b.classList.add('sel'); B.date = b.dataset.iso; B.dateLabel = b.dataset.label;
-      box.classList.remove('bad'); $('qbE1').hidden = true;
+      b.classList.add('sel'); B.date = b.dataset.iso; B.dateLabel = b.dataset.label; B.ymd = b.dataset.ymd;
+      box.classList.remove('bad'); $('qbE1').hidden = true; paintDay();
     });
     $('qbMore').addEventListener('click', function () {
       all('button[hidden]', box).forEach(function (x) { x.hidden = false; }); this.hidden = true;
     });
     $('qbWins').addEventListener('click', function (e) {
-      var b = e.target.closest('button'); if (!b) return;
-      all('button', this).forEach(function (x) { x.classList.remove('sel'); });
-      b.classList.add('sel'); B.win = b.dataset.win;
+      var b = e.target.closest('button'); if (!b || b.disabled) return;
+      B.wk = b.dataset.wk; paintDay();
+    });
+    $('qbGarage').addEventListener('click', function () {
+      B.garage = !B.garage;
+      this.setAttribute('aria-pressed', String(B.garage));
+      var spot = document.querySelector('#qbSpots [data-note="Garage"]');   // and on the "where" screen
+      if (spot) spot.classList.toggle('sel', B.garage);
+      paintDay();
     });
   })();
+
+  /* ------------------------- the day, engineered around the job (js/schedule.js) and its forecast
+     Windows are cut so the detail finishes before sunset (6pm with a garage), the weather is read for
+     the hours we'd be working outside, and a cold day says rinseless before anyone has to ask.     */
+  B.wk = 'morning'; B.garage = false;
+  function wxArea() { var t = $('qbTown').value; return t && t !== '__ask' && window.CALWeather ? window.CALWeather.areaFor(t) : 'hartford'; }
+  function firstYmd() { var b = $('qbDates').querySelector('button'); return b ? b.dataset.ymd : todayYmd(); }
+  var lastData = {};
+  function paintDay() {
+    var W = window.CALWeather;
+    if (!window.CALSchedule || !B.job) return;
+    var area = wxArea();
+    draw(lastData[area] || null, area);
+    if (W) W.get(area).then(function (data) { if (data) { lastData[area] = data; draw(data, area); } });
+  }
+  function draw(data, area) {
+    var W = window.CALWeather, S = window.CALSchedule, town = $('qbTown').value;
+    if (wxArea() !== area) return;
+    if (data && W) all('#qbDates button').forEach(function (b) {
+      var d = data.days[b.dataset.ymd], t = data.typical && data.typical.days[b.dataset.ymd], el = b.querySelector('.qb-dwx');
+      if (!d && !t) { if (el) el.remove(); b.classList.remove('wet', 'typ'); return; }
+      if (!el) { el = document.createElement('span'); el.className = 'qb-dwx'; b.appendChild(el); }
+      el.innerHTML = d ? W.dayHTML(d) : W.typHTML(t);
+      b.classList.toggle('wet', !!d && W.wet(d) && B.job.outside && !B.garage);
+      b.classList.toggle('typ', !d);
+      b.setAttribute('aria-label', b.dataset.label + (d ? ', ' + d.label.toLowerCase() + ', high ' + d.hi + ' degrees' + (d.pop ? ', ' + d.pop + '% chance of rain' : '')
+        : ', typically a high of ' + t.hi + ' degrees'));
+    });
+    var p = S.plan({ job: B.job, ymd: B.ymd || firstYmd(), area: area, garage: B.garage, data: data });
+    B.wk = S.best(p, B.wk);
+    B.plan = p;
+    all('#qbWins button').forEach(function (b) {
+      var w = p.wins[b.dataset.wk], el = b.querySelector('.qb-wx'), time = b.querySelector('span');
+      b.disabled = !w.ok; b.classList.toggle('off', !w.ok); b.classList.toggle('sel', w.ok && b.dataset.wk === B.wk);
+      b.classList.toggle('wet', !!w.wet); b.classList.toggle('cold', !!w.cold);
+      time.textContent = w.ok ? w.time : 'Not this day';
+      if (!w.ok) { el.hidden = false; el.innerHTML = '<em>' + w.why + '</em>'; return; }
+      var bits = (w.wx && W ? W.winHTML(w.wx) : '') + (w.cold ? '<small class="qb-rl">Rinseless</small>' : '') +
+        (w.doneB ? '<small class="qb-done">Done by ' + S.clock(w.doneB) + '</small>' : w.two ? '<small class="qb-done">2 visits</small>' : '');
+      el.hidden = !bits; el.innerHTML = bits;
+    });
+    var w = p.wins[B.wk];
+    B.win = w.label;
+    var tl = $('qbTl');
+    tl.hidden = !B.ymd;
+    if (B.ymd) {
+      tl.innerHTML = '<p class="tl-head"><b>' + (B.dateLabel || '') + '</b><span>' + w.name + ' arrival</span></p>' + S.timeline(p, B.wk);
+      S.place(tl);
+    }
+    var box = $('qbPlan'); box.innerHTML = '';
+    if (B.ymd) S.notes(p, B.wk).forEach(function (n) {
+      var el = document.createElement('p'); el.className = 'qb-pn n-' + n.kind; el.textContent = n.text; box.appendChild(el);
+    });
+    var src = $('qbWxSrc');
+    src.hidden = !data;
+    if (data) src.textContent = (town && town !== '__ask' ? 'Forecast for ' + data.label : 'Forecast for central Connecticut until you choose your town') +
+      ' · National Weather Service' + (p.level === 'typical' ? ' · typical weather: NOAA 1991–2020 normals' : '');
+    var where = $('qbWxWhere');
+    if (where) {
+      var sel = w.ok && w.wx;
+      where.hidden = !(sel && town && town !== '__ask');
+      if (!where.hidden) where.textContent = 'Forecast for ' + (B.dateLabel || '') + ' while we work outside, ' + data.label + ': ' + W.label(sel) + '.';
+    }
+  }
 
   /* ------------------------------------------- 2 · the car, picked with taps */
   var POPULAR = [['Toyota'], ['Honda'], ['Ford'], ['Chevrolet', 'Chevy'], ['Nissan'], ['Hyundai'], ['Jeep'], ['Subaru'],
@@ -331,6 +413,7 @@
 
   /* ------------------------------------------------------- 2 · where, 3 · you */
   $('qbTown').addEventListener('change', function () {
+    paintDay();
     var n = $('qbTownNote'), v = this.value;
     n.hidden = !v; n.innerHTML = '';
     if (v === '__ask') { n.textContent = 'Call or text (203) 560-3572 and we will tell you straight away whether we can reach you.'; return; }
@@ -443,9 +526,9 @@
     $('qbPayCard').hidden = false; $('qbTextHold').hidden = true;
     payUI = { pending: true };
     var body = {
-      source: 'menu', packageKey: b.pkgKey, paintKey: '', tier: b.tier, addons: b.serverAdds.join(','), ref: B.ref,
+      source: 'menu', area: wxArea(), packageKey: b.pkgKey, paintKey: '', tier: b.tier, addons: b.serverAdds.join(','), ref: B.ref,
       name: $('qbName').value, phone: $('qbPhone').value, email: $('qbEmail').value.trim(),
-      vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: '',
+      vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: B.garage ? 'Garage' : '', garage: B.garage ? 'yes' : 'no',
       date: B.date, window: B.win, address: $('qbStreet').value, town: $('qbTown').value, zip: $('qbZip').value,
       notes: notes(), estTotal: money(b.total) + (b.plus ? '+' : ''),
       agreementVersion: AGREEMENT_VERSION, signature: $('qbSig').value.trim(), signedAt: B.signedAt,

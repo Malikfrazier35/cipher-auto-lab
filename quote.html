@@ -495,17 +495,24 @@
         <!-- STEP 4 — WHEN AND WHERE -->
         <div class="pane" data-p="4">
           <div class="qh">Pick a day.</div>
-          <div class="qs" id="leadnote">Mon–Sat, from two days out. Sundays by request only.</div>
+          <div class="qs" id="leadnote">Mon–Sat, from two days out. Sundays by request only. The windows are built around your detail, so it's finished before dark.</div>
           <div class="dates" id="dates"></div>
           <button type="button" class="more-dates" id="moreDates" hidden>Show later dates</button>
 
           <div class="qh u-16">And a window.</div>
           <div class="qs">We'll confirm an arrival time the day before.</div>
           <div class="opts" id="win">
-            <button type="button" class="opt sel" data-win="Morning · 8–11am"><b>Morning</b><span>8am – 11am</span></button>
-            <button type="button" class="opt" data-win="Midday · 11am–2pm"><b>Midday</b><span>11am – 2pm</span></button>
-            <button type="button" class="opt" data-win="Afternoon · 2–5pm"><b>Afternoon</b><span>2pm – 5pm</span></button>
+            <button type="button" class="opt sel" data-win="Morning · 8–11am" data-wk="morning"><b>Morning</b><span>8am – 11am</span><span class="wx" hidden></span></button>
+            <button type="button" class="opt" data-win="Midday · 11am–2pm" data-wk="midday"><b>Midday</b><span>11am – 2pm</span><span class="wx" hidden></span></button>
+            <button type="button" class="opt" data-win="Afternoon · 2–5pm" data-wk="afternoon"><b>Afternoon</b><span>2pm – 5pm</span><span class="wx" hidden></span></button>
           </div>
+          <div class="tl" id="tl" hidden></div>
+          <div class="plan" id="plan"></div>
+          <button type="button" class="garage" id="garage" aria-pressed="false">
+            <span class="gbox" aria-hidden="true"></span>
+            <span class="gtxt"><b>I have a garage you can work in</b><small>Rain or shine, and you can work until 6pm. I'm fine with a wash or rinseless wash inside it.</small></span>
+          </button>
+          <p class="wxsrc" id="wxSrc" hidden></p>
 
           <div class="qh u-20">Where's the car?</div>
           <div class="qs">We bring our own water, power and canopy. All we need is about 15 feet of clear space around the vehicle.</div>
@@ -673,7 +680,7 @@
             <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
             <h3>Booked.</h3>
             <div class="ref mono" id="refCode">CAL-000000</div>
-            <p class="u-24">Deposit received and your slot is held. We'll confirm the arrival window by text the day before.</p>
+            <p class="u-24">Deposit received and your slot is held. We'll confirm the arrival window by text the day before. Texts may come from <b>(203) 592-9589</b> or <b>(203) 560-3572</b>: both are us, so save both.</p>
             <p class="u-25">A receipt is on its way to your email. Send us the summary below too if you'd like it on record — and text photos of the vehicle any time, they help us come prepared.</p>
             <div class="jobcard" id="jobBox" hidden>
               <div class="jc-l mono">Your booking page</div>
@@ -821,6 +828,8 @@
 <script src="https://js.stripe.com/endive/stripe.js"></script>
 <script src="config.js"></script>
 <script src="vehicles.js"></script>
+<script src="js/weather.js" defer></script>
+<script src="js/schedule.js" defer></script>
 <script src="js/deposit.js" defer></script>
 <script src="js/address.js" defer></script>
 <script src="app.js" defer></script>

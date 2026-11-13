@@ -40,7 +40,7 @@
       ]
     },
     {
-      "source": "/api/(.*)",
+      "source": "/api/((?!weather).*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -92,6 +92,12 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/weather-watch",
+      "schedule": "0 12 * * *"
     }
   ]
 }

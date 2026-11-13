@@ -43,21 +43,38 @@ Read [`SECURITY.md`](SECURITY.md). Short version: no inline code in the HTML (CI
 it), the strict CSP starts in report-only mode, and the most important protections are
 passkeys on every account that can touch the site, the money or the domain.
 
-## Files this repo does NOT contain
+## Everything is in this repo
 
-The booking widget on `quote.html` is driven by scripts that live in the existing
-deployment (the home page no longer loads them; the other pages still do). Copy them into the project root before deploying or the form will not work:
+The whole site lives here now, including the booking scripts (`config.js`, `vehicles.js`,
+`app.js`, `photoquote.js`), the fleet page and its script (`fleet.html`, `fleet.js`), the
+legal pages (`agreement.html`, `terms.html`, `privacy.html`, `legal.css`) and the photos in
+`img/`. Upload the repo's **contents** to the root of the GitHub repo, never the folder itself,
+or Vercel serves it under a sub-path and the home page stays old.
 
-```
-config.js        site config — prices, towns, Stripe publishable key
-vehicles.js      vehicle make/model/trim data for the booking picker
-app.js           booking widget: service picker, pricing, dates, payment
-photoquote.js    the four-photo upload quote flow
-img/             photography, including img/sonata-canopy.webp (hero)
-```
+## Payments (Stripe)
 
-Keep `/fleet`, `/agreement`, `/terms` and `/privacy` as they already are — the footer
-links to them and they are not part of this bundle.
+The booking deposit is a custom checkout inside the booking form: a Stripe Checkout Session in
+`elements` mode with Stripe's Payment Element, styled to the site. Three Vercel functions in
+`api/` do the server side:
+
+| File | What it does |
+|---|---|
+| `api/create-checkout-session.js` | Works out the deposit from the service (never from the browser) and creates the session |
+| `api/checkout-status.js` | Tells the page whether a deposit went through when a payment app sends the customer back |
+| `api/stripe-webhook.js` | On a paid deposit: credits it to the customer, saves their address for tax, and creates a **draft** balance invoice from the catalog products (`cal_*`). Nothing is sent until you send it |
+| `api/_booking.js` | Prices, deposits and invoice lines, in step with `app.js` |
+
+Vercel environment variables (Production, marked **Sensitive**), never in this repo:
+
+- `STRIPE_SECRET_KEY`: a restricted key with write access to Checkout Sessions, Customers,
+  Invoices, PaymentIntents, Products and Prices.
+- `STRIPE_WEBHOOK_SECRET`: the signing secret of the webhook destination
+  `https://cipherautolab.com/api/stripe-webhook`, sending `checkout.session.completed`,
+  `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`.
+
+Until `STRIPE_SECRET_KEY` is set, the deposit step falls back to "text us your booking" and
+nothing is charged. Prices include Connecticut sales tax (Stripe Tax, tax-inclusive prices).
+Tests: `npm i && node tools/test_stripe_api.mjs`.
 
 **Do not commit secrets.** `config.js` should hold only the *publishable* Stripe key.
 Anything secret belongs in the hosting provider's environment variables.

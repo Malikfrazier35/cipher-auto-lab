@@ -7,7 +7,7 @@ Prices mirror detailing.html. Change them here and rerun:  python3 build_menu.py
 """
 import pathlib, re
 
-R = pathlib.Path(__file__).resolve().parent.parent      # repo root
+R = pathlib.Path("/mnt/user-data/outputs/cipher-site-repo")
 TEL, SMS, NUM = "tel:+12035603572", "sms:+12035603572", "(203) 560-3572"
 
 SIZES = [("sedan", "Sedan or coupe", "Sedan"), ("suv", "SUV, 5 seats", "SUV"),
@@ -140,7 +140,7 @@ def page():
     <div class="m-in">
       <p class="m-kick"><span class="m-dot"></span>Mobile across CT · Home or work</p>
       <h1>Pick a size. Pick a detail. <em>Text it to us.</em></h1>
-      <p class="m-lede">Every price, by vehicle size, and it's the price, not a starting point. Build your detail below and send it as a text. We reply with a time.</p>
+      <p class="m-lede">Every price, by vehicle size. Build your detail below and send it as a text, and we reply with a time. Travel fee by town, quoted before you book.</p>
       <fieldset class="m-sizes">
         <legend>Your vehicle</legend>
 {sizes_html()}
@@ -162,7 +162,7 @@ def page():
       <legend class="m-sr">Add-ons</legend>
 {addons_html()}
     </fieldset>
-    <p class="m-fine">Clay bar and iron decontamination together are $119. Add-ons are the same price on every vehicle.</p>
+    <p class="m-fine">Clay bar and iron decontamination together are $119. Add-ons are the same price on every vehicle. Depending on your town a travel fee may apply; it's in the price we text back.</p>
   </section>
 
   <section class="m-sec" aria-labelledby="h-paint">
@@ -180,7 +180,7 @@ def page():
 
   <section class="m-go" aria-label="Book">
     <a class="m-btn lime" data-sms href="{SMS}">Text it to us</a>
-    <a class="m-btn" data-book href="quote.html#quote">Book online</a>
+    <a class="m-btn" data-book href="/quote#quote">Book this detail</a>
     <a class="m-btn ghost" href="quote.html#photoquote">Get a photo quote</a>
     <a class="m-btn ghost" href="{TEL}">Call {NUM}</a>
   </section>
@@ -191,13 +191,13 @@ def page():
   <div class="m-bar-in">
     <div class="m-sum"><b data-sum-what>Full Detail · Sedan</b><span><b data-sum-total>$259</b> · <span data-sum-time>about 5 hrs</span></span></div>
     <a class="m-btn lime" data-sms href="{SMS}">Text it</a>
-    <a class="m-btn" data-book href="quote.html#quote">Book</a>
+    <a class="m-btn" data-book href="/quote#quote">Book</a>
   </div>
 </div>
 
 <footer class="m-foot">
   <div class="m-wrap">
-    <p><b>Cipher Auto Lab LLC</b> · Mobile detailing &amp; ceramic coating across CT · Insured</p>
+    <p><b>Cipher Auto Lab LLC</b> · Mobile detailing &amp; ceramic coating across CT · Travel fee by town · Insured</p>
     <p><a href="mailto:hello@cipherautolab.com">hello@cipherautolab.com</a> · <a href="index.html">cipherautolab.com</a> · <a href="detailing.html">Full detailing page</a></p>
   </div>
 </footer>

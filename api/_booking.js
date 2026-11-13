@@ -33,6 +33,13 @@ export const ADDONS = {
 };
 export const DECON_BUNDLE = 119; // iron + clay together
 
+// Minutes on the job, as on /menu and in js/schedule.js (paint work is a full day, quoted separately)
+export const MINS = { exterior: 120, interior: 180, full: 300,
+  extract: 60, leather: 45, stain: 60, pethair: 45, iron: 45, clay: 45, sealant: 30, cspray: 45, engine: 45, headlight: 60 };
+export function jobMinutes(bk) { return bk.paintKey ? 0 : bk.adds.reduce((m, k) => m + (MINS[k] || 0), MINS[bk.packageKey] || 0); }
+// November to March every exterior gets the salt neutralizer on wheels, wells and lower panels
+export function saltSeason(dateText) { const d = new Date(dateText || ''); const m = isNaN(d) ? 0 : d.getMonth() + 1; return m >= 11 || (m >= 1 && m <= 3); }
+
 export const TIER = { sedan: 'sedan or coupe', suv5: '5-seat SUV', suv7: '7-seat SUV', truck: 'truck or van' };
 
 const clean = (v, max = 200) => String(v ?? '').replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, max);
@@ -72,6 +79,10 @@ export function parseBooking(b) {
       signedAt: clean(b.signedAt, 40), photoConsent: b.photoConsent === 'yes' ? 'yes' : 'no',
       // which booking flow it came from: the Detail Menu (QR codes, magnets, postcards) or the site
       source: b.source === 'menu' ? 'menu' : 'site',
+      // forecast area (county) the page used, so the confirmed booking can carry its forecast
+      area: /^[a-z-]{4,20}$/.test(String(b.area || '')) ? String(b.area) : '',
+      // the customer has a garage and is fine with a wash or rinseless wash inside it (lets the job run to 6pm)
+      garage: b.garage === 'yes' || b.garage === true ? 'yes' : 'no',
     },
   };
 }
@@ -121,7 +132,8 @@ export function bookingMetadata(bk) {
     vehicle: bk.vehicle, condition: bk.condition, parked: bk.parked, date: bk.date, window: bk.window,
     address: bk.address, town: bk.town, zip: bk.zip, notes: bk.notes, agreement_version: bk.agreementVersion,
     signed_name: bk.signature, signed_at: bk.signedAt, photo_consent: bk.photoConsent,
-    booking_source: bk.source || 'site',
+    booking_source: bk.source || 'site', area: bk.area || '', garage: bk.garage || 'no',
+    job_minutes: jobMinutes(bk) || '', salt_neutralizer: SVC[bk.packageKey].ext && saltSeason(bk.date) ? 'included' : '',
   };
   for (const k of Object.keys(m)) m[k] = String(m[k] ?? '').slice(0, 500);
   return m;

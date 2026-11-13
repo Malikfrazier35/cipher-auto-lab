@@ -325,6 +325,7 @@
     o2.textContent='My town is not listed'; g2.appendChild(o2); sel.appendChild(g2);
 
     sel.addEventListener('change', function(){
+      if(typeof paintWeather==='function') paintWeather();
       var n=$('areaNote'), v=sel.value, edge=(v==='__ask');
       n.hidden=!v; n.classList.toggle('warn', edge);
       if(edge){
@@ -359,10 +360,69 @@
 
   /* ------------------------------------------------------- step 4: when */
   $('win').addEventListener('click',function(ev){
-    var b=ev.target.closest('.opt'); if(!b) return;
-    $$('#win .opt').forEach(function(o){o.classList.remove('sel')});
-    b.classList.add('sel'); S.win=b.dataset.win;
+    var b=ev.target.closest('.opt'); if(!b || b.disabled) return;
+    S.wk=b.dataset.wk; paintWeather();
   });
+  $('garage').addEventListener('click',function(){
+    S.garage=!S.garage; this.setAttribute('aria-pressed',String(S.garage));
+    if(S.garage && $('bk2')) $('bk2').value='Garage';
+    paintWeather();
+  });
+
+  /* the day, engineered around the job (js/schedule.js) with its forecast (js/weather.js):
+     windows cut so the detail finishes before sunset (6pm in a garage), weather for the hours we'd
+     be outside, rinseless at 35°F or colder. Paint work starts in the morning.                      */
+  S.wk='morning'; S.garage=false;
+  function wxArea(){ var t=$('btw')&&$('btw').value; return t && t!=='__ask' && window.CALWeather ? window.CALWeather.areaFor(t) : 'hartford' }
+  function job(){ return window.CALSchedule ? window.CALSchedule.job(S.key, activeAdds(), S.paint) : null }
+  var wxSeen={};
+  function paintWeather(){
+    var W=window.CALWeather, area=wxArea();
+    if(!window.CALSchedule) return;
+    drawDay(wxSeen[area]||null, area);
+    if(W) W.get(area).then(function(data){ if(data){ wxSeen[area]=data; drawDay(data, area) } });
+  }
+  function drawDay(data, area){
+    var W=window.CALWeather, P=window.CALSchedule, town=$('btw').value, J=job();
+    if(wxArea()!==area || !J) return;
+    if(data && W) $$('#dates .dt').forEach(function(b){
+      var d=data.days[b.dataset.ymd], t=data.typical && data.typical.days[b.dataset.ymd], el=b.querySelector('.dwx');
+      if(!d && !t){ if(el) el.remove(); b.classList.remove('wet','typ'); return }
+      if(!el){ el=document.createElement('span'); el.className='dwx'; b.appendChild(el) }
+      el.innerHTML=d ? W.dayHTML(d) : W.typHTML(t);
+      b.classList.toggle('wet', !!d && W.wet(d) && J.outside && !S.garage); b.classList.toggle('typ', !d);
+    });
+    var first=$('dates') && $('dates').querySelector('.dt');
+    var p=P.plan({ job:J, ymd:S.ymd || (first ? first.dataset.ymd : ''), area:area, garage:S.garage, data:data });
+    S.wk=P.best(p, S.wk);
+    $$('#win .opt').forEach(function(b){
+      var w=p.wins[b.dataset.wk], el=b.querySelector('.wx'), time=b.querySelector('span');
+      b.disabled=!w.ok; b.classList.toggle('off',!w.ok); b.classList.toggle('sel', w.ok && b.dataset.wk===S.wk);
+      b.classList.toggle('wet',!!w.wet); b.classList.toggle('cold',!!w.cold);
+      time.textContent=w.ok ? w.time : 'Not this day';
+      if(!w.ok){ el.hidden=false; el.innerHTML='<em>'+w.why+'</em>'; return }
+      var bits=(w.wx && W ? W.winHTML(w.wx) : '')+(w.cold ? '<small class="rl">Rinseless</small>' : '')+
+        (w.doneB ? '<small class="done">Done by '+P.clock(w.doneB)+'</small>' : w.two ? '<small class="done">2 visits</small>' : '');
+      el.hidden=!bits; el.innerHTML=bits;
+    });
+    var w=p.wins[S.wk];
+    S.win=w.label;
+    var tl=$('tl'); tl.hidden=!S.ymd;
+    if(S.ymd){
+      var dt=document.querySelector('#dates .dt.sel');
+      tl.innerHTML='<p class="tl-head"><b>'+(dt ? dt.querySelector('em').textContent+' '+dt.querySelector('i').textContent+' '+dt.querySelector('b').textContent : '')+
+        '</b><span>'+w.name+' arrival</span></p>'+P.timeline(p, S.wk);
+      P.place(tl);
+    }
+    var box=$('plan'); box.innerHTML='';
+    if(S.ymd) P.notes(p, S.wk).forEach(function(n){
+      var el=document.createElement('p'); el.className='pn n-'+n.kind; el.textContent=n.text; box.appendChild(el);
+    });
+    var src=$('wxSrc'); src.hidden=!data;
+    if(data) src.textContent=(town && town!=='__ask' ? 'Forecast for '+data.label : 'Forecast for central Connecticut until you choose your town')+
+      ' · National Weather Service'+(p.level==='typical' ? ' · typical weather: NOAA 1991–2020 normals' : '');
+  }
+  window.addEventListener('load', paintWeather);
 
   var DAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -374,6 +434,7 @@
       if(d.getDay()!==0){
         var b=document.createElement('button');
         b.type='button'; b.className='dt'; b.dataset.iso=d.toDateString();
+        b.dataset.ymd=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
         if(made>=12) b.hidden=true;
         b.innerHTML='<em>'+DAY[d.getDay()]+'</em><b>'+d.getDate()+'</b><i>'+MON[d.getMonth()]+'</i>';
         box.appendChild(b); made++;
@@ -391,7 +452,7 @@
     box.addEventListener('click',function(ev){
       var b=ev.target.closest('.dt'); if(!b) return;
       box.querySelectorAll('.dt').forEach(function(o){o.classList.remove('sel')});
-      b.classList.add('sel'); S.date=b.dataset.iso; box.classList.remove('bad'); recheckWhere();
+      b.classList.add('sel'); S.date=b.dataset.iso; S.ymd=b.dataset.ymd; box.classList.remove('bad'); recheckWhere(); paintWeather();
     });
   })();
 
@@ -402,6 +463,7 @@
       var i=+x.dataset.sb; x.classList.toggle('on',i===n); x.classList.toggle('done',i<n);
     });
     document.querySelector('.bk').scrollIntoView({behavior:'smooth',block:'start'});
+    if(n===4) paintWeather();          // the job may have changed on steps 1-3
   }
   function where(){ return esc($('bad').value)+', '+esc($('btw').value)+', CT '+esc($('bzip').value) }
 
@@ -633,8 +695,8 @@
           packageKey:S.key, paintKey:S.paint, tier:S.tier, addons:activeAdds().join(','),
           ref:S.ref,
           name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
-          vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value,
-          date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
+          vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value, garage:S.garage?'yes':'no',
+          area:wxArea(), date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
           notes:$('bn').value, estTotal:totalText(),
           agreementVersion:AGREEMENT_VERSION, signature:S.sig, signedAt:S.signedAt,
           photoConsent:S.photoOk?'yes':'no'
