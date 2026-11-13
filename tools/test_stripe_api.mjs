@@ -349,3 +349,118 @@ assert.equal(pl.level, 'typical');
 assert.match(SC.notes(pl, 'morning').find((n) => n.kind === 'far').text, /^Too far out for a forecast\. Typical for Dec 12 \(Hartford-Bradley\): high 42°, low 26°, rain or snow on about 1 in 3 days/);
 assert.ok(!SC.plan({ job: SC.job('exterior', []), ymd: '2027-05-01', area: 'hartford' }).salt, 'no salt line in May');
 console.log('schedule tests passed');
+
+// ---- confirmation texts (Twilio, toll-free)
+const sms = await import('../api/_sms.js');
+assert.equal(sms.gsm('Midday · 11am–1:30pm “ok” 35°F'), 'Midday, 11am-1:30pm "ok" 35F');
+const ctext = sms.confirmationText({ first: 'Ana', service: 'Full Detail', date: 'Tue Nov 17 2026', window: 'Morning · 8–9:30am', ref: 'CAL-AB12CD', deposit: 40 });
+assert.equal(ctext, "Cipher Auto Lab: you're booked, Ana! Full Detail, Tue, Nov 17, Morning, 8-9:30am. Ref CAL-AB12CD. $40 deposit received. " +
+  "We'll text your arrival time the day before. Questions? Text or call (203) 560-3572. Reply STOP to opt out.");
+assert.ok(/^[\x20-\x7E]+$/.test(ctext) && ctext.length <= 306, 'plain GSM text, two segments at most');
+assert.deepEqual(await sms.sendSms({}, '2035550100', 'hi'), { skipped: 'not configured' });
+const tw = { TWILIO_ACCOUNT_SID: 'AC123', TWILIO_API_KEY: 'SK456', TWILIO_API_SECRET: 'sec', TWILIO_FROM: '+18885550100' };
+let twCall;
+const twFetch = async (url, o) => { twCall = { url, o }; return { ok: true, status: 201, json: async () => ({ sid: 'SM1' }) }; };
+assert.deepEqual(await sms.sendSms(tw, '2035550100', 'Hi · there', twFetch), { sid: 'SM1' });
+assert.equal(twCall.url, 'https://api.twilio.com/2010-04-01/Accounts/AC123/Messages.json');
+assert.equal(twCall.o.headers.Authorization, 'Basic ' + btoa('SK456:sec'), 'API key pair, not the auth token');
+assert.equal(new URLSearchParams(twCall.o.body).toString(), 'To=%2B12035550100&From=%2B18885550100&Body=Hi%2C+there');
+assert.deepEqual(await sms.sendSms(tw, '555', 'x', twFetch), { skipped: 'no number' });
+await assert.rejects(sms.sendSms(tw, '2035550100', 'x', async () => ({ ok: false, status: 400, json: async () => ({ code: 21610 }) })), /twilio 400 21610/);
+// in the webhook: texted, and the owner's push says so; a Twilio failure never fails the booking
+for (const [twOk, line] of [[true, 'Confirmation texted to the customer'], [false, 'Confirmation text FAILED: text them yourself']]) {
+  const pushed = [], texts = [];
+  deps.env = tw;
+  deps.fetch = async (url, o) => {
+    if (String(url).startsWith('https://api.twilio.com')) { texts.push(new URLSearchParams(o.body).get('Body')); return twOk ? { ok: true, status: 201, json: async () => ({ sid: 'SM9' }) } : { ok: false, status: 500, json: async () => ({}) }; }
+    if (String(url).startsWith('https://ntfy.sh')) { pushed.push(JSON.parse(o.body)); return { ok: true, status: 200 }; }
+    return fakeNws(url);
+  };
+  s = fake();
+  const ev = { ...event, id: 'evt_sms', data: { object: { ...event.data.object, metadata: { ...md, sms_opt_in: 'yes' } } } }, pl = JSON.stringify(ev);
+  r = await webhook(hook(pl, real.webhooks.generateTestHeaderString({ payload: pl, secret })), s, secret, 'topic-x');
+  assert.equal((await r.json()).result, 'confirmed');
+  assert.equal(texts.length, 1);
+  assert.match(texts[0], /^Cipher Auto Lab: you're booked, Malik! Full Detail \+ Ceramic Coating, Tue, Nov 10, Morning\. Ref CAL-AB12CD\. \$100 deposit received\./);
+  assert.ok(pushed[0].message.endsWith(line));
+}
+// no tick in the texting box: no text, and the push says so
+{
+  const pushed = [], texts = [];
+  deps.env = tw;
+  deps.fetch = async (url, o) => {
+    if (String(url).startsWith('https://api.twilio.com')) { texts.push(1); return { ok: true, status: 201, json: async () => ({ sid: 'SM9' }) }; }
+    if (String(url).startsWith('https://ntfy.sh')) { pushed.push(JSON.parse(o.body)); return { ok: true, status: 200 }; }
+    return fakeNws(url);
+  };
+  assert.equal(md.sms_opt_in, 'no', 'the box is never pre-ticked');
+  const pl = JSON.stringify({ ...event, id: 'evt_nosms' });
+  r = await webhook(hook(pl, real.webhooks.generateTestHeaderString({ payload: pl, secret })), fake(), secret, 'topic-x');
+  assert.equal((await r.json()).result, 'confirmed');
+  assert.equal(texts.length, 0);
+  assert.ok(pushed[0].message.endsWith("No auto-texts: they didn't tick the texting box"));
+}
+assert.equal(parseBooking({ ...booking, smsOptIn: 'yes' }).booking.smsOptIn, 'yes');
+assert.equal(bookingMetadata(parseBooking({ ...booking, smsOptIn: 'yes' }).booking).sms_opt_in, 'yes');
+// the day-before reminder from the morning check: opted in, tomorrow, once
+{
+  const texts = [];
+  watchDeps.now = () => new Date('2026-11-09T12:00:00Z');
+  watchDeps.fetch = async (url, o) => {
+    if (String(url).startsWith('https://api.twilio.com')) { texts.push(new URLSearchParams(o.body)); return { ok: true, status: 201, json: async () => ({ sid: 'SM7' }) }; }
+    if (String(url).startsWith('https://ntfy.sh')) return { ok: true, status: 200 };
+    return fakeNws(url);
+  };
+  const base = { booking_status: 'deposit_received', area: 'hartford', date: 'Tue Nov 10 2026', window: 'Morning · 8–11am', phone: '2035550100', package_key: 'full', paint_key: '' };
+  const list = [
+    { id: 'pi_r1', metadata: { ...base, booking_ref: 'CAL-REM001', sms_opt_in: 'yes' } },
+    { id: 'pi_r2', metadata: { ...base, booking_ref: 'CAL-REM002', sms_opt_in: 'no' } },
+    { id: 'pi_r3', metadata: { ...base, booking_ref: 'CAL-REM003', sms_opt_in: 'yes', reminder_sent: '2026-11-08' } },
+    { id: 'pi_r4', metadata: { ...base, booking_ref: 'CAL-REM004', sms_opt_in: 'yes', date: 'Wed Nov 11 2026' } },
+  ];
+  s = fake();
+  s.paymentIntents.search = async () => ({ data: list, has_more: false });
+  const out = await (await watch(cron(), s, { ...env, ...tw })).json();
+  assert.deepEqual(out.reminded, ['CAL-REM001'], 'opted in, tomorrow, not reminded yet');
+  assert.equal(texts.length, 1);
+  assert.equal(texts[0].get('To'), '+12035550100');
+  assert.equal(texts[0].get('Body'), "Cipher Auto Lab: reminder, your Full Detail is tomorrow, Tue, Nov 10, Morning, 8-11am. " +
+    "We'll text your exact arrival time later today. Questions? Text or call (203) 560-3572. Reply STOP to opt out.");
+  assert.deepEqual(s.calls.filter((c) => c[0] === 'pi.update').map((c) => c.slice(1)).find((c) => c[0] === 'pi_r1'), ['pi_r1', { metadata: { reminder_sent: '2026-11-09' } }]);
+}
+deps.env = {}; deps.fetch = fakeNws;
+console.log('sms tests passed');
+
+// ---- replies to the booking line (Twilio inbound webhook)
+const ib = await import('../api/sms-inbound.js');
+// Twilio's documented example: signature for a known URL, token and body
+assert.equal(ib.signature('12345', 'https://mycompany.com/myapp.php?foo=1&bar=2',
+  new URLSearchParams({ CallSid: 'CA1234567890ABCDE', Caller: '+12349013030', Digits: '1234', From: '+12349013030', To: '+18005551212' })),
+  '0/KCTR6DLpKmkAf8muzZqo1nDgQ=');
+{
+  const ienv = { TWILIO_AUTH_TOKEN: 'tok', TWILIO_ACCOUNT_SID: 'AC123', NTFY_TOPIC: 'topic-x' };
+  const pushed = [];
+  ib.deps.fetch = async (url, o) => { pushed.push(JSON.parse(o.body)); return { ok: true, status: 200 }; };
+  const post = (fields, sig, url = 'https://cipherautolab.com/api/sms-inbound') => {
+    const p = new URLSearchParams(fields);
+    return new Request(url, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded', 'x-twilio-signature': sig ?? ib.signature('tok', 'https://cipherautolab.com/api/sms-inbound', p) }, body: p.toString() });
+  };
+  const fields = { AccountSid: 'AC123', From: '+12035550100', To: '+18885550100', Body: 'Can you come at 10 instead?' };
+  const st = fake();
+  st.paymentIntents.search = async (q) => { st.calls.push(['pi.search', q]); return { data: [{ metadata: { customer_name: 'Ana Ruiz', booking_ref: 'CAL-AB12CD', date: 'Tue Nov 17 2026' } }] }; };
+  r = await ib.inbound(post(fields), ienv, st);
+  assert.equal(r.status, 200);
+  assert.equal(await r.text(), '<?xml version="1.0" encoding="UTF-8"?><Response></Response>', 'nothing is texted back');
+  assert.equal(st.calls[0][1].query, "metadata['phone']:'2035550100'");
+  assert.equal(pushed[0].title, 'Text to the booking line from Ana Ruiz');
+  assert.equal(pushed[0].message, 'Ana Ruiz · CAL-AB12CD · Tue Nov 17 2026\n(203) 555-0100: "Can you come at 10 instead?"');
+  assert.deepEqual(pushed[0].actions.map((a) => a.url), ['sms:+12035550100', 'tel:+12035550100']);
+  assert.equal((await ib.inbound(post(fields, 'forged'), ienv, st)).status, 403, 'forged requests refused');
+  assert.equal((await ib.inbound(post({ ...fields, AccountSid: 'ACother' }), ienv, st)).status, 403, 'other Twilio accounts refused');
+  assert.equal((await ib.inbound(post(fields), { ...ienv, TWILIO_AUTH_TOKEN: '' }, st)).status, 503, 'refused until the token is set');
+  r = await ib.inbound(post({ ...fields, Body: 'stop' }), ienv, null);
+  assert.match(pushed.at(-1).message, /opted out of booking texts/);
+  assert.equal(pushed.at(-1).title, 'Text to the booking line from (203) 555-0100');
+  assert.equal((await ib.inbound(new Request('https://cipherautolab.com/api/sms-inbound'), ienv, st)).status, 405);
+}
+console.log('inbound sms tests passed');

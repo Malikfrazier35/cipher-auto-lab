@@ -482,3 +482,7 @@ html.qb-open,html.qb-open body{overflow:hidden}
 .m-winter-list b{font-size:14.5px;font-weight:800;line-height:1.25}
 .m-winter-list span{font-size:13px;color:var(--body);line-height:1.4;margin-top:2px}
 .m-inc li.m-salt{color:#0E7490;font-weight:700}
+/* optional texting consent (never pre-ticked) */
+.qb-sms{margin-top:14px}
+.qb-sms small{display:block;margin-top:4px;font-size:12px;font-weight:500;line-height:1.45;opacity:.8}
+.qb-sms a{color:inherit;text-decoration:underline;text-underline-offset:2px}

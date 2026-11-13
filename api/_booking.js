@@ -83,6 +83,8 @@ export function parseBooking(b) {
       area: /^[a-z-]{4,20}$/.test(String(b.area || '')) ? String(b.area) : '',
       // the customer has a garage and is fine with a wash or rinseless wash inside it (lets the job run to 6pm)
       garage: b.garage === 'yes' || b.garage === true ? 'yes' : 'no',
+      // ticked the optional texting box (booking confirmation and day-before reminder); never pre-ticked
+      smsOptIn: b.smsOptIn === 'yes' ? 'yes' : 'no',
     },
   };
 }
@@ -133,7 +135,7 @@ export function bookingMetadata(bk) {
     address: bk.address, town: bk.town, zip: bk.zip, notes: bk.notes, agreement_version: bk.agreementVersion,
     signed_name: bk.signature, signed_at: bk.signedAt, photo_consent: bk.photoConsent,
     booking_source: bk.source || 'site', area: bk.area || '', garage: bk.garage || 'no',
-    job_minutes: jobMinutes(bk) || '', salt_neutralizer: SVC[bk.packageKey].ext && saltSeason(bk.date) ? 'included' : '',
+    job_minutes: jobMinutes(bk) || '', sms_opt_in: bk.smsOptIn || 'no', salt_neutralizer: SVC[bk.packageKey].ext && saltSeason(bk.date) ? 'included' : '',
   };
   for (const k of Object.keys(m)) m[k] = String(m[k] ?? '').slice(0, 500);
   return m;

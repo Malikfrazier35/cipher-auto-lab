@@ -528,7 +528,7 @@
     var body = {
       source: 'menu', area: wxArea(), packageKey: b.pkgKey, paintKey: '', tier: b.tier, addons: b.serverAdds.join(','), ref: B.ref,
       name: $('qbName').value, phone: $('qbPhone').value, email: $('qbEmail').value.trim(),
-      vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: B.garage ? 'Garage' : '', garage: B.garage ? 'yes' : 'no',
+      vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: B.garage ? 'Garage' : '', garage: B.garage ? 'yes' : 'no', smsOptIn: $('qbSmsOk').checked ? 'yes' : 'no',
       date: B.date, window: B.win, address: $('qbStreet').value, town: $('qbTown').value, zip: $('qbZip').value,
       notes: notes(), estTotal: money(b.total) + (b.plus ? '+' : ''),
       agreementVersion: AGREEMENT_VERSION, signature: $('qbSig').value.trim(), signedAt: B.signedAt,

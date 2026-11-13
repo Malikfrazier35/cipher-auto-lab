@@ -1,4 +1,5 @@
 // GET /api/weather-watch  (run every morning by Vercel Cron, see vercel.json)
+// Also texts tomorrow's customers a reminder, if they ticked the texting box and Twilio is set up (api/_sms.js).
 // Checks every confirmed booking in the next 3 days against the National Weather Service forecast
 // for its window. When rain, snow or storms are a real chance, it sends a push to the owner's
 // phone through ntfy (free app, no account), with one tap to text the customer about moving.
@@ -10,6 +11,8 @@
 import Stripe from 'stripe';
 import { AREAS, forecast } from './_weather.js';
 import { push as send } from './_notify.js';
+import { sendSms, reminderText, configured as smsOn } from './_sms.js';
+import { SVC, PAINT } from './_booking.js';
 
 const WINDOW_KEY = { Morning: 'morning', Midday: 'midday', Afternoon: 'afternoon' };
 const WINDOW_TEXT = { morning: '8–11am', midday: '11am–2pm', afternoon: '2–5pm' };
@@ -91,7 +94,19 @@ export async function watch(request, stripe, env) {
     await stripe.paymentIntents.update(b.pi.id, { metadata: { weather_alert_sent: today, weather_alert: `${what} ${w.pop}% (${b.ymd} ${b.win})` } });
     sent.push(b.md.booking_ref);
   }
-  return Response.json({ checked: bookings.length, alerted: sent, clear });
+  // the day-before reminder, once per booking, only for customers who opted in to texts
+  const tomorrow = etYmd(new Date(deps.now().getTime() + 864e5)), reminded = [];
+  if (smsOn(env)) {
+    for (const b of bookings) {
+      const md = b.md;
+      if (b.ymd !== tomorrow || md.sms_opt_in !== 'yes' || md.reminder_sent) continue;
+      const service = SVC[md.package_key] ? SVC[md.package_key].name + (PAINT[md.paint_key] ? ' + ' + PAINT[md.paint_key].name : '') : 'detail';
+      const r = await sendSms(env, md.phone, reminderText({ service, date: md.date, window: md.window }), deps.fetch)
+        .catch((e) => { console.warn('reminder text failed', md.booking_ref, e && e.message); return {}; });
+      if (r.sid) { await stripe.paymentIntents.update(b.pi.id, { metadata: { reminder_sent: today } }); reminded.push(md.booking_ref); }
+    }
+  }
+  return Response.json({ checked: bookings.length, alerted: sent, clear, reminded });
 }
 
 let client = null;

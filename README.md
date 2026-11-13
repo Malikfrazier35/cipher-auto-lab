@@ -71,6 +71,14 @@ Vercel environment variables (Production, marked **Sensitive**), never in this r
 - `STRIPE_WEBHOOK_SECRET`: the signing secret of the webhook destination
   `https://cipherautolab.com/api/stripe-webhook`, sending `checkout.session.completed`,
   `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`.
+- `NTFY_TOPIC` (and optionally `CRON_SECRET`): the private ntfy topic for the owner's new-booking
+  and morning weather pushes (`api/_notify.js`, `api/weather-watch.js`).
+- `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY`, `TWILIO_API_SECRET` (or `TWILIO_AUTH_TOKEN`) and
+  `TWILIO_FROM` (the verified toll-free number, `+18xx...`): the customer's confirmation text
+  (`api/_sms.js`). Until they are set, no texts are sent and nothing else changes.
+- `TWILIO_AUTH_TOKEN`: lets `api/sms-inbound.js` check that a reply really came from Twilio, then
+  pushes it to the owner's phone. Twilio > Messaging Service > Integration > Incoming messages >
+  Send a webhook: `https://cipherautolab.com/api/sms-inbound` (POST).
 
 Until `STRIPE_SECRET_KEY` is set, the deposit step falls back to "text us your booking" and
 nothing is charged. Prices include Connecticut sales tax (Stripe Tax, tax-inclusive prices).

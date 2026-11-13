@@ -695,7 +695,7 @@
           packageKey:S.key, paintKey:S.paint, tier:S.tier, addons:activeAdds().join(','),
           ref:S.ref,
           name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
-          vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value, garage:S.garage?'yes':'no',
+          vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value, garage:S.garage?'yes':'no', smsOptIn:$('smsOk')&&$('smsOk').checked?'yes':'no',
           area:wxArea(), date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
           notes:$('bn').value, estTotal:totalText(),
           agreementVersion:AGREEMENT_VERSION, signature:S.sig, signedAt:S.signedAt,

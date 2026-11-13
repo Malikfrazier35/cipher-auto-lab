@@ -8,7 +8,9 @@
 //      paint work, add-ons, using the catalog products, Connecticut tax included). Nothing is
 //      sent: after the walk-around you open it in the Stripe app, add the travel fee or any
 //      re-quote, and send it; the deposit credit comes off automatically,
-//   3. marks the payment "deposit_received" with the invoice ID, so a retried event is a no-op.
+//   3. marks the payment "deposit_received" with the invoice ID, so a retried event is a no-op,
+//   4. texts the customer a confirmation from the toll-free number (api/_sms.js, once Twilio is set
+//      up) and pushes the booking to the owner's phone (api/_notify.js). Neither can fail a booking.
 //
 // Needs STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET (the endpoint's signing secret) in Vercel. Events to send: checkout.session.completed, checkout.session.async_payment_succeeded,
 // checkout.session.async_payment_failed.
@@ -16,6 +18,7 @@ import Stripe from 'stripe';
 import { SVC, PAINT, TIER, invoiceLines, json } from './_booking.js';
 import { AREAS, forecast, windowLine } from './_weather.js';
 import { push, NUMBERS_LINE } from './_notify.js';
+import { sendSms, confirmationText, configured as smsOn } from './_sms.js';
 
 export async function handleEvent(event, stripe, topic) {
   switch (event.type) {
@@ -103,9 +106,18 @@ export async function confirmBooking(session, stripe, topic) {
   });
   console.log('deposit received', ref, 'draft balance invoice', invoice.id);
 
-  // a push to the owner's phone for every new booking; never holds up or fails the booking
+  // the customer's confirmation text, then a push to the owner's phone; neither fails the booking
+  const deposit = (session.amount_total || 0) / 100;
+  let texted = '';
+  if (smsOn(deps.env) && md.sms_opt_in !== 'yes') texted = 'not opted in';
+  else if (smsOn(deps.env)) {
+    texted = await sendSms(deps.env, md.phone, confirmationText({
+      first: (md.customer_name || '').split(' ')[0], ref, deposit, date: md.date, window: md.window,
+      service: SVC[bk.packageKey].name + (bk.paintKey ? ' + ' + PAINT[bk.paintKey].name : ''),
+    }), deps.fetch).then((r) => (r.sid ? 'sent' : r.skipped), (e) => { console.warn('confirmation text failed', e && e.message); return 'failed'; });
+  }
   const total = lines.reduce((a, l) => a + l.amount, 0) / 100;
-  await notifyBooking(topic, { md, ref, piId, invoiceId: invoice.id, deposit: (session.amount_total || 0) / 100, total, forecast: fc })
+  await notifyBooking(topic, { md, ref, piId, invoiceId: invoice.id, deposit, total, forecast: fc, texted })
     .catch((e) => console.warn('booking push failed', e && e.message));
   return 'confirmed';
 }
@@ -113,7 +125,7 @@ export async function confirmBooking(session, stripe, topic) {
 // The forecast for the booked day and window, as it stood when the deposit came in, so it is
 // on the payment in the Stripe app. Never holds up or fails a booking: 4 seconds, then skip.
 const WINDOW_KEY = { Morning: 'morning', Midday: 'midday', Afternoon: 'afternoon' };
-export const deps = { fetch: (...a) => fetch(...a) };   // tests swap this out
+export const deps = { fetch: (...a) => fetch(...a), env: process.env };   // tests swap these out
 export async function bookingForecast(md, fetchImpl = deps.fetch) {
   try {
     const area = AREAS[md.area] ? md.area : 'hartford';
@@ -136,8 +148,10 @@ export async function notifyBooking(topic, b) {
   if (!topic) return false;
   const md = b.md, first = (md.customer_name || '').split(' ')[0] || 'there';
   const when = `${md.date || ''}, ${md.window || ''}`.replace(/^, |, $/g, '');
-  const hello = `Hi ${first}, it's Cipher Auto Lab. Your detail (${b.ref}) on ${md.date || 'the day you picked'} is booked and your deposit is in. ` +
-    `We'll text your arrival time the day before. ${NUMBERS_LINE}`;
+  const hello = b.texted === 'sent'
+    ? `Hi ${first}, it's Cipher Auto Lab about your detail (${b.ref}) on ${md.date || 'the day you picked'}. `
+    : `Hi ${first}, it's Cipher Auto Lab. Your detail (${b.ref}) on ${md.date || 'the day you picked'} is booked and your deposit is in. ` +
+      `We'll text your arrival time the day before. ${NUMBERS_LINE}`;
   const rain = /Rain|Snow|Thunder/.test(b.forecast || '') && /([4-9]\d|100)% chance/.test(b.forecast || '');
   const mins = +md.job_minutes || 0, lo = /: (-?\d+)(?:-\d+)?°F/.exec(b.forecast || '');
   const job = [
@@ -156,7 +170,9 @@ export async function notifyBooking(topic, b) {
       title: `New booking · ${md.service || 'Detail'}`,
       message: `${b.ref} · ${md.customer_name || ''} · ${md.town || ''}\n${when}\n$${b.deposit} deposit paid · est. $${b.total.toLocaleString('en-US')} total` +
         (md.vehicle ? `\n${md.vehicle}` : '') + (job ? `\n${job}` : '') + (b.forecast ? `\nForecast: ${b.forecast}` : '') +
-        (md.booking_source === 'menu' ? '\nFrom the Detail Menu' : ''),
+        (md.booking_source === 'menu' ? '\nFrom the Detail Menu' : '') +
+        (b.texted === 'sent' ? '\nConfirmation texted to the customer' : b.texted === 'failed' ? '\nConfirmation text FAILED: text them yourself' :
+          b.texted === 'not opted in' ? '\nNo auto-texts: they didn\'t tick the texting box' : ''),
       priority: 4,
       tags: rain ? 'umbrella' : 'calendar',
       actions,
