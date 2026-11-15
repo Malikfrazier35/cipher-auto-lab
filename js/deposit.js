@@ -53,7 +53,7 @@
     if (o.express && document.querySelector(o.express)) {
       express = checkout.createExpressCheckoutElement({
         buttonHeight: 52,
-        buttonType: { applePay: 'book', googlePay: 'book' },
+        buttonType: { applePay: o.buttonType || 'book', googlePay: o.buttonType || 'book' },
         buttonTheme: theme === 'light' ? { applePay: 'black', googlePay: 'black' } : { applePay: 'white', googlePay: 'white' },
         layout: { maxColumns: 1, overflow: 'never' },
         paymentMethodOrder: ['apple_pay', 'google_pay'],

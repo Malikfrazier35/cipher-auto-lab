@@ -42,6 +42,11 @@ export function saltSeason(dateText) { const d = new Date(dateText || ''); const
 
 export const TIER = { sedan: 'sedan or coupe', suv5: '5-seat SUV', suv7: '7-seat SUV', truck: 'truck or van' };
 
+// Where a booking came from (printed QR codes and links, ?src=): see api/_channels.js
+import { channel } from './_channels.js';
+import { AREAS } from './_weather.js';
+export { OFFERS } from './_channels.js';
+
 const clean = (v, max = 200) => String(v ?? '').replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, max);
 const digits = (v) => String(v ?? '').replace(/\D/g, '');
 
@@ -85,6 +90,12 @@ export function parseBooking(b) {
       garage: b.garage === 'yes' || b.garage === true ? 'yes' : 'no',
       // ticked the optional texting box (booking confirmation and day-before reminder); never pre-ticked
       smsOptIn: b.smsOptIn === 'yes' ? 'yes' : 'no',
+      // channel attribution: the last QR code or link they came from, and the first (with its day)
+      campaign: (channel(b.campaign) || {}).id || '',
+      firstCampaign: (channel(b.firstCampaign) || {}).id || '',
+      firstSeen: /^20\d\d-\d\d-\d\d$/.test(String(b.firstSeen || '')) ? String(b.firstSeen) : '',
+      // a gift card code typed at booking (checked against Stripe by the server, never trusted as is)
+      giftCode: /^GC-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(String(b.giftCode || '')) ? String(b.giftCode) : '',
     },
   };
 }
@@ -135,7 +146,12 @@ export function bookingMetadata(bk) {
     address: bk.address, town: bk.town, zip: bk.zip, notes: bk.notes, agreement_version: bk.agreementVersion,
     signed_name: bk.signature, signed_at: bk.signedAt, photo_consent: bk.photoConsent,
     booking_source: bk.source || 'site', area: bk.area || '', garage: bk.garage || 'no',
-    job_minutes: jobMinutes(bk) || '', sms_opt_in: bk.smsOptIn || 'no', salt_neutralizer: SVC[bk.packageKey].ext && saltSeason(bk.date) ? 'included' : '',
+    job_minutes: jobMinutes(bk) || '', sms_opt_in: bk.smsOptIn || 'no', gift_code: bk.giftCode || '',
+    // for the channel report: where it came from, where it is, what it is worth (cents, tax included)
+    campaign: bk.campaign || '', campaign_type: bk.campaign ? channel(bk.campaign).type : '',
+    first_campaign: bk.firstCampaign || '', first_seen: bk.firstSeen || '',
+    county: AREAS[bk.area] ? AREAS[bk.area].label : '',
+    est_value: String(invoiceLines(bk).reduce((a, l) => a + l.amount, 0)), salt_neutralizer: SVC[bk.packageKey].ext && saltSeason(bk.date) ? 'included' : '',
   };
   for (const k of Object.keys(m)) m[k] = String(m[k] ?? '').slice(0, 500);
   return m;

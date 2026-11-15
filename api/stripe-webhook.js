@@ -15,7 +15,10 @@
 // Needs STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET (the endpoint's signing secret) in Vercel. Events to send: checkout.session.completed, checkout.session.async_payment_succeeded,
 // checkout.session.async_payment_failed.
 import Stripe from 'stripe';
-import { SVC, PAINT, TIER, invoiceLines, json } from './_booking.js';
+import { SVC, PAINT, TIER, OFFERS, invoiceLines, bookingMetadata, json } from './_booking.js';
+import { channel } from './_channels.js';
+import { bump } from './_metrics.js';
+import { findGift, spendGift, dollars, GIFTS } from './_gift.js';
 import { AREAS, forecast, windowLine } from './_weather.js';
 import { push, NUMBERS_LINE } from './_notify.js';
 import { sendSms, confirmationText, configured as smsOn } from './_sms.js';
@@ -26,6 +29,7 @@ export async function handleEvent(event, stripe, topic) {
     case 'checkout.session.async_payment_succeeded': {
       const session = event.data.object;
       if (session.payment_status === 'unpaid') return 'waiting'; // delayed methods settle later
+      if (session.metadata && session.metadata.kind === 'gift') return giftSold(session, topic);
       return confirmBooking(session, stripe, topic);
     }
     case 'checkout.session.async_payment_failed': {
@@ -91,13 +95,14 @@ export async function confirmBooking(session, stripe, topic) {
   }, { idempotencyKey: key });
 
   const lines = invoiceLines(bk);
-  for (let i = 0; i < lines.length; i++) {
-    const l = lines[i];
-    const item = l.product
-      ? { price_data: { currency: 'usd', product: l.product, unit_amount: l.amount, tax_behavior: 'inclusive' } }
-      : { currency: 'usd', amount: l.amount, tax_code: l.tax_code, tax_behavior: 'inclusive' };
-    await stripe.invoiceItems.create({ customer, invoice: invoice.id, description: l.description, ...item },
-      { idempotencyKey: `${key}-${i}` });
+  await addLines(stripe, customer, invoice.id, lines, key);
+
+  // a gift card typed at booking that didn't cover the deposit: what is left on it comes off now
+  const total = lines.reduce((a, l) => a + l.amount, 0) / 100;
+  let gift = null;
+  if (md.gift_code) {
+    gift = await applyGift(stripe, customer, md.gift_code, ref, Math.round(total * 100) - (session.amount_total || 0), `${key}-gift`)
+      .catch((e) => { console.warn('gift card not applied', ref, e && e.message); return { code: md.gift_code, failed: true }; });
   }
 
   const fc = await bookingForecast(md);
@@ -116,10 +121,99 @@ export async function confirmBooking(session, stripe, topic) {
       service: SVC[bk.packageKey].name + (bk.paintKey ? ' + ' + PAINT[bk.paintKey].name : ''),
     }), deps.fetch).then((r) => (r.sid ? 'sent' : r.skipped), (e) => { console.warn('confirmation text failed', e && e.message); return 'failed'; });
   }
-  const total = lines.reduce((a, l) => a + l.amount, 0) / 100;
-  await notifyBooking(topic, { md, ref, piId, invoiceId: invoice.id, deposit, total, forecast: fc, texted })
+  await notifyBooking(topic, { md, ref, piId, invoiceId: invoice.id, deposit, total, forecast: fc, texted, gift })
     .catch((e) => console.warn('booking push failed', e && e.message));
+  await bump(deps.env, { e: 'booked', ch: md.campaign || 'direct', place: md.town ? `${md.town}, CT` : '' }, deps.fetch);
   return 'confirmed';
+}
+
+async function addLines(stripe, customer, invoiceId, lines, key) {
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    const item = l.product
+      ? { price_data: { currency: 'usd', product: l.product, unit_amount: l.amount, tax_behavior: 'inclusive' } }
+      : { currency: 'usd', amount: l.amount, tax_code: l.tax_code, tax_behavior: 'inclusive' };
+    await stripe.invoiceItems.create({ customer, invoice: invoiceId, description: l.description, ...item },
+      { idempotencyKey: `${key}-${i}` });
+  }
+}
+
+// A gift card pays like the deposit does: as credit on the customer, which the balance invoice uses
+// after tax. Takes no more than `maxCents` (what is still owed) and no more than the card holds.
+async function applyGift(stripe, customer, code, ref, maxCents, key) {
+  const g = await findGift(stripe, code);
+  if (!g) return { code, failed: true };
+  const already = (g.pi.metadata.gift_used || '').split(',').find((u) => u.startsWith(ref + ':'));
+  const cents = already ? +already.split(':')[1] : Math.max(0, Math.min(g.balance, maxCents));
+  if (cents > 0) {
+    await stripe.customers.createBalanceTransaction(customer, {
+      amount: -cents, currency: 'usd', description: `Gift card ${g.code} (${ref})`, metadata: { booking_ref: ref, gift_code: g.code },
+    }, { idempotencyKey: key });
+  }
+  const left = already ? g.balance : await spendGift(stripe, g, cents, ref);
+  return { code: g.code, applied: cents, left };
+}
+
+/** A booking whose deposit a gift card covers: no payment at all, the booking lives on its draft invoice. */
+export async function bookWithGift(bk, gift, stripe, topic) {
+  const md = bookingMetadata(bk), ref = bk.ref, key = `giftbook-${ref}`;
+  const zip = /^06\d{3}$/.test(bk.zip || '') ? bk.zip : '';
+  const customer = (await stripe.customers.create({
+    email: bk.email, name: bk.name, phone: '+1' + bk.phone,
+    address: bk.address ? { line1: bk.address, city: bk.town || undefined, state: 'CT', postal_code: zip || undefined, country: 'US' } : undefined,
+    metadata: { last_booking: ref },
+  }, { idempotencyKey: `${key}-customer` })).id;
+  const lines = invoiceLines(bk);
+  const totalCents = lines.reduce((a, l) => a + l.amount, 0);
+  const fc = await bookingForecast(md);
+  const invoice = await stripe.invoices.create({
+    customer,
+    collection_method: 'send_invoice',
+    days_until_due: 7,
+    auto_advance: false,
+    pending_invoice_items_behavior: 'exclude',
+    automatic_tax: { enabled: !!zip },
+    description: `Balance for booking ${ref} on ${md.date || 'the booked day'}${md.town ? ' in ' + md.town : ''}. ` +
+      `Gift card ${gift.code} is credited against this invoice. The final amount is confirmed at the walk-around; ` +
+      'any travel fee for your town is added before this is sent. Prices include Connecticut sales tax.',
+    metadata: { ...md, booking_status: 'deposit_received', paid_with: 'gift card', forecast_at_booking: fc },
+  }, { idempotencyKey: key });
+  await addLines(stripe, customer, invoice.id, lines, key);
+  const g = await applyGift(stripe, customer, gift.code, ref, totalCents, `${key}-gift`);
+  await stripe.invoices.update(invoice.id, { metadata: { gift_applied: String(g.applied), balance_invoice: invoice.id } });
+  console.log('gift booking', ref, 'draft balance invoice', invoice.id);
+
+  let texted = '';
+  if (smsOn(deps.env) && md.sms_opt_in !== 'yes') texted = 'not opted in';
+  else if (smsOn(deps.env)) {
+    texted = await sendSms(deps.env, md.phone, confirmationText({
+      first: (md.customer_name || '').split(' ')[0], ref, date: md.date, window: md.window, giftCode: g.code,
+      service: SVC[bk.packageKey].name + (bk.paintKey ? ' + ' + PAINT[bk.paintKey].name : ''),
+    }), deps.fetch).then((r) => (r.sid ? 'sent' : r.skipped), (e) => { console.warn('confirmation text failed', e && e.message); return 'failed'; });
+  }
+  await notifyBooking(topic, { md, ref, invoiceId: invoice.id, deposit: 0, total: totalCents / 100, forecast: fc, texted, gift: g })
+    .catch((e) => console.warn('booking push failed', e && e.message));
+  await bump(deps.env, { e: 'booked', ch: md.campaign || 'direct', place: md.town ? `${md.town}, CT` : '' }, deps.fetch);
+  return { ref, invoiceId: invoice.id, applied: g.applied, left: g.left };
+}
+
+/** A gift card was bought: tell the owner. The card works from the moment the payment succeeded. */
+async function giftSold(session, topic) {
+  const md = session.metadata || {};
+  console.log('gift card sold', md.gift_code);
+  await bump(deps.env, { e: 'gift', ch: md.campaign || 'direct' }, deps.fetch);
+  if (topic) {
+    await push(topic, {
+      title: `Gift card sold · ${dollars(parseInt(md.gift_amount, 10) || 0)}`,
+      message: `${md.gift_code} · ${(GIFTS[md.gift_kind] || {}).name || 'Gift card'}
+For ${md.gift_to || '?'}, from ${md.gift_from || '?'}` +
+        (md.gift_message ? `
+"${md.gift_message}"` : ''),
+      priority: 3, tags: 'gift',
+      actions: [{ action: 'view', label: 'Payment', url: `https://dashboard.stripe.com/payments/${session.payment_intent}` }],
+    }, deps.fetch).catch((e) => console.warn('gift push failed', e && e.message));
+  }
+  return 'gift';
 }
 
 // The forecast for the booked day and window, as it stood when the deposit came in, so it is
@@ -162,15 +256,19 @@ export async function notifyBooking(topic, b) {
   ].filter(Boolean).join(' · ');
   const actions = [
     ...(md.phone ? [{ action: 'view', label: `Text ${first}`, url: `sms:+1${md.phone}?&body=${encodeURIComponent(hello)}` }] : []),
-    { action: 'view', label: 'Payment', url: `https://dashboard.stripe.com/payments/${b.piId}` },
+    ...(b.piId ? [{ action: 'view', label: 'Payment', url: `https://dashboard.stripe.com/payments/${b.piId}` }] : []),
     { action: 'view', label: 'Draft invoice', url: `https://dashboard.stripe.com/invoices/${b.invoiceId}` },
   ];
   return Promise.race([
     push(topic, {
       title: `New booking · ${md.service || 'Detail'}`,
-      message: `${b.ref} · ${md.customer_name || ''} · ${md.town || ''}\n${when}\n$${b.deposit} deposit paid · est. $${b.total.toLocaleString('en-US')} total` +
+      message: `${b.ref} · ${md.customer_name || ''} · ${md.town || ''}\n${when}\n` +
+        (b.deposit ? `$${b.deposit} deposit paid` : 'No deposit: gift card') + ` · est. $${b.total.toLocaleString('en-US')} total` +
+        (b.gift ? (b.gift.failed ? `\nGift card ${b.gift.code} NOT applied: check it in Stripe` : `\nGift card ${b.gift.code}: ${dollars(b.gift.applied)} applied, ${dollars(b.gift.left)} left on it`) : '') +
         (md.vehicle ? `\n${md.vehicle}` : '') + (job ? `\n${job}` : '') + (b.forecast ? `\nForecast: ${b.forecast}` : '') +
         (md.booking_source === 'menu' ? '\nFrom the Detail Menu' : '') +
+        (channel(md.campaign) ? `\nQR: ${channel(md.campaign).label}` : '') +
+        (channel(md.campaign) && OFFERS[channel(md.campaign).type] ? `\n${OFFERS[channel(md.campaign).type]}` : '') +
         (b.texted === 'sent' ? '\nConfirmation texted to the customer' : b.texted === 'failed' ? '\nConfirmation text FAILED: text them yourself' :
           b.texted === 'not opted in' ? '\nNo auto-texts: they didn\'t tick the texting box' : ''),
       priority: 4,

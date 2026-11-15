@@ -458,6 +458,7 @@
 
   /* -------------------------------------------------------------- navigation */
   function show(n){
+    if(n>=2 && window.CALSource) window.CALSource.mark('start');   // booking started: counted once per visit, by channel
     $$('.pane').forEach(function(p){p.classList.toggle('on',p.dataset.p==String(n))});
     $$('.sb').forEach(function(x){
       var i=+x.dataset.sb; x.classList.toggle('on',i===n); x.classList.toggle('done',i<n);
@@ -677,10 +678,37 @@
     show(7);
   }
 
+  function bookingBody(){
+    return {
+      packageKey:S.key, paintKey:S.paint, tier:S.tier, addons:activeAdds().join(','),
+      ref:S.ref,
+      name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
+      vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value, garage:S.garage?'yes':'no', smsOptIn:$('smsOk')&&$('smsOk').checked?'yes':'no',
+      campaign:window.CALSource?window.CALSource.get():'', giftCode:S.gift?S.gift.code:'',
+      firstCampaign:window.CALSource?window.CALSource.first().src:'', firstSeen:window.CALSource?window.CALSource.first().day:'',
+      area:wxArea(), date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
+      notes:$('bn').value, estTotal:totalText(),
+      agreementVersion:AGREEMENT_VERSION, signature:S.sig, signedAt:S.signedAt,
+      photoConsent:S.photoOk?'yes':'no'
+    };
+  }
+
   async function startPayment(){
     $('payAmt').textContent='$'+deposit();
     $('payBal').textContent=money(bal());
     $('e6').style.display='none';
+    $('giftPay').hidden=true; $('payWrap').hidden=false;
+    $('payBtn').textContent='Pay deposit & book';
+    if(S.gift && window.CALGift && window.CALGift.covers(S.gift, deposit())){   // nothing to pay: book on the card
+      $('payLoading').style.display='none';
+      $('payWrap').hidden=true; $('giftPay').hidden=false;
+      $('payAmt').textContent='Gift card';
+      $('payBal').textContent=money(Math.max(0, total()-S.gift.balance));
+      $('giftPayTxt').textContent=window.CALGift.words(S.gift, deposit());
+      $('payBtn').textContent='Book with my gift card'; $('payBtn').disabled=false;
+      payUI={ gift:true };
+      return;
+    }
     $('payLoading').style.display='flex';
 
     if(!cardsOn()){
@@ -691,16 +719,7 @@
     try{
       var r = await fetch('/api/create-checkout-session',{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          packageKey:S.key, paintKey:S.paint, tier:S.tier, addons:activeAdds().join(','),
-          ref:S.ref,
-          name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
-          vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value, garage:S.garage?'yes':'no', smsOptIn:$('smsOk')&&$('smsOk').checked?'yes':'no',
-          area:wxArea(), date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
-          notes:$('bn').value, estTotal:totalText(),
-          agreementVersion:AGREEMENT_VERSION, signature:S.sig, signedAt:S.signedAt,
-          photoConsent:S.photoOk?'yes':'no'
-        })
+        body: JSON.stringify(bookingBody())
       });
       var data = {};
       try{ data = await r.json() }catch(e){}
@@ -725,9 +744,40 @@
     }
   }
 
+  /* gift card code on step 5 (js/giftcode.js checks it; the server checks it again when booking) */
+  (function(){
+    var btn=$('giftBtn'), box=$('giftBox'), input=$('giftCode'), msg=$('giftMsg');
+    if(!btn) return;
+    btn.addEventListener('click',function(){ var open=box.hidden; box.hidden=!open; btn.setAttribute('aria-expanded',String(open)); if(open) input.focus() });
+    function apply(){
+      if(!window.CALGift) return;
+      if(!input.value.trim()){ S.gift=null; msg.hidden=true; return }
+      msg.hidden=false; msg.className='fldnote giftmsg'; msg.textContent='Checking…';
+      window.CALGift.check(input.value).then(function(d){
+        if(d.ok){ S.gift={code:d.code, balance:d.balance}; input.value=d.code; msg.textContent=window.CALGift.words(S.gift, deposit()); msg.className='fldnote giftmsg ok' }
+        else { S.gift=null; msg.textContent=d.error; msg.className='fldnote giftmsg bad' }
+      });
+    }
+    $('giftApply').addEventListener('click',apply);
+    input.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); apply() } });
+  })();
+
   $('payBtn').addEventListener('click', async function(){
     if(paying || !payUI) return;
     var btn=this;
+    if(payUI.gift){                    // a gift card that covers the deposit: the server books it, nothing is charged
+      paying=true; btn.textContent='Booking…'; $('e6').style.display='none';
+      try{
+        var r=await fetch('/api/create-checkout-session',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(bookingBody()) });
+        var d={}; try{ d=await r.json() }catch(e){}
+        if(!r.ok || !d.booked) throw new Error(d.error||'We couldn’t finish the booking. Nothing was charged. Call or text (203) 560-3572.');
+        fill('f'); remember();
+        var f6=$('f6'); if(f6) f6.textContent='Gift card';
+        show(7);
+      }catch(err){ payFail(err && err.message) }
+      finally{ paying=false; btn.textContent='Book with my gift card' }
+      return;
+    }
     paying=true; btn.textContent='Processing…'; $('e6').style.display='none';
     // stays on this page for cards; only payment apps that need to leave come back to /quote?paid=1
     try{ await payUI.pay() }finally{ paying=false; btn.textContent='Pay deposit & book' }

@@ -66,6 +66,12 @@
       p.textContent = '+' + money(l.price) + (l.plus ? '+' : '');
       li.appendChild(t); li.appendChild(p); ul.appendChild(li);
     });
+    var src = window.CALSource ? window.CALSource.type() : '', OFFER = { door: ['Neighbor offer', 'Booked within 7 days of your door hanger'], work: ['Workplace Detail Day', 'When 3+ cars book that day at your work'] };
+    if (OFFER[src]) {      // the offer printed on the QR code they scanned
+      var oli = document.createElement('li'), ot = document.createElement('div'), op = document.createElement('span'), os = document.createElement('small');
+      oli.className = 'qb-salt'; ot.textContent = OFFER[src][0]; os.textContent = OFFER[src][1]; ot.appendChild(os);
+      op.textContent = 'No travel fee'; oli.appendChild(ot); oli.appendChild(op); ul.appendChild(oli);
+    }
     if (b.salt) {          // November to March, every exterior: shown on the pass, at no charge
       var li = document.createElement('li'), t = document.createElement('div'), p = document.createElement('span'), sm = document.createElement('small');
       li.className = 'qb-salt'; t.textContent = 'Winter salt neutralizer';
@@ -130,7 +136,7 @@
     qb.querySelector('.qb-body').scrollTop = 0;
     if (focus !== false) { var h = qb.querySelector('.qb-s.on .qb-h'); if (h) h.focus({ preventScroll: true }); }
     if (n < 5 && !B.paid && payUI) {     // stepping back from the deposit: start a fresh payment next time
-      payUI = null; $('qbExpress').innerHTML = ''; $('qbPayment').innerHTML = ''; $('qbSep').hidden = true;
+      payUI = null; $('qbExpress').innerHTML = ''; $('qbPayment').innerHTML = ''; $('qbSep').hidden = true; $('qbGiftPay').hidden = true;
     }
     if (n === 1 || n === 2) paintDay();
     if (n === 4) offerSign();
@@ -166,6 +172,7 @@
     paintPass(b);
     B.job = b.job;
     B.paid = false; B.ref = ''; payUI = null;
+    if (window.CALSource) window.CALSource.mark('start');     // counted once per visit, by channel
     qb.hidden = false;
     document.documentElement.classList.add('qb-open');
     history.pushState({ qb: 0 }, '', '#book');
@@ -529,12 +536,23 @@
       source: 'menu', area: wxArea(), packageKey: b.pkgKey, paintKey: '', tier: b.tier, addons: b.serverAdds.join(','), ref: B.ref,
       name: $('qbName').value, phone: $('qbPhone').value, email: $('qbEmail').value.trim(),
       vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: B.garage ? 'Garage' : '', garage: B.garage ? 'yes' : 'no', smsOptIn: $('qbSmsOk').checked ? 'yes' : 'no',
+      campaign: window.CALSource ? window.CALSource.get() : '', giftCode: B.gift ? B.gift.code : '',
+      firstCampaign: window.CALSource ? window.CALSource.first().src : '', firstSeen: window.CALSource ? window.CALSource.first().day : '',
       date: B.date, window: B.win, address: $('qbStreet').value, town: $('qbTown').value, zip: $('qbZip').value,
       notes: notes(), estTotal: money(b.total) + (b.plus ? '+' : ''),
       agreementVersion: AGREEMENT_VERSION, signature: $('qbSig').value.trim(), signedAt: B.signedAt,
       photoConsent: $('qbPhoto').checked ? 'yes' : 'no',
     };
     remember(b);
+    $('qbGiftPay').hidden = true;
+    if (B.gift && window.CALGift && window.CALGift.covers(B.gift, b.dep)) {   // nothing to pay: book on the card
+      $('qbPayWait').hidden = true; $('qbPayCard').hidden = true; $('qbGiftPay').hidden = false;
+      $('qbPayAmt').textContent = 'Gift card';
+      $('qbPayBal').textContent = money(Math.max(0, b.total - B.gift.balance));
+      $('qbGiftPayTxt').textContent = window.CALGift.words(B.gift, b.dep);
+      payUI = { gift: true, body: body, b: b };
+      return;
+    }
     Promise.resolve(loadAssets()).then(function () {
       if (!window.STRIPE_PK || !window.Stripe || !window.CALDeposit) { textToHold(b); return null; }
       return fetch('/api/create-checkout-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -556,6 +574,41 @@
     }).then(function () { $('qbPayWait').hidden = true; })
       .catch(function (err) { $('qbPayWait').hidden = true; payUI = null; payError(err && err.message); });
   }
+
+  $('qbGiftBook').addEventListener('click', function () {
+    if (paying || !payUI || !payUI.gift) return;
+    var btn = this, job = payUI; paying = true; btn.disabled = true; btn.textContent = 'Booking…'; $('qbE5').hidden = true;
+    fetch('/api/create-checkout-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(job.body) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return [r, d]; }); })
+      .then(function (x) {
+        if (!x[0].ok || !x[1].booked) throw new Error(x[1].error || "We couldn't finish the booking. Nothing was charged. Call or text (203) 560-3572.");
+        B.paid = true;
+        fillDone({ ref: B.ref, what: job.b.pkgName + ' · ' + job.b.sizeLabel, day: B.dateLabel || B.date, win: B.win,
+                   paid: 'Gift card', where: where(), sms: smsBody(job.b) });
+        history.replaceState({ qb: 6 }, '', '#book');
+        show(6);
+      })
+      .catch(function (e) { payError(e && e.message); })
+      .then(function () { paying = false; btn.disabled = false; btn.textContent = 'Book with my gift card'; });
+  });
+
+  /* gift card code, on the "you" screen */
+  $('qbGiftBtn').addEventListener('click', function () {
+    var open = $('qbGiftBox').hidden; $('qbGiftBox').hidden = !open; this.setAttribute('aria-expanded', String(open));
+    if (open) $('qbGift').focus();
+  });
+  function applyGift() {
+    var msg = $('qbGiftMsg'), code = $('qbGift').value;
+    if (!window.CALGift) return;
+    if (!code.trim()) { B.gift = null; msg.hidden = true; return; }
+    msg.hidden = false; msg.className = 'qb-giftmsg'; msg.textContent = 'Checking…';
+    window.CALGift.check(code).then(function (d) {
+      if (d.ok) { B.gift = { code: d.code, balance: d.balance }; $('qbGift').value = d.code; msg.textContent = window.CALGift.words(B.gift, build().dep); msg.className = 'qb-giftmsg ok'; }
+      else { B.gift = null; msg.textContent = d.error; msg.className = 'qb-giftmsg bad'; }
+    });
+  }
+  $('qbGiftApply').addEventListener('click', applyGift);
+  $('qbGift').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); applyGift(); } });
 
   $('qbPayBtn').addEventListener('click', function () {
     if (paying || !payUI || !payUI.pay) return;

@@ -72,6 +72,10 @@
     </div>
   </section>
 
+  <!-- Printed offers: shown only to someone who scanned that QR code (js/source.js) -->
+  <aside class="m-offer" data-offer="door" hidden><span class="m-dot"></span><p><b>Neighbor offer.</b> Book within 7 days of the date on your door hanger and there's no travel fee. We're already on your street.</p></aside>
+  <aside class="m-offer" data-offer="work" hidden><span class="m-dot"></span><p><b>Workplace Detail Day.</b> Book the day on your office's flyer and use the office address. When 3 or more cars book that day, there's no travel fee.</p></aside>
+
   <!-- Winter: shown November to March (js/season.js hides it the rest of the year) -->
   <section class="m-card m-winter" aria-labelledby="h-winter" data-season="winter">
     <div class="m-winter-band"><span class="m-dot"></span>Winter in CT · November to March</div>
@@ -85,6 +89,9 @@
       </ul>
     </div>
   </section>
+
+  <!-- Holidays: shown November and December (js/season.js) -->
+  <a class="m-giftband" href="gift.html" data-season="holiday" hidden><span class="m-giftband-k">Holiday gift cards</span><b>Give a detail.</b><span>From $50. Never expire. Sent to your email in a minute.</span><span class="m-giftband-go" aria-hidden="true">→</span></a>
 
   <section class="m-sec" aria-labelledby="h-pkg">
     <h2 id="h-pkg"><span class="m-step">01</span> Choose a package</h2>
@@ -334,13 +341,19 @@
     <section class="qb-s" data-s="3">
       <p class="qb-k">03 / 05 · You</p>
       <h2 class="qb-h" tabindex="-1">Who are we <em>meeting?</em></h2>
-      <p class="qb-sub">Used for this booking only: your arrival time and your receipt. We may text from (203) 592-9589 or (203) 560-3572; to reach us, text or call (203) 560-3572.</p>
+      <p class="qb-sub">Used for this booking only: your arrival time and your receipt. We may text from (888) 297-9548, (203) 592-9589 or (203) 560-3572; to reach us, text or call (203) 560-3572.</p>
       <div class="qb-card">
         <label class="qb-f"><span>Name</span><input id="qbName" name="name" placeholder="First and last name" autocomplete="name" maxlength="80"></label>
         <label class="qb-f"><span>Mobile</span><input id="qbPhone" name="tel" type="tel" inputmode="tel" placeholder="(203) 555-0100" autocomplete="tel" maxlength="20"></label>
         <label class="qb-f"><span>Email, for your receipt</span><input id="qbEmail" name="email" type="email" inputmode="email" placeholder="you@email.com" autocomplete="email" maxlength="120"></label>
       </div>
       <label class="qb-check qb-sms" id="qbSmsBox"><input type="checkbox" id="qbSmsOk"><span>Optional: text me my booking confirmation and a reminder the day before. <small>Cipher Auto Lab booking texts, usually 1–3 per booking. Msg &amp; data rates may apply. Reply HELP for help, STOP to opt out. <a href="terms.html#texts" target="_blank" rel="noopener">Terms</a> · <a href="privacy.html#texts" target="_blank" rel="noopener">Privacy</a></small></span></label>
+      <button type="button" class="qb-giftbtn" id="qbGiftBtn" aria-expanded="false">Have a gift card?</button>
+      <div class="qb-card qb-gift" id="qbGiftBox" hidden>
+        <label class="qb-f"><span>Gift card code</span><input id="qbGift" placeholder="GC-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16"></label>
+        <button type="button" class="qb-giftapply" id="qbGiftApply">Apply</button>
+        <p class="qb-giftmsg" id="qbGiftMsg" role="status" hidden></p>
+      </div>
       <p class="qb-err" id="qbE3" role="alert" hidden></p>
     </section>
 
@@ -381,6 +394,11 @@
         <button type="button" class="qb-pay" id="qbPayBtn" disabled>Pay deposit &amp; book</button>
         <p class="qb-safe">Payments by Stripe. Your card number goes to Stripe only and is never stored by us.</p>
       </div>
+      <div class="qb-card qb-giftpay" id="qbGiftPay" hidden>
+        <p class="qb-giftpay-h"><b>Your gift card covers the deposit.</b></p>
+        <p class="qb-giftpay-t" id="qbGiftPayTxt">Nothing to pay today.</p>
+        <button type="button" class="qb-pay" id="qbGiftBook">Book with my gift card</button>
+      </div>
       <div class="qb-card qb-texthold" id="qbTextHold" hidden>
         <p>Card deposits are paused right now, so we hold your slot by text instead. Your booking is already typed out: send it and we reply with your arrival window. Nothing is charged today.</p>
         <a class="m-btn lime" id="qbSms" href="sms:+12035603572">Text my booking</a>
@@ -407,7 +425,7 @@
         </div>
         <div class="qb-pass-cut" aria-hidden="true"></div>
         <div class="qb-pass-in qb-pass-foot">
-          <p class="qb-pass-fine">We text you an arrival time the day before. Texts may come from <b>(203) 592-9589</b> or <b>(203) 560-3572</b>: both are us, so save both. Your receipt is on its way to your email.</p>
+          <p class="qb-pass-fine">We text you an arrival time the day before. Texts may come from <b>(888) 297-9548</b> (booking texts), <b>(203) 592-9589</b> or <b>(203) 560-3572</b>: all are us, so save them. To reach us, text or call (203) 560-3572. Your receipt is on its way to your email.</p>
         </div>
       </div>
       <a class="m-btn ghost qb-done-btn" href="sms:+12035603572" id="qbDoneSms">Text us about this booking</a>
@@ -431,6 +449,8 @@
 </footer>
 <script src="js/season.js" defer></script>
 <script src="js/menu.js" defer></script>
+<script src="js/source.js" defer></script>
+<script src="js/giftcode.js" defer></script>
 <script src="js/weather.js" defer></script>
 <script src="js/schedule.js" defer></script>
 <script src="js/menu-book.js" defer></script>

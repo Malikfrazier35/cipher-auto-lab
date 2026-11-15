@@ -14,5 +14,7 @@ export async function push(topic, { title, message, priority, tags, actions, cli
   return true;
 }
 
-// The two numbers customers may get texts from; both are the business.
-export const NUMBERS_LINE = 'Texts may come from (203) 592-9589 or (203) 560-3572, both are us.';
+// The numbers customers may get texts from; all are the business. (888) 297-9548 is the toll-free
+// booking line (automatic confirmation and reminder texts, api/_sms.js); 560 is the main line.
+export const BOOKING_LINE = '(888) 297-9548';
+export const NUMBERS_LINE = 'Texts may come from (888) 297-9548, (203) 592-9589 or (203) 560-3572, all are us.';

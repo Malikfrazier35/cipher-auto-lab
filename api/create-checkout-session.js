@@ -8,6 +8,10 @@
 // "text us your booking", so the site keeps working before payments are switched on.
 import Stripe from 'stripe';
 import { parseBooking, depositFor, serviceLabel, bookingMetadata, json } from './_booking.js';
+import { findGift } from './_gift.js';
+import { bookWithGift } from './stripe-webhook.js';
+
+export const deps = { topic: () => process.env.NTFY_TOPIC };   // tests swap this
 
 // A fixed label so these sessions can be told apart in the Stripe Dashboard.
 const INTEGRATION_ID = 'cipher_booking_deposit_qhxwmtzr';
@@ -46,6 +50,23 @@ export async function createCheckout(request, stripe) {
   if (error) return json({ error }, 400);
 
   const deposit = depositFor(booking);
+
+  // A gift card: if it covers the deposit, the booking is made now with no payment, and the card
+  // pays on the final invoice. If not, the deposit is taken as usual and the card comes off later.
+  if (booking.giftCode) {
+    let gift = null;
+    try { gift = await findGift(stripe, booking.giftCode); } catch (e) { console.error('gift lookup failed', e && e.type, e && e.code); }
+    if (!gift || !gift.balance) return json({ error: "That gift card can't be used: it wasn't found or has been used up. Remove it to pay the deposit, or call (203) 560-3572." }, 400);
+    if (gift.balance >= deposit * 100) {
+      try {
+        const r = await bookWithGift(booking, gift, stripe, deps.topic());
+        return json({ booked: true, ref: r.ref, giftApplied: r.applied / 100, giftLeft: r.left / 100 });
+      } catch (e) {
+        console.error('gift booking failed', e && e.type, e && e.code, e && e.message);
+        return json({ error: "We couldn't finish the booking with the gift card. Nothing was charged. Call or text (203) 560-3572 and we'll book it for you." }, 502);
+      }
+    }
+  }
   const metadata = bookingMetadata(booking);
   try {
     const session = await stripe.checkout.sessions.create(

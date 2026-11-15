@@ -26,10 +26,11 @@ function fake() {
     paymentIntents: {
       retrieve: rec('pi.retrieve', { id: 'pi_1', metadata: {} }),
       update: rec('pi.update', {}),
+      search: rec('pi.search', { data: [], has_more: false }),
     },
     customers: { update: rec('customers.update', {}), createBalanceTransaction: rec('customers.credit', {}),
                  search: rec('customers.search', { data: [] }), create: rec('customers.create', { id: 'cus_new' }) },
-    invoices: { create: rec('invoices.create', { id: 'in_1' }) },
+    invoices: { create: rec('invoices.create', { id: 'in_1' }), update: rec('invoices.update', {}), search: rec('invoices.search', { data: [], has_more: false }) },
     invoiceItems: { create: rec('invoiceItems.create', {}) },
   };
 }
@@ -196,7 +197,7 @@ assert.equal(bookingPushes[0].topic, 'owner-topic');
 assert.equal(bookingPushes[0].title, 'New booking · Full Detail + Ceramic Coating (5-seat SUV)');
 assert.match(bookingPushes[0].message, /^CAL-AB12CD · Malik Test · Enfield\nTue Nov 10 2026, Morning\n\$100 deposit paid · est\. \$1,421 total\n2019 Honda CR-V\nSalt neutralizer included\nForecast: Morning 8-11am/);
 assert.deepEqual(bookingPushes[0].actions.map((a) => a.label), ['Text Malik', 'Payment', 'Draft invoice']);
-assert.match(decodeURIComponent(bookingPushes[0].actions[0].url), /Texts may come from \(203\) 592-9589 or \(203\) 560-3572, both are us\.$/);
+assert.match(decodeURIComponent(bookingPushes[0].actions[0].url), /Texts may come from \(888\) 297-9548, \(203\) 592-9589 or \(203\) 560-3572, all are us\.$/);
 // ntfy down: the booking still confirms
 deps.fetch = async (url) => (String(url).startsWith('https://ntfy.sh') ? { ok: false, status: 500 } : fakeNws(url));
 r = await webhook(hook(payload, real.webhooks.generateTestHeaderString({ payload, secret })), fake(), secret, 'owner-topic');
@@ -464,3 +465,215 @@ assert.equal(ib.signature('12345', 'https://mycompany.com/myapp.php?foo=1&bar=2'
   assert.equal((await ib.inbound(new Request('https://cipherautolab.com/api/sms-inbound'), ienv, st)).status, 405);
 }
 console.log('inbound sms tests passed');
+
+
+// ---- gift cards
+const giftMod = await import('../api/_gift.js');
+const { createGift, parseGift } = await import('../api/create-gift-session.js');
+const { giftCheck } = await import('../api/gift-check.js');
+const cc = await import('../api/create-checkout-session.js');
+assert.match(giftMod.newCode(), /^GC-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/);
+assert.equal(giftMod.cleanCode(' gc 7kq2 mx9p '), 'GC-7KQ2-MX9P');
+assert.equal(giftMod.cleanCode('GC-7KQ2-MX9'), '');
+// buying one
+const greq = (body, origin = 'https://cipherautolab.com') => new Request('https://cipherautolab.com/api/create-gift-session',
+  { method: 'POST', headers: { origin, 'x-forwarded-for': '9.9.9.' + Math.random() }, body: JSON.stringify(body) });
+const buy = { gift: 'g100', fromName: 'Malik', toName: 'Ana Ruiz', email: 'buyer@example.com', message: 'Happy holidays', amount: 1 };
+s = fake();
+r = await createGift(greq(buy), s, () => 'GC-TEST-0001');
+assert.equal(r.status, 200);
+const gs = s.calls[0][1];
+assert.equal(gs.line_items[0].price_data.unit_amount, 10000, 'the amount comes from the server');
+assert.match(gs.line_items[0].price_data.product_data.name, /\$100 gift card: code GC-TEST-0001$/);
+assert.match(gs.line_items[0].price_data.product_data.description, /Never expires, no fees\.$/);
+assert.deepEqual(gs.payment_intent_data.metadata, { kind: 'gift', gift_code: 'GC-TEST-0001', gift_kind: 'g100', gift_amount: '10000', gift_balance: '10000',
+  gift_to: 'Ana Ruiz', gift_from: 'Malik', gift_message: 'Happy holidays', gift_status: 'active', campaign: '' });
+assert.equal(gs.return_url, 'https://cipherautolab.com/gift?paid=1&session_id={CHECKOUT_SESSION_ID}');
+assert.equal((await createGift(greq({ ...buy, gift: 'g999' }), fake())).status, 400);
+assert.equal((await createGift(greq(buy, 'https://evil.example'), fake())).status, 403);
+assert.match(parseGift({ ...buy, email: 'nope' }).error, /receipt with the gift code/);
+assert.equal(GIFTS_full(), 25900);
+function GIFTS_full() { return giftMod.GIFTS.full.amount * 100; }
+// the paid card's details for the printable card
+s = fake();
+s.checkout.sessions.retrieve = async () => ({ status: 'complete', payment_status: 'paid', client_reference_id: 'GC-TEST-0001', amount_total: 10000, metadata: gs.metadata });
+r = await checkoutStatus(new Request('https://x/api/checkout-status?session_id=cs_live_abcdefghijkl'), s);
+assert.deepEqual((await r.json()).gift, { code: 'GC-TEST-0001', amount: 100, kind: 'g100', to: 'Ana Ruiz', from: 'Malik', message: 'Happy holidays' });
+// a card in Stripe
+const giftPI = (bal, extra = {}) => ({ id: 'pi_gift', status: 'succeeded', metadata: { kind: 'gift', gift_code: 'GC-TEST-0001', gift_amount: '10000', gift_balance: String(bal), gift_to: 'Ana', ...extra } });
+const withGift = (bal, extra) => { const f = fake(); f.paymentIntents.search = async (q) => { f.calls.push(['pi.search', q]); return { data: [giftPI(bal, extra)] }; }; return f; };
+const chk = (code) => new Request('https://cipherautolab.com/api/gift-check', { method: 'POST', headers: { origin: 'https://cipherautolab.com', 'x-forwarded-for': '7.7.7.' + Math.random() }, body: JSON.stringify({ code }) });
+s = withGift(10000);
+r = await giftCheck(chk('gc-test-0001'), s);
+assert.deepEqual(await r.json(), { ok: true, code: 'GC-TEST-0001', balance: 100 });
+assert.equal(s.calls[0][1].query, "metadata['gift_code']:'GC-TEST-0001'");
+assert.equal((await (await giftCheck(chk('GC-TEST-0001'), withGift(0))).json()).error, 'That gift card has been used up.');
+assert.equal((await giftCheck(chk('GC-TEST-0001'), fake())).status, 404);
+assert.equal((await giftCheck(chk('hello'), fake())).status, 400);
+{ const f = withGift(10000); f.paymentIntents.search = async () => ({ data: [{ ...giftPI(10000), status: 'requires_payment_method' }] });
+  assert.equal((await giftCheck(chk('GC-TEST-0001'), f)).status, 404, 'an unpaid card is no card'); }
+
+// booking with a card that covers the deposit: no payment, the booking is on its draft invoice
+const gpush = [];
+deps.env = {};
+deps.fetch = async (url, o) => { if (String(url).startsWith('https://ntfy.sh')) { gpush.push(JSON.parse(o.body)); return { ok: true, status: 200 }; } return fakeNws(url); };
+cc.deps.topic = () => 'topic-g';
+const giftBooking = { ...booking, paintKey: '', packageKey: 'full', tier: 'sedan', addons: 'extract', giftCode: 'GC-TEST-0001', campaign: 'door', ref: 'CAL-GIFT01' };
+s = withGift(10000);
+r = await cc.createCheckout(req(giftBooking), s);
+const gb = await r.json();
+assert.deepEqual(gb, { booked: true, ref: 'CAL-GIFT01', giftApplied: 100, giftLeft: 0 });
+assert.ok(!s.calls.some((c) => c[0] === 'sessions.create'), 'nothing to pay');
+const gcred = s.calls.find((c) => c[0] === 'customers.credit');
+assert.equal(gcred[1], 'cus_new'); assert.equal(gcred[2].amount, -10000, 'the card is credit, used after tax like a deposit');
+const ginv = s.calls.find((c) => c[0] === 'invoices.create')[1];
+assert.equal(ginv.metadata.booking_status, 'deposit_received');
+assert.equal(ginv.metadata.paid_with, 'gift card');
+assert.equal(ginv.metadata.campaign, 'door');
+assert.equal(ginv.metadata.gift_code, 'GC-TEST-0001');
+assert.equal(s.calls.filter((c) => c[0] === 'invoiceItems.create').length, 2);
+assert.deepEqual(s.calls.find((c) => c[0] === 'pi.update').slice(1), ['pi_gift', { metadata: { gift_balance: '0', gift_used: 'CAL-GIFT01:10000' } }]);
+assert.match(gpush[0].message, /No deposit: gift card · est\. \$358 total/);
+assert.match(gpush[0].message, /Gift card GC-TEST-0001: \$100 applied, \$0 left on it/);
+assert.match(gpush[0].message, /QR: Door hangers\nNeighbor offer: no travel fee if booked within 7 days/);
+assert.ok(!gpush[0].actions.some((a) => a.label === 'Payment'));
+// a bigger card on a cheaper job keeps the rest
+s = withGift(50000);
+await cc.createCheckout(req({ ...giftBooking, packageKey: 'exterior', addons: '', ref: 'CAL-GIFT02' }), s);
+assert.equal(s.calls.find((c) => c[0] === 'customers.credit')[2].amount, -10900);
+assert.equal(s.calls.find((c) => c[0] === 'pi.update')[2].metadata.gift_balance, '39100');
+// used twice for the same booking (a double tap): spent once
+s = withGift(39100, { gift_used: 'CAL-GIFT02:10900' });
+await cc.createCheckout(req({ ...giftBooking, packageKey: 'exterior', addons: '', ref: 'CAL-GIFT02' }), s);
+assert.equal(s.calls.find((c) => c[0] === 'customers.credit')[2].amount, -10900, 'same credit, same idempotency key');
+assert.ok(!s.calls.some((c) => c[0] === 'pi.update'), 'balance not taken twice');
+// a card that is used up, or unknown
+assert.equal((await cc.createCheckout(req(giftBooking), withGift(0))).status, 400);
+// a card smaller than the deposit: the deposit is taken, the card comes off when it lands
+s = withGift(5000);
+r = await cc.createCheckout(req({ ...giftBooking, paintKey: 'ceramic', ref: 'CAL-GIFT03' }), s);
+assert.ok((await r.json()).clientSecret);
+const gmd = s.calls.find((c) => c[0] === 'sessions.create')[1].metadata;
+assert.equal(gmd.gift_code, 'GC-TEST-0001');
+s = withGift(5000);
+s.paymentIntents.retrieve = async () => ({ id: 'pi_dep', metadata: {} });
+const gev = { id: 'evt_g', type: 'checkout.session.completed', data: { object: { id: 'cs_g', payment_status: 'paid', payment_intent: 'pi_dep', customer: 'cus_1', amount_total: 10000, client_reference_id: 'CAL-GIFT03', metadata: gmd } } };
+const gpl = JSON.stringify(gev);
+r = await webhook(hook(gpl, real.webhooks.generateTestHeaderString({ payload: gpl, secret })), s, secret, 'topic-g');
+assert.equal((await r.json()).result, 'confirmed');
+const credits = s.calls.filter((c) => c[0] === 'customers.credit').map((c) => c[2].amount);
+assert.deepEqual(credits, [-10000, -5000], 'deposit, then the gift card');
+assert.match(gpush.at(-1).message, /Gift card GC-TEST-0001: \$50 applied, \$0 left on it/);
+// a gift card sale tells the owner
+s = fake();
+const sold = { id: 'evt_s', type: 'checkout.session.completed', data: { object: { id: 'cs_s', payment_status: 'paid', payment_intent: 'pi_s', amount_total: 25900, metadata: { ...gs.metadata, gift_kind: 'full', gift_amount: '25900' } } } };
+const spl = JSON.stringify(sold);
+r = await webhook(hook(spl, real.webhooks.generateTestHeaderString({ payload: spl, secret })), s, secret, 'topic-g');
+assert.equal((await r.json()).result, 'gift');
+assert.ok(!s.calls.some((c) => c[0] === 'invoices.create'), 'not a booking');
+assert.equal(gpush.at(-1).title, 'Gift card sold · $259');
+assert.match(gpush.at(-1).message, /^GC-TEST-0001 · Full Detail gift card\nFor Ana Ruiz, from Malik\n"Happy holidays"$/);
+// the morning check sees gift card bookings too (they live on the draft invoice)
+{
+  watchDeps.now = () => new Date('2026-11-09T12:00:00Z');
+  const sent = [];
+  watchDeps.fetch = async (url, o) => { if (String(url).startsWith('https://ntfy.sh')) { sent.push(JSON.parse(o.body)); return { ok: true, status: 200 }; } return fakeNws(url); };
+  s = fake();
+  s.invoices.search = async (q) => { s.calls.push(['invoices.search', q]); return { data: [{ id: 'in_g', metadata: { booking_status: 'deposit_received', booking_ref: 'CAL-GIFT01', area: 'hartford', date: 'Tue Nov 10 2026', window: 'Afternoon · 2–4pm', customer_name: 'Ana Ruiz', phone: '2035550100' } }], has_more: false }; };
+  const out = await (await watch(new Request('https://cipherautolab.com/api/weather-watch', { headers: { authorization: 'Bearer cron-test' } }), s, { NTFY_TOPIC: 't', CRON_SECRET: 'cron-test' })).json();
+  assert.deepEqual(out.alerted, ['CAL-GIFT01']);
+  assert.deepEqual(s.calls.find((c) => c[0] === 'invoices.update').slice(1, 2), ['in_g'], 'the alert is noted on the invoice');
+  assert.equal(sent[0].actions.at(-1).url, 'https://dashboard.stripe.com/invoices/in_g');
+}
+deps.fetch = fakeNws;
+console.log('gift card tests passed');
+
+// ---- channels: the data engine
+const chm = await import('../api/_channels.js');
+const met = await import('../api/_metrics.js');
+const trk = await import('../api/track.js');
+const rep = await import('../api/channel-report.js');
+assert.equal(chm.channel('door').label, 'Door hangers');
+assert.deepEqual([chm.channel('Door-Enfield-Elm-1118').id, chm.channel('door-enfield-elm-1118').type, chm.channel('door-enfield-elm-1118').label],
+  ['door-enfield-elm-1118', 'door', 'Door hanger · enfield elm 1118']);
+assert.equal(chm.channel('evil'), null); assert.equal(chm.channel('door hanger'), null); assert.equal(chm.channel('door-' + 'x'.repeat(30)), null);
+{
+  const b = parseBooking({ ...booking, campaign: 'door-enfield-elm-1118', firstCampaign: 'magnet', firstSeen: '2026-11-10', area: 'hartford' }).booking;
+  const m = bookingMetadata(b);
+  assert.deepEqual([m.campaign, m.campaign_type, m.first_campaign, m.first_seen, m.county], ['door-enfield-elm-1118', 'door', 'magnet', '2026-11-10', 'Hartford County']);
+  assert.equal(m.est_value, '142100', 'what the job is worth, tax included, in cents');
+  assert.equal(bookingMetadata(parseBooking({ ...booking, campaign: 'evil', firstSeen: 'yesterday' }).booking).campaign, '');
+  assert.ok(Object.keys(m).length <= 42, 'room left under Stripe\'s 50 metadata keys for what the webhook adds');
+}
+// counting: Upstash pipeline, counts only
+{
+  const sent = [];
+  const kv = { KV_REST_API_URL: 'https://kv.example/', KV_REST_API_TOKEN: 'tok' };
+  const kfetch = async (url, o) => { sent.push({ url, auth: o.headers.Authorization, cmds: JSON.parse(o.body) }); return { ok: true, status: 200, json: async () => [{ result: 1 }] }; };
+  assert.equal(await met.bump({}, { e: 'scan', ch: 'door' }, kfetch), false, 'off without Redis');
+  assert.equal(await met.bump(kv, { e: 'scan', ch: 'door', place: 'Enfield, CT', day: '2026-11-18' }, kfetch), true);
+  assert.deepEqual(sent[0], { url: 'https://kv.example/pipeline', auth: 'Bearer tok', cmds: [['HINCRBY', 'cal:d:2026-11-18', 'scan|door', 1], ['HINCRBY', 'cal:g:2026-11-18', 'scan|door|Enfield, CT', 1]] });
+  assert.equal(await met.bump(kv, { e: 'scan', ch: 'door' }, async () => { throw new Error('down'); }), false, 'a failed count never throws');
+  const rd = await met.readDays(kv, ['2026-11-18'], async () => ({ ok: true, json: async () => [{ result: ['scan|door', '3', 'start|door', '1'] }, { result: ['scan|door|Enfield, CT', '3'] }] }));
+  assert.deepEqual(rd, { '2026-11-18': { totals: { 'scan|door': 3, 'start|door': 1 }, places: { 'scan|door|Enfield, CT': 3 } } });
+  const H = (o) => ({ get: (k) => o[k] ?? null });
+  assert.equal(met.placeOf(H({ 'x-vercel-ip-country': 'US', 'x-vercel-ip-country-region': 'CT', 'x-vercel-ip-city': 'Windsor%20Locks' })), 'Windsor Locks, CT');
+  assert.equal(met.placeOf(H({ 'x-vercel-ip-country': 'CA' })), 'CA');
+  // the beacon endpoint
+  sent.length = 0; trk.deps.fetch = kfetch;
+  const beacon = (body, h = {}) => new Request('https://cipherautolab.com/api/track', { method: 'POST',
+    headers: { origin: 'https://cipherautolab.com', 'user-agent': 'Mozilla/5.0 (iPhone)', 'x-forwarded-for': '5.5.5.' + Math.random(),
+      'x-vercel-ip-country': 'US', 'x-vercel-ip-country-region': 'CT', 'x-vercel-ip-city': 'Enfield', ...h }, body: JSON.stringify(body) });
+  assert.equal((await trk.track(beacon({ e: 'scan', ch: 'door-enfield-elm-1118' }), kv)).status, 204);
+  assert.deepEqual(sent[0].cmds[1], ['HINCRBY', `cal:g:${met.etDay()}`, 'scan|door-enfield-elm-1118|Enfield, CT', 1]);
+  assert.equal((await trk.track(beacon({ e: 'scan', ch: 'evil' }), kv)).status, 400);
+  assert.equal((await trk.track(beacon({ e: 'scan', ch: 'door' }, { origin: 'https://evil.example' }), kv)).status, 403);
+  const before = sent.length;
+  assert.equal((await trk.track(beacon({ e: 'scan', ch: 'door' }, { 'user-agent': 'facebookexternalhit/1.1' }), kv)).status, 204);
+  assert.equal(sent.length, before, 'link previews are not scans');
+  assert.equal((await trk.track(beacon({ e: 'start', ch: '' }), kv)).status, 204);
+  assert.deepEqual(sent.at(-1).cmds[0], ['HINCRBY', `cal:d:${met.etDay()}`, 'start|direct', 1]);
+}
+// the report: channels, towns, places, bookings, daily
+{
+  const ts = (d) => Math.floor(Date.parse(d + 'T15:00:00Z') / 1000);
+  const pi = (ref, day, md, amt = 4000) => ({ id: 'pi_' + ref, created: ts(day), amount: amt, amount_received: amt, metadata: { booking_ref: ref, booking_status: 'deposit_received', ...md } });
+  const payments = [
+    pi('A', '2026-11-18', { campaign: 'door-enfield-elm-1118', first_campaign: 'door-enfield-elm-1118', first_seen: '2026-11-18', town: 'Enfield', zip: '06082', county: 'Hartford County', est_value: '25900', date: 'Sat Nov 21 2026', package_key: 'full', tier: 'sedan', window: 'Morning · 8–11am' }),
+    pi('B', '2026-11-19', { campaign: 'door-enfield-elm-1118', first_campaign: 'magnet', first_seen: '2026-11-12', town: 'Enfield', zip: '06082', county: 'Hartford County', est_value: '10900', date: 'Mon Nov 23 2026' }, 2500),
+    pi('C', '2026-11-19', { town: 'Milford', zip: '06460', county: 'New Haven County', est_value: '16900', date: 'Tue Nov 24 2026' }, 3000),
+    pi('OLD', '2026-09-01', { campaign: 'door', town: 'Enfield', est_value: '10900', date: 'Sat Sep 05 2026' }),
+  ];
+  const giftBookings = [{ id: 'in_G', created: ts('2026-11-20'), metadata: { booking_ref: 'G', campaign: 'work-acme', town: 'Hartford', county: 'Hartford County', est_value: '25900', date: 'Fri Nov 27 2026' } }];
+  const giftSales = [{ id: 'pi_gs', created: ts('2026-11-20'), amount: 10000, amount_received: 10000, metadata: { kind: 'gift', campaign: 'fb' } }];
+  const counts = { '2026-11-18': { totals: { 'scan|door-enfield-elm-1118': 9, 'start|door-enfield-elm-1118': 3 }, places: { 'scan|door-enfield-elm-1118|Enfield, CT': 8, 'scan|door-enfield-elm-1118|Suffield, CT': 1 } },
+                   '2026-11-19': { totals: { 'scan|door-enfield-elm-1118': 1, 'scan|work-acme': 4, 'start|work-acme': 2 }, places: {} } };
+  const rb = rep.buildReport({ since: '2026-11-15', until: '2026-11-20', counts, payments, giftBookings, giftSales });
+  const door = rb.channels.find((c) => c.channel === 'door-enfield-elm-1118');
+  assert.deepEqual([door.scans, door.starts, door.bookings, door.first_touch_bookings, door.booked_value, door.deposits, door.scan_to_book_pct, door.label],
+    [10, 3, 2, 1, 368, 65, 20, 'Door hanger · enfield elm 1118']);
+  assert.equal(door.avg_days_to_book, 3.5, 'scan on the 18th booked same day; magnet on the 12th booked on the 19th');
+  assert.equal(rb.channels.find((c) => c.channel === 'work-acme').bookings, 1, 'gift card bookings count for their channel');
+  assert.equal(rb.channels.find((c) => c.channel === 'direct').bookings, 1);
+  assert.equal(rb.channels.find((c) => c.channel === 'fb').gift_value, 100);
+  assert.ok(!rb.bookings.some((b) => b.ref === 'OLD'), 'outside the range');
+  assert.ok(!Object.keys(rb.bookings[0]).some((k) => /name|phone|address|email/.test(k)), 'no personal details in the engine');
+  assert.deepEqual(rb.towns[0], { town: 'Enfield', county: 'Hartford County', zips: '06082', bookings: 2, booked_value: 368, channels: 'Door hanger · enfield elm 1118 (2)' });
+  assert.deepEqual(rb.places[0], { channel: 'door-enfield-elm-1118', channel_label: 'Door hanger · enfield elm 1118', place: 'Enfield, CT', scans: 8, starts: 0 });
+  assert.deepEqual(rb.daily.find((d) => d.day === '2026-11-19'), { day: '2026-11-19', scans: 5, starts: 2, bookings: 2, booked_value: 278, gift_cards: 0 });
+  assert.equal(rb.bookings[0].lead_days, 3);
+  // the endpoint: key, CSV
+  s = fake();
+  s.paymentIntents.search = async (q) => ({ data: q.query.includes("'gift'") ? giftSales : payments, has_more: false });
+  s.invoices.search = async () => ({ data: giftBookings, has_more: false });
+  const rq = (q) => new Request('https://cipherautolab.com/api/channel-report' + q);
+  assert.equal((await rep.report(rq(''), s, {})).status, 503, 'needs REPORT_KEY');
+  assert.equal((await rep.report(rq('?key=nope'), s, { REPORT_KEY: 'rk-test-1234' })).status, 403);
+  r = await rep.report(rq('?key=rk-test-1234&since=2026-11-15&until=2026-11-20'), s, { REPORT_KEY: 'rk-test-1234' });
+  const jr = await r.json();
+  assert.equal(jr.scans_counted, false); assert.equal(jr.bookings.length, 4);
+  r = await rep.report(rq('?key=rk-test-1234&since=2026-11-15&until=2026-11-20&format=csv&table=towns'), s, { REPORT_KEY: 'rk-test-1234' });
+  assert.equal(r.headers.get('content-type'), 'text/csv; charset=utf-8');
+  assert.match(await r.text(), /^town,county,zips,bookings,booked_value,channels\nEnfield,Hartford County,06082,2,368,Door hanger · enfield elm 1118 \(2\)\n/);
+}
+console.log('channel engine tests passed');

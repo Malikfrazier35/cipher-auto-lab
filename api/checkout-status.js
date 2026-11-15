@@ -12,11 +12,17 @@ export async function checkoutStatus(request, stripe) {
   if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(id)) return json({ error: 'Bad request' }, 400);
   try {
     const s = await stripe.checkout.sessions.retrieve(id);
+    const md = s.metadata || {};
+    // a paid gift card: what the printable card on /gift needs (the code is on the receipt too)
+    const gift = md.kind === 'gift' && s.payment_status === 'paid'
+      ? { code: md.gift_code, amount: (parseInt(md.gift_amount, 10) || 0) / 100, kind: md.gift_kind, to: md.gift_to, from: md.gift_from, message: md.gift_message || '' }
+      : undefined;
     return json({
       status: s.status,
       payment_status: s.payment_status,
       ref: s.client_reference_id || '',
       amount: typeof s.amount_total === 'number' ? s.amount_total / 100 : null,
+      ...(gift ? { gift } : {}),
     });
   } catch (e) {
     console.error('checkout status failed', e && e.type, e && e.code);

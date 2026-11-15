@@ -685,3 +685,14 @@ select:disabled{opacity:.5;cursor:not-allowed}
 .garage:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .agree.sms-in{margin-top:12px}
 .agree.sms-in a{color:var(--acc);text-decoration:underline;text-underline-offset:2px}
+/* gift card at booking (step 5 and 6) */
+#payWrap[hidden],.giftpay[hidden],.giftbox[hidden],.giftmsg[hidden]{display:none}
+.giftbtn{margin-top:12px;background:none;border:0;padding:6px 0;color:var(--acc);font:inherit;font-size:14px;font-weight:650;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.giftbox{margin-top:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.giftbox .fld{margin:0}
+.giftmsg{grid-column:1/-1;margin:0}
+.giftmsg.ok{color:#D9F99D !important}
+.giftmsg.bad{color:#F87171 !important}
+.giftpay{border:1px solid rgba(163,230,53,.35);background:rgba(163,230,53,.07);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.giftpay p{margin:0}
+.giftpay .fldnote{margin-top:6px}

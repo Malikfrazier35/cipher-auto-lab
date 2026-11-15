@@ -546,6 +546,12 @@
             <input type="checkbox" id="smsOk">
             <span>Optional: text me my booking confirmation and a reminder the day before. Cipher Auto Lab booking texts, usually 1–3 per booking. Msg &amp; data rates may apply. Reply HELP for help, STOP to opt out. <a href="terms.html#texts" target="_blank" rel="noopener">Terms</a> · <a href="privacy.html#texts" target="_blank" rel="noopener">Privacy</a></span>
           </label>
+          <button type="button" class="giftbtn" id="giftBtn" aria-expanded="false">Have a gift card?</button>
+          <div class="giftbox" id="giftBox" hidden>
+            <div class="fld"><label for="giftCode">Gift card code</label><input id="giftCode" placeholder="GC-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16"></div>
+            <button type="button" class="btn ghost" id="giftApply">Apply</button>
+            <p class="fldnote giftmsg" id="giftMsg" role="status" hidden></p>
+          </div>
           <div class="fld"><label for="bem">Email (optional)</label><input id="bem" type="email" placeholder="you@email.com"></div>
           <div class="err" id="e4" role="alert">Enter a name and a 10-digit phone number.</div>
 
@@ -665,6 +671,10 @@
             <div class="paysep" id="paySep" hidden><span>or pay with card</span></div>
             <div id="payment-element"></div>
           </div>
+          <div class="giftpay" id="giftPay" hidden>
+            <p><b>Your gift card covers the deposit.</b></p>
+            <p class="fldnote" id="giftPayTxt">Nothing to pay today.</p>
+          </div>
           <div class="err" id="e6">Payment could not be completed. Nothing has been charged — try again or call us.</div>
 
           <div class="paysafe">
@@ -684,7 +694,7 @@
             <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
             <h3>Booked.</h3>
             <div class="ref mono" id="refCode">CAL-000000</div>
-            <p class="u-24">Deposit received and your slot is held. We'll confirm the arrival window by text the day before. Texts may come from <b>(203) 592-9589</b> or <b>(203) 560-3572</b>: both are us, so save both.</p>
+            <p class="u-24">Deposit received and your slot is held. We'll confirm the arrival window by text the day before. Texts may come from <b>(888) 297-9548</b> (booking texts), <b>(203) 592-9589</b> or <b>(203) 560-3572</b>: all are us, so save them. To reach us, text or call (203) 560-3572.</p>
             <p class="u-25">A receipt is on its way to your email. Send us the summary below too if you'd like it on record — and text photos of the vehicle any time, they help us come prepared.</p>
             <div class="jobcard" id="jobBox" hidden>
               <div class="jc-l mono">Your booking page</div>
@@ -819,7 +829,7 @@
           <svg><use href="#ic-star"/></svg><span>Review us on Google</span></a>
       </div>
       <p class="u-15">Cipher Auto Lab LLC · Connecticut</p><p>© 2026 · Licensed &amp; insured</p>
-      <p class="flegal"><a href="/fleet">Fleet</a> · <a href="/merch">Merch</a> · <a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
+      <p class="flegal"><a href="/fleet">Fleet</a> · <a href="/merch">Merch</a> · <a href="/gift">Gift cards</a> · <a href="/agreement">Service Agreement</a> · <a href="/terms">Terms of Service</a> · <a href="/privacy">Privacy Policy</a></p>
     </div>
   </div>
 </footer>
@@ -832,6 +842,8 @@
 <script src="https://js.stripe.com/endive/stripe.js"></script>
 <script src="config.js"></script>
 <script src="vehicles.js"></script>
+<script src="js/source.js" defer></script>
+<script src="js/giftcode.js" defer></script>
 <script src="js/weather.js" defer></script>
 <script src="js/schedule.js" defer></script>
 <script src="js/deposit.js" defer></script>

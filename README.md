@@ -84,6 +84,25 @@ Until `STRIPE_SECRET_KEY` is set, the deposit step falls back to "text us your b
 nothing is charged. Prices include Connecticut sales tax (Stripe Tax, tax-inclusive prices).
 Tests: `npm i && node tools/test_stripe_api.mjs`.
 
+### Channel tracking (the data engine)
+
+Every printed QR code and shared link carries `?src=<channel>`: a type (`door`, `magnet`, `card`,
+`dash`, `postcard`, `flyer`, `work`, `fleet`, `fb`, `ig`, `google`, `gift`, `sms`, `email`), then
+optionally where it went (`door-enfield-elm-1118`). `python3 tools/make_qr.py <id>` makes the code.
+
+- `js/source.js` keeps the first channel (30 days) and the latest (7 days) on the device, counts a scan
+  and a booking start through `api/track.js`, and sends both channels with every booking and gift card.
+- Bookings carry `campaign`, `campaign_type`, `first_campaign`, `first_seen`, `town`, `zip`, `county`
+  and `est_value` (cents) in Stripe; the webhook counts `booked` and `gift` per channel and town.
+- `api/_channels.js` lists placements with a label, print date, quantity and cost.
+- `GET /api/channel-report?key=REPORT_KEY` joins it all: channels (scans, starts, bookings, value,
+  conversion, cost per booking), towns, scan places, bookings (no names or contact details) and a
+  daily funnel. `&format=csv&table=channels|towns|places|bookings|daily` for a spreadsheet.
+
+Vercel environment variables for it: `REPORT_KEY` (Sensitive, any long random string), and Upstash
+Redis from the Vercel Marketplace (free plan), which adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+Without Redis, bookings are still tracked by channel; only scan and start counts wait for it.
+
 **Do not commit secrets.** `config.js` should hold only the *publishable* Stripe key.
 Anything secret belongs in the hosting provider's environment variables.
 

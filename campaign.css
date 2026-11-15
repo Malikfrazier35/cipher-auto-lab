@@ -276,3 +276,16 @@ a.c-panel:hover{transform:translateY(-3px)}
 .c-winter-list svg{grid-row:span 2;width:34px;height:34px;padding:6px;border-radius:9px;background:rgba(163,230,53,.1);stroke:var(--acc);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .c-winter-list b{font-size:15px;font-weight:750;color:var(--ink)}
 .c-winter-list span{font-size:13.5px;color:var(--mute);line-height:1.45;margin-top:2px}
+
+/* ---- holiday gift cards band (js/season.js shows it November and December) */
+.c-giftband{padding:0 0 clamp(26px,4vw,44px)}
+.c-giftband[hidden]{display:none}
+.c-giftband-in{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 20px;align-items:center;text-decoration:none;color:var(--ink);
+  border:1px solid rgba(163,230,53,.35);border-radius:18px;padding:clamp(18px,3vw,26px) clamp(18px,3vw,30px);
+  background:linear-gradient(120deg,rgba(163,230,53,.10),rgba(163,230,53,.02) 60%)}
+.c-giftband-in .eyebrow{grid-column:1;margin:0}
+.c-giftband-in b{grid-column:1;font-size:clamp(24px,3.4vw,34px);font-weight:900;letter-spacing:-.03em}
+.c-giftband-t{grid-column:1;color:var(--mute);font-size:15px}
+.c-giftband-in .btn{grid-column:2;grid-row:1/4}
+@media(max-width:640px){.c-giftband-in{grid-template-columns:1fr}.c-giftband-in .btn{grid-column:1;grid-row:auto;justify-self:start;margin-top:10px}}
+.c-giftband-in:focus-visible{outline:2px solid var(--acc);outline-offset:3px}

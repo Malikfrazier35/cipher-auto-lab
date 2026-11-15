@@ -53,17 +53,19 @@ export async function watch(request, stripe, env) {
   const today = etYmd(deps.now());
   const last = etYmd(new Date(deps.now().getTime() + DAYS_AHEAD * 864e5));
 
-  // confirmed bookings (deposit paid), soonest first
+  // confirmed bookings, soonest first: deposits (on the payment) and gift card bookings (on the draft invoice)
   const bookings = [];
-  let page = null;
-  do {
-    const res = await stripe.paymentIntents.search({ query: "metadata['booking_status']:'deposit_received'", limit: 100, ...(page ? { page } : {}) });
-    for (const pi of res.data || []) {
-      const md = pi.metadata || {}, ymd = ymdOf(md.date), win = WINDOW_KEY[String(md.window || '').split(' ')[0]];
-      if (ymd && win && ymd >= today && ymd <= last) bookings.push({ pi, md, ymd, win, area: AREAS[md.area] ? md.area : 'hartford' });
-    }
-    page = res.has_more ? res.next_page : null;
-  } while (page);
+  for (const where of ['paymentIntents', 'invoices']) {
+    let page = null;
+    do {
+      const res = await stripe[where].search({ query: "metadata['booking_status']:'deposit_received'", limit: 100, ...(page ? { page } : {}) });
+      for (const pi of res.data || []) {
+        const md = pi.metadata || {}, ymd = ymdOf(md.date), win = WINDOW_KEY[String(md.window || '').split(' ')[0]];
+        if (ymd && win && ymd >= today && ymd <= last) bookings.push({ pi, where, md, ymd, win, area: AREAS[md.area] ? md.area : 'hartford' });
+      }
+      page = res.has_more ? res.next_page : null;
+    } while (page);
+  }
 
   const forecasts = {}, sent = [], clear = [];
   for (const b of bookings.sort((x, y) => x.ymd.localeCompare(y.ymd))) {
@@ -81,7 +83,7 @@ export async function watch(request, stripe, env) {
       'Want to keep it, or move to a drier day? Moving is free.';
     const actions = [
       ...(b.md.phone ? [{ action: 'view', label: `Text ${first}`, url: `sms:+1${b.md.phone}?&body=${encodeURIComponent(sms)}` }] : []),
-      { action: 'view', label: 'Open in Stripe', url: `https://dashboard.stripe.com/payments/${b.pi.id}` },
+      { action: 'view', label: 'Open in Stripe', url: `https://dashboard.stripe.com/${b.where === 'invoices' ? 'invoices' : 'payments'}/${b.pi.id}` },
     ];
     await push(env.NTFY_TOPIC, {
       title: `${what} ${w.pop}% · ${day}, ${WINDOW_TEXT[b.win]}`,
@@ -91,7 +93,7 @@ export async function watch(request, stripe, env) {
       tags: w.kind === 'snow' ? 'snowflake' : w.kind === 'storm' ? 'zap' : 'umbrella',
       actions,
     });
-    await stripe.paymentIntents.update(b.pi.id, { metadata: { weather_alert_sent: today, weather_alert: `${what} ${w.pop}% (${b.ymd} ${b.win})` } });
+    await stripe[b.where].update(b.pi.id, { metadata: { weather_alert_sent: today, weather_alert: `${what} ${w.pop}% (${b.ymd} ${b.win})` } });
     sent.push(b.md.booking_ref);
   }
   // the day-before reminder, once per booking, only for customers who opted in to texts
@@ -103,7 +105,7 @@ export async function watch(request, stripe, env) {
       const service = SVC[md.package_key] ? SVC[md.package_key].name + (PAINT[md.paint_key] ? ' + ' + PAINT[md.paint_key].name : '') : 'detail';
       const r = await sendSms(env, md.phone, reminderText({ service, date: md.date, window: md.window }), deps.fetch)
         .catch((e) => { console.warn('reminder text failed', md.booking_ref, e && e.message); return {}; });
-      if (r.sid) { await stripe.paymentIntents.update(b.pi.id, { metadata: { reminder_sent: today } }); reminded.push(md.booking_ref); }
+      if (r.sid) { await stripe[b.where].update(b.pi.id, { metadata: { reminder_sent: today } }); reminded.push(md.booking_ref); }
     }
   }
   return Response.json({ checked: bookings.length, alerted: sent, clear, reminded });

@@ -54,8 +54,9 @@ export function reminderText({ service, date, window }) {
 }
 
 /** The text a customer gets the moment their deposit lands. */
-export function confirmationText({ first, service, date, window, ref, deposit }) {
+export function confirmationText({ first, service, date, window, ref, deposit, giftCode }) {
   const day = dayOf(date);
   return gsm(`Cipher Auto Lab: you're booked${first ? ', ' + first : ''}! ${service}, ${day}, ${window}. Ref ${ref}. ` +
-    `$${deposit} deposit received. We'll text your arrival time the day before. Questions? Text or call ${MAIN_LINE}. Reply STOP to opt out.`);
+    (giftCode ? `Gift card ${giftCode} applied. ` : `$${deposit} deposit received. `) +
+    `We'll text your arrival time the day before. Questions? Text or call ${MAIN_LINE}. Reply STOP to opt out.`);
 }
