@@ -675,5 +675,29 @@ assert.equal(chm.channel('evil'), null); assert.equal(chm.channel('door hanger')
   r = await rep.report(rq('?key=rk-test-1234&since=2026-11-15&until=2026-11-20&format=csv&table=towns'), s, { REPORT_KEY: 'rk-test-1234' });
   assert.equal(r.headers.get('content-type'), 'text/csv; charset=utf-8');
   assert.match(await r.text(), /^town,county,zips,bookings,booked_value,channels\nEnfield,Hartford County,06082,2,368,Door hanger · enfield elm 1118 \(2\)\n/);
+  // forgiving table names and formats (a hand-typed link must not dead-end)
+  for (const [raw, want] of [['channels', 'channels'], ['Channels', 'channels'], ['channel', 'channels'], ['channels.', 'channels'], [' towns ', 'towns'],
+    ['Town', 'towns'], ['place', 'places'], ['booking', 'bookings'], ['day', 'daily'], ['Daily', 'daily'], ['', 'channels'], ['zzz', 'channels'], [null, 'channels']]) {
+    assert.equal(rep.pickTable(raw), want, `table ${raw}`);
+  }
+  assert.equal(rep.pickFormat('CSV', ''), 'csv'); assert.equal(rep.pickFormat('', 'text/html,application/xhtml+xml'), 'html');
+  assert.equal(rep.pickFormat('', '*/*'), 'json'); assert.equal(rep.pickFormat('json', 'text/html'), 'json');
+  r = await rep.report(rq('?key=rk-test-1234&since=2026-11-15&until=2026-11-20&format=csv&table=Channel'), s, { REPORT_KEY: 'rk-test-1234' });
+  assert.equal(r.status, 200); assert.match(await r.text(), /^channel,type,type_label,label,/);
+  // in a browser: a page, keys kept in its links, no scripts, nothing personal
+  const hq = (q) => new Request('https://cipherautolab.com/api/channel-report' + q, { headers: { accept: 'text/html' } });
+  r = await rep.report(hq('?key=rk-test%26<1234>&since=2026-11-15&until=2026-11-20'), s, { REPORT_KEY: 'rk-test&<1234>' });
+  assert.equal(r.status, 200); assert.equal(r.headers.get('content-type'), 'text/html; charset=utf-8');
+  assert.equal(r.headers.get('x-robots-tag'), 'noindex, nofollow');
+  const page = await r.text();
+  assert.ok(!/<script/i.test(page) && !/\sstyle=/.test(page) && !/\son[a-z]+=/.test(page), 'CSP-clean page');
+  assert.ok(page.includes('href="/api/channel-report?key=rk-test%26%3C1234%3E&amp;days=30"'), 'date tabs keep the key, escaped');
+  assert.ok(!page.includes('<1234>'), 'the key is never written raw');
+  assert.ok(page.includes('Door hanger · enfield elm 1118') && page.includes('Enfield') && page.includes('first saw magnet, 7 days before'));
+  assert.ok(page.includes('QR opens are not being counted'), 'says when Upstash is not connected');
+  assert.ok(!/Business cards</.test(page) && /Magnets</.test(page), 'channels with nothing in the dates are left off the page; first-touch-only ones stay');
+  assert.ok(!/test@|Malik|203555/.test(page));
+  r = await rep.report(hq('?key=rk-test%26<1234>&days=30'), s, { REPORT_KEY: 'rk-test&<1234>' });
+  assert.match(await r.text(), /days=30" aria-current="page"/, 'days=30 is the last 30 days');
 }
 console.log('channel engine tests passed');

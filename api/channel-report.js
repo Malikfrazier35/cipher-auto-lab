@@ -1,4 +1,4 @@
-// GET /api/channel-report?key=<REPORT_KEY>[&since=YYYY-MM-DD][&until=YYYY-MM-DD][&format=csv&table=channels|towns|places|bookings|daily]
+// GET /api/channel-report?key=<REPORT_KEY>[&days=30 | &since=YYYY-MM-DD&until=YYYY-MM-DD][&format=html|json|csv&table=channels|towns|places|bookings|daily]
 // The data engine's read side: every marketing channel (printed QR codes, links) with what it brought,
 // joined from the scan counts (api/_metrics.js) and the bookings and gift cards in Stripe.
 //   channels  one row per channel: scans, booking starts, bookings, booked value, deposits, gift cards,
@@ -8,12 +8,15 @@
 //   bookings  one row per booking, without names, phones or addresses: channel, first channel, town,
 //             ZIP, county, service, value, lead time, days from first scan to booking
 //   daily     the funnel day by day
-// JSON by default (all tables), CSV for one table. Needs REPORT_KEY in Vercel (Sensitive), sent as
-// ?key= or "Authorization: Bearer". Scan counts need Upstash Redis connected; bookings work without it.
+// Opened in a browser it is a page to read (api/_report-page.js); format=json gives every table as JSON,
+// format=csv one table for a spreadsheet. The table name is forgiving (Towns, town, towns. all work).
+// Needs REPORT_KEY in Vercel (Sensitive), sent as ?key= or "Authorization: Bearer".
+// Scan counts need Upstash Redis connected; bookings work without it.
 import Stripe from 'stripe';
 import { timingSafeEqual } from 'node:crypto';
 import { channel, REGISTRY, TYPES } from './_channels.js';
 import { readDays, etDay, metricsOn } from './_metrics.js';
+import { reportPage } from './_report-page.js';
 
 export const deps = { fetch: (...a) => fetch(...a) };   // tests swap this
 
@@ -25,6 +28,23 @@ function dayList(since, until) { const out = []; for (let t = Date.parse(since +
 function ymdOf(text) { const d = new Date(text || ''); return isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 const dollars = (c) => Math.round(+c || 0) / 100;
 const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : null);
+export const TABLES = ['channels', 'towns', 'places', 'bookings', 'daily'];
+
+/** "Towns", "town", "channels." or "" -> a table name; anything unrecognisable -> channels. */
+export function pickTable(raw) {
+  const t = String(raw || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (!t) return 'channels';
+  if (t === 'day' || t === 'days') return 'daily';
+  return TABLES.find((n) => n === t || n === t + 's' || (t.length >= 3 && n.startsWith(t.slice(0, 3)))) || 'channels';
+}
+/** csv, json or html: a browser gets the page unless it asks for something else. */
+export function pickFormat(raw, accept) {
+  const f = String(raw || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (f.startsWith('csv') || f === 'spreadsheet' || f === 'excel') return 'csv';
+  if (f.startsWith('json')) return 'json';
+  if (f.startsWith('htm') || f === 'page') return 'html';
+  return /text\/html/.test(accept || '') ? 'html' : 'json';
+}
 
 async function searchAll(stripe, where, query) {
   const out = []; let page = null;
@@ -132,7 +152,9 @@ export async function report(request, stripe, env) {
 
   const today = etDay();
   const until = isDay(url.searchParams.get('until')) ? url.searchParams.get('until') : today;
-  let since = isDay(url.searchParams.get('since')) ? url.searchParams.get('since') : etDay(new Date(Date.now() - 89 * DAY));
+  const wantDays = Math.min(366, Math.max(1, parseInt(url.searchParams.get('days'), 10) || 0));
+  let since = isDay(url.searchParams.get('since')) ? url.searchParams.get('since')
+    : etDay(new Date(Date.parse(until + 'T12:00:00Z') - ((url.searchParams.get('days') ? wantDays : 90) - 1) * DAY));
   if (daysBetween(since, until) > 365) since = etDay(new Date(Date.parse(until + 'T12:00:00Z') - 365 * DAY));
   if (since > until) return Response.json({ error: 'since is after until' }, { status: 400 });
 
@@ -144,12 +166,19 @@ export async function report(request, stripe, env) {
     searchAll(stripe, 'paymentIntents', "metadata['kind']:'gift' AND status:'succeeded'"),
   ]);
   const tables = buildReport({ since, until, counts, payments, giftBookings, giftSales });
-  const headers = { 'Cache-Control': 'no-store' };
-  const table = url.searchParams.get('table') || 'channels';
-  if (url.searchParams.get('format') === 'csv') {
-    if (!tables[table]) return Response.json({ error: 'table is one of ' + Object.keys(tables).join(', ') }, { status: 400 });
+  const headers = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer' };
+  const format = pickFormat(url.searchParams.get('format'), request.headers.get('accept'));
+  if (format === 'csv') {
+    const table = pickTable(url.searchParams.get('table'));
     return new Response(csv(tables[table]), { headers: { ...headers, 'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="cipher-${table}-${since}-to-${until}.csv"` } });
+  }
+  if (format === 'html') {
+    // links on the page keep the key the page was opened with, so they work from a phone bookmark
+    const link = (q) => '/api/channel-report?' + new URLSearchParams({ key: given, ...q }).toString();
+    const span = daysBetween(since, until) + 1;
+    const html = reportPage({ since, until, days: [7, 30, 90, 365].includes(span) && until === today ? span : 0, tables, scansOn: metricsOn(env), link });
+    return new Response(html, { headers: { ...headers, 'Content-Type': 'text/html; charset=utf-8' } });
   }
   return Response.json({ since, until, scans_counted: metricsOn(env), generated: new Date().toISOString(), ...tables }, { headers });
 }

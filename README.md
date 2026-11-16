@@ -97,7 +97,9 @@ optionally where it went (`door-enfield-elm-1118`). `python3 tools/make_qr.py <i
 - `api/_channels.js` lists placements with a label, print date, quantity and cost.
 - `GET /api/channel-report?key=REPORT_KEY` joins it all: channels (scans, starts, bookings, value,
   conversion, cost per booking), towns, scan places, bookings (no names or contact details) and a
-  daily funnel. `&format=csv&table=channels|towns|places|bookings|daily` for a spreadsheet.
+  daily funnel. Opened in a browser it is a page to read (`api/_report-page.js`, styled by
+  `report.css`, with Last 7/30/90 days and a year); `&days=30` or `&since=&until=` set the dates,
+  `&format=csv&table=channels|towns|places|bookings|daily` downloads one table, `&format=json` all.
 
 Vercel environment variables for it: `REPORT_KEY` (Sensitive, any long random string), and Upstash
 Redis from the Vercel Marketplace (free plan), which adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
