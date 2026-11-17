@@ -24,7 +24,8 @@ export function etDay(d = new Date()) {
 }
 const clean = (s, n = 40) => String(s || '').replace(/[|\u0000-\u001F]/g, ' ').trim().slice(0, n);
 
-async function pipeline(env, cmds, fetchImpl = fetch) {
+/** Run Redis commands in one round trip: [[cmd, ...args], ...] -> [{result}|{error}, ...], or null when not connected. */
+export async function pipeline(env, cmds, fetchImpl = fetch) {
   const c = creds(env);
   if (!c || !cmds.length) return null;
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 3000);

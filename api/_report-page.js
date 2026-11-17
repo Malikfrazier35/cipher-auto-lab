@@ -1,5 +1,6 @@
 // The channel report as a page to read in a browser (api/channel-report.js, when opened from a link).
-// Plain HTML with no scripts; styles in /report.css. Owner-only: it is served only with the right key.
+// Plain HTML with no scripts; styles in /report.css. Owner-only: served only after the passcode screen
+// (api/_report-auth.js) or with the key.
 // Files in /api whose names start with "_" are shared code, not endpoints.
 import { SVC, PAINT, TIER } from './_booking.js';
 
@@ -81,7 +82,7 @@ export function reportPage({ since, until, days, tables, scansOn, link }) {
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow"><meta name="referrer" content="same-origin">
 <title>Channel report · Cipher Auto Lab</title><link rel="stylesheet" href="/report.css"></head>
 <body><main class="r">
 <div class="r-top"><div><p class="r-eyebrow">Cipher Auto Lab · Channel report</p><h1>Where bookings come from</h1>
@@ -99,6 +100,7 @@ ${section('towns', 'By town (where the work is)', '', townTable)}
 ${section('places', 'Where QR codes were opened', 'Approximate, from the phone\'s internet connection: a nearby town, not an address.', placeTable)}
 ${section('bookings', 'Each booking', 'No names, phone numbers or addresses. Those stay in Stripe and on your bookings board.', bookTable)}
 ${section('daily', 'Day by day', 'Days with no activity are left out here and kept in the download.', dayTable)}
-<p class="r-foot">Booked value is the estimate at booking (package, size and add-ons), before travel fees and anything found on site. Bookings come from Stripe; QR opens are counted once per visit.</p>
+<div class="r-foot"><p>Booked value is the estimate at booking (package, size and add-ons), before travel fees and anything found on site. Bookings come from Stripe; QR opens are counted once per visit.</p>
+<form method="post" action="/api/channel-report"><button class="r-out" type="submit" name="signout" value="1">Sign out of this device</button></form></div>
 </main></body></html>`;
 }

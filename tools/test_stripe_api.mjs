@@ -684,20 +684,102 @@ assert.equal(chm.channel('evil'), null); assert.equal(chm.channel('door hanger')
   assert.equal(rep.pickFormat('', '*/*'), 'json'); assert.equal(rep.pickFormat('json', 'text/html'), 'json');
   r = await rep.report(rq('?key=rk-test-1234&since=2026-11-15&until=2026-11-20&format=csv&table=Channel'), s, { REPORT_KEY: 'rk-test-1234' });
   assert.equal(r.status, 200); assert.match(await r.text(), /^channel,type,type_label,label,/);
-  // in a browser: a page, keys kept in its links, no scripts, nothing personal
-  const hq = (q) => new Request('https://cipherautolab.com/api/channel-report' + q, { headers: { accept: 'text/html' } });
-  r = await rep.report(hq('?key=rk-test%26<1234>&since=2026-11-15&until=2026-11-20'), s, { REPORT_KEY: 'rk-test&<1234>' });
-  assert.equal(r.status, 200); assert.equal(r.headers.get('content-type'), 'text/html; charset=utf-8');
-  assert.equal(r.headers.get('x-robots-tag'), 'noindex, nofollow');
+  // in a browser: a passcode screen, then a signed-in cookie; the key never sits in the page or its links
+  const auth = await import('../api/_report-auth.js');
+  rep.deps.sleep = async () => {};
+  const KEY = 'rk-test&<1234>-long-random', ENV = { REPORT_KEY: KEY, REPORT_PASSCODE: '482915', NTFY_TOPIC: 'topic-x' };
+  const hq = (q, h = {}) => new Request('https://cipherautolab.com/api/channel-report' + q, { headers: { accept: 'text/html', ...h } });
+  const post = (q, body, h = {}) => new Request('https://cipherautolab.com/api/channel-report' + q, { method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', origin: 'https://cipherautolab.com', 'x-real-ip': '198.51.100.7', ...h }, body: new URLSearchParams(body).toString() });
+  const ck = (res) => (res.headers.get('set-cookie') || '').split(';')[0];
+  // not signed in: the screen, not the data
+  r = await rep.report(hq('?days=30'), s, ENV);
+  assert.equal(r.status, 401); let html = await r.text();
+  assert.ok(html.includes('Enter your passcode') && html.includes('action="/api/channel-report?days=30"') && html.includes('autocomplete="current-password"'));
+  assert.ok(!html.includes('Door hanger') && !/<script/i.test(html) && !/\sstyle=/.test(html) && !/\son[a-z]+=/.test(html), 'no data, CSP-clean');
+  assert.equal((await rep.report(rq('?format=csv'), s, ENV)).status, 403, 'scripts without the key get nothing');
+  // wrong passcode: the screen again, a count, and no cookie
+  auth._resetMemory();
+  r = await rep.report(post('?days=30', { passcode: '000000', remember: '1' }), s, ENV);
+  assert.equal(r.status, 401); assert.match(await r.text(), /didn&#39;t match/); assert.equal(r.headers.get('set-cookie'), null);
+  // a form from another site is refused
+  assert.equal((await rep.report(post('', { passcode: '482915' }, { origin: 'https://evil.example' }), s, ENV)).status, 403);
+  assert.equal((await rep.report(post('', { passcode: '482915' }, { origin: 'null', 'sec-fetch-site': 'cross-site' }), s, ENV)).status, 403);
+  assert.equal((await rep.report(post('', { passcode: '482915' }, { origin: 'null', 'sec-fetch-site': 'same-origin' }), s, ENV)).status, 303, 'a browser that hides the origin but says same-origin');
+  // right passcode: back to the same dates, signed in for 30 days
+  r = await rep.report(post('?days=30', { passcode: '482916', remember: '1' }), s, ENV);
+  assert.equal(r.status, 401, 'one digit off');
+  assert.equal((await rep.report(post('', { passcode: ' 482915 ' }), s, ENV)).status, 303, 'spaces around it are ignored');
+  r = await rep.report(post('?days=30', { passcode: '482915', remember: '1' }), s, ENV);
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/api/channel-report?days=30');
+  const sc = r.headers.get('set-cookie');
+  assert.match(sc, /^cal_report=[0-9a-z]+\.[A-Za-z0-9_-]{43}; Path=\/api\/channel-report; Max-Age=2592000; HttpOnly; Secure; SameSite=Lax$/);
+  const cookie = ck(r);
+  r = await rep.report(hq('?since=2026-11-15&until=2026-11-20', { cookie: 'other=1; ' + cookie }), s, ENV);
+  assert.equal(r.status, 200); assert.equal(r.headers.get('x-robots-tag'), 'noindex, nofollow');
   const page = await r.text();
   assert.ok(!/<script/i.test(page) && !/\sstyle=/.test(page) && !/\son[a-z]+=/.test(page), 'CSP-clean page');
-  assert.ok(page.includes('href="/api/channel-report?key=rk-test%26%3C1234%3E&amp;days=30"'), 'date tabs keep the key, escaped');
-  assert.ok(!page.includes('<1234>'), 'the key is never written raw');
+  assert.ok(page.includes('href="/api/channel-report?days=30"') && !page.includes('key='), 'links hold no key');
+  assert.ok(page.includes('name="signout"'));
   assert.ok(page.includes('Door hanger · enfield elm 1118') && page.includes('Enfield') && page.includes('first saw magnet, 7 days before'));
+  assert.ok(page.includes('Full Detail') && page.includes('sedan or coupe'), 'service names, not codes');
   assert.ok(page.includes('QR opens are not being counted'), 'says when Upstash is not connected');
   assert.ok(!/Business cards</.test(page) && /Magnets</.test(page), 'channels with nothing in the dates are left off the page; first-touch-only ones stay');
   assert.ok(!/test@|Malik|203555/.test(page));
-  r = await rep.report(hq('?key=rk-test%26<1234>&days=30'), s, { REPORT_KEY: 'rk-test&<1234>' });
+  r = await rep.report(hq('?days=30', { cookie }), s, ENV);
   assert.match(await r.text(), /days=30" aria-current="page"/, 'days=30 is the last 30 days');
+  r = await rep.report(new Request('https://cipherautolab.com/api/channel-report?format=csv&table=towns', { headers: { cookie } }), s, ENV);
+  assert.equal(r.status, 200, 'spreadsheet downloads ride on the cookie');
+  // "keep me signed in" off: a browser-session cookie
+  r = await rep.report(post('', { passcode: '482915' }), s, ENV);
+  assert.ok(!/Max-Age/.test(r.headers.get('set-cookie')));
+  // forged, expired, or from before a passcode change: signed out
+  const [, exp, sig] = cookie.match(/=([0-9a-z]+)\.(.+)$/);
+  assert.equal(auth.signedIn(ENV, `cal_report=${(parseInt(exp, 36) + 9e9).toString(36)}.${sig}`), false, 'a longer date breaks the signature');
+  assert.equal(auth.signedIn(ENV, `cal_report=${exp}.${sig.slice(0, -1)}${sig.endsWith('A') ? 'B' : 'A'}`), false, 'a changed signature');
+  assert.equal(auth.signedIn(ENV, cookie, Date.now() + 31 * 864e5), false, 'expires');
+  assert.equal(auth.signedIn({ ...ENV, REPORT_PASSCODE: '771204' }, cookie), false, 'changing the passcode signs everyone out');
+  assert.equal(auth.signedIn({ ...ENV, REPORT_KEY: 'another-key' }, cookie), false);
+  assert.equal(auth.signedIn(ENV, cookie), true);
+  // a passcode shorter than 6 is ignored: the key is the passcode until it is fixed
+  assert.equal(auth.passcodeOf({ REPORT_KEY: KEY, REPORT_PASSCODE: '1234' }), KEY);
+  assert.equal(auth.passcodeOf({ REPORT_KEY: KEY }), KEY);
+  // an old link with the key: signs in and drops the key from the address bar
+  r = await rep.report(hq('?key=' + encodeURIComponent(KEY) + '&days=7'), s, ENV);
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/api/channel-report?days=7'); assert.match(r.headers.get('set-cookie'), /^cal_report=/);
+  r = await rep.report(hq('?key=wrong'), s, ENV); assert.equal(r.status, 401, 'a wrong key gets the passcode screen');
+  // scripts can still use the key
+  r = await rep.report(new Request('https://cipherautolab.com/api/channel-report?format=csv', { headers: { authorization: 'Bearer ' + KEY } }), s, ENV);
+  assert.equal(r.status, 200);
+  // sign out
+  r = await rep.report(post('?days=30', { signout: '1' }, { cookie }), s, ENV);
+  assert.equal(r.status, 303); assert.match(r.headers.get('set-cookie'), /^cal_report=; Path=\/api\/channel-report; Max-Age=0/);
+  // lockout: 5 wrong from one connection -> locked, the owner's phone is warned once; others still get in
+  auth._resetMemory();
+  const pushes = []; rep.deps.fetch = async (u, o) => { if (String(u).includes('ntfy')) pushes.push(JSON.parse(o.body)); return new Response('{}'); };
+  for (let i = 0; i < 5; i++) assert.equal((await rep.report(post('', { passcode: 'guess' + i }), s, ENV)).status, 401);
+  r = await rep.report(post('', { passcode: '482915' }), s, ENV);
+  assert.equal(r.status, 429, 'locked even with the right passcode'); assert.match(await r.text(), /Too many wrong tries/);
+  assert.equal(pushes.length, 1); assert.match(pushes[0].message, /5 wrong passcodes from one connection/); assert.equal(pushes[0].topic, 'topic-x');
+  assert.equal((await rep.report(post('', { passcode: '482915' }, { 'x-real-ip': '203.0.113.9' }), s, ENV)).status, 303, 'another connection is not locked');
+  // 20 wrong from anywhere -> locked for everyone
+  auth._resetMemory();
+  for (let i = 0; i < 20; i++) await rep.report(post('', { passcode: 'g' + i }, { 'x-real-ip': '10.0.0.' + i }), s, ENV);
+  assert.equal((await rep.report(post('', { passcode: '482915' }, { 'x-real-ip': '10.9.9.9' }), s, ENV)).status, 429);
+  assert.ok(pushes.some((p) => /20 wrong passcodes in the last hour/.test(p.message)));
+  // with Upstash connected the counts live in Redis (shared by every server), keyed by a hash, not the address
+  auth._resetMemory(); const db = new Map(), seen = [];
+  rep.deps.fetch = async (u, o) => {
+    if (String(u).includes('ntfy')) return new Response('{}');
+    const out = JSON.parse(o.body).map(([c, k]) => { seen.push(k); if (c === 'INCR') { db.set(k, (db.get(k) || 0) + 1); return { result: db.get(k) }; }
+      if (c === 'GET') return { result: db.has(k) ? String(db.get(k)) : null }; if (c === 'DEL') { db.delete(k); return { result: 1 }; } return { result: 1 }; });
+    return Response.json(out);
+  };
+  const RENV = { ...ENV, KV_REST_API_URL: 'https://kv.example', KV_REST_API_TOKEN: 't' };
+  for (let i = 0; i < 5; i++) await rep.report(post('', { passcode: 'x' + i }), s, RENV);
+  assert.equal((await rep.report(post('', { passcode: '482915' }), s, RENV)).status, 429);
+  assert.ok(seen.every((k) => !String(k).includes('198.51.100.7')), 'no raw address stored');
+  assert.ok([...db.keys()].some((k) => /^cal:pass:ip:[0-9a-f]{24}$/.test(k)));
+  rep.deps.fetch = (...a) => fetch(...a);
 }
 console.log('channel engine tests passed');

@@ -1,4 +1,5 @@
-// GET /api/channel-report?key=<REPORT_KEY>[&days=30 | &since=YYYY-MM-DD&until=YYYY-MM-DD][&format=html|json|csv&table=channels|towns|places|bookings|daily]
+// GET /api/channel-report[?days=30 | ?since=YYYY-MM-DD&until=YYYY-MM-DD][&format=html|json|csv&table=channels|towns|places|bookings|daily]
+// POST /api/channel-report  the passcode screen's form (passcode, remember) or signout=1
 // The data engine's read side: every marketing channel (printed QR codes, links) with what it brought,
 // joined from the scan counts (api/_metrics.js) and the bookings and gift cards in Stripe.
 //   channels  one row per channel: scans, booking starts, bookings, booked value, deposits, gift cards,
@@ -10,19 +11,21 @@
 //   daily     the funnel day by day
 // Opened in a browser it is a page to read (api/_report-page.js); format=json gives every table as JSON,
 // format=csv one table for a spreadsheet. The table name is forgiving (Towns, town, towns. all work).
-// Needs REPORT_KEY in Vercel (Sensitive), sent as ?key= or "Authorization: Bearer".
+// In a browser: a passcode screen, then a cookie keeps the device signed in (api/_report-auth.js).
+// For scripts: REPORT_KEY as "Authorization: Bearer" or ?key=. Needs REPORT_KEY in Vercel (Sensitive);
+// REPORT_PASSCODE (Sensitive, 6+ characters) is what you type, and REPORT_KEY is the passcode without it.
 // Scan counts need Upstash Redis connected; bookings work without it.
 import Stripe from 'stripe';
-import { timingSafeEqual } from 'node:crypto';
 import { channel, REGISTRY, TYPES } from './_channels.js';
-import { readDays, etDay, metricsOn } from './_metrics.js';
+import { readDays, etDay, metricsOn, placeOf } from './_metrics.js';
 import { reportPage } from './_report-page.js';
+import { sameSecret, passcodeOf, sessionCookie, signOutCookie, signedIn, locked, wrongPasscode, rightPasscode, loginPage } from './_report-auth.js';
 
-export const deps = { fetch: (...a) => fetch(...a) };   // tests swap this
+export const deps = { fetch: (...a) => fetch(...a), sleep: (ms) => new Promise((r) => setTimeout(r, ms)) };   // tests swap these
+const OURS = /^https:\/\/(www\.)?cipherautolab\.com(\/|$)|^https:\/\/cipher-auto-lab[a-z0-9-]*\.vercel\.app(\/|$)/;
 
 const DAY = 864e5;
 const isDay = (s) => /^20\d\d-\d\d-\d\d$/.test(String(s || ''));
-function same(a, b) { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); }
 function daysBetween(a, b) { return Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / DAY); }
 function dayList(since, until) { const out = []; for (let t = Date.parse(since + 'T12:00:00Z'); t <= Date.parse(until + 'T12:00:00Z'); t += DAY) out.push(new Date(t).toISOString().slice(0, 10)); return out; }
 function ymdOf(text) { const d = new Date(text || ''); return isNaN(d) ? '' : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
@@ -142,12 +145,51 @@ function csv(rows) {
   return [cols.join(','), ...rows.map((r) => cols.map((c) => cell(r[c])).join(','))].join('\n') + '\n';
 }
 
+// same-origin, not no-referrer: with no-referrer browsers send the sign-in form as Origin: null
+const HEADERS = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin' };
+const page = (html, status = 200, extra = {}) => new Response(html, { status, headers: { ...HEADERS, 'Content-Type': 'text/html; charset=utf-8', ...extra } });
+const goTo = (location, cookie) => new Response(null, { status: 303, headers: { ...HEADERS, Location: location, 'Set-Cookie': cookie } });
+/** The dates asked for, without the key: where the passcode screen sends you back to. */
+function back(url) {
+  const q = new URLSearchParams();
+  for (const k of ['days', 'since', 'until']) if (url.searchParams.get(k)) q.set(k, url.searchParams.get(k).slice(0, 10));
+  return '/api/channel-report' + (q.toString() ? '?' + q : '');
+}
+
+/** The passcode screen's form: sign in or sign out. */
+async function signIn(request, env, url) {
+  // only our own pages may post here: our Origin, or the browser's own word that the form is same-origin
+  const from = request.headers.get('origin') || request.headers.get('referer') || '';
+  const sameOrigin = request.headers.get('sec-fetch-site') === 'same-origin' && (!from || from === 'null');
+  if (!OURS.test(from) && !sameOrigin) return new Response('Forbidden', { status: 403, headers: HEADERS });
+  const form = new URLSearchParams((await request.text()).slice(0, 2000));
+  const to = back(url);
+  if (form.get('signout')) return goTo(to, signOutCookie);
+  const ip = request.headers.get('x-real-ip') || (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
+  if (await locked(env, ip, deps.fetch)) return page(loginPage({ action: to, message: 'Too many wrong tries. Wait 15 minutes, then try again.' }), 429, { 'Retry-After': '900' });
+  if (!sameSecret((form.get('passcode') || '').trim(), passcodeOf(env))) {
+    await wrongPasscode(env, ip, placeOf(request.headers), deps.fetch);
+    await deps.sleep(500);
+    return page(loginPage({ action: to, message: "That passcode didn't match. Try again." }), 401);
+  }
+  await rightPasscode(env, ip, deps.fetch);
+  return goTo(to, sessionCookie(env, { remember: form.get('remember') === '1' }));
+}
+
 export async function report(request, stripe, env) {
-  if (request.method !== 'GET') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET' } });
+  if (request.method !== 'GET' && request.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, POST' } });
   if (!env.REPORT_KEY) return Response.json({ error: 'REPORT_KEY is not set' }, { status: 503 });
   const url = new URL(request.url);
+  if (request.method === 'POST') return signIn(request, env, url);
   const given = url.searchParams.get('key') || (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
-  if (!same(given, env.REPORT_KEY)) return Response.json({ error: 'Forbidden' }, { status: 403 });
+  const keyOk = !!given && sameSecret(given, env.REPORT_KEY);
+  const format = pickFormat(url.searchParams.get('format'), request.headers.get('accept'));
+  // an old link with the key in it: sign this browser in, then drop the key from the address bar
+  if (format === 'html' && keyOk && url.searchParams.get('key')) return goTo(back(url), sessionCookie(env));
+  if (!keyOk && !signedIn(env, request.headers.get('cookie'))) {
+    if (format === 'html') return page(loginPage({ action: back(url) }), 401);
+    return Response.json({ error: 'Forbidden' }, { status: 403, headers: HEADERS });
+  }
   if (!stripe) return Response.json({ error: 'payments_off' }, { status: 503 });
 
   const today = etDay();
@@ -166,16 +208,15 @@ export async function report(request, stripe, env) {
     searchAll(stripe, 'paymentIntents', "metadata['kind']:'gift' AND status:'succeeded'"),
   ]);
   const tables = buildReport({ since, until, counts, payments, giftBookings, giftSales });
-  const headers = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer' };
-  const format = pickFormat(url.searchParams.get('format'), request.headers.get('accept'));
+  const headers = HEADERS;
   if (format === 'csv') {
     const table = pickTable(url.searchParams.get('table'));
     return new Response(csv(tables[table]), { headers: { ...headers, 'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="cipher-${table}-${since}-to-${until}.csv"` } });
   }
   if (format === 'html') {
-    // links on the page keep the key the page was opened with, so they work from a phone bookmark
-    const link = (q) => '/api/channel-report?' + new URLSearchParams({ key: given, ...q }).toString();
+    // the sign-in cookie carries the access, so the page's own links never hold the key
+    const link = (q) => '/api/channel-report?' + new URLSearchParams(q).toString();
     const span = daysBetween(since, until) + 1;
     const html = reportPage({ since, until, days: [7, 30, 90, 365].includes(span) && until === today ? span : 0, tables, scansOn: metricsOn(env), link });
     return new Response(html, { headers: { ...headers, 'Content-Type': 'text/html; charset=utf-8' } });

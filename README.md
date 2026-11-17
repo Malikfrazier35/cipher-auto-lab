@@ -95,13 +95,21 @@ optionally where it went (`door-enfield-elm-1118`). `python3 tools/make_qr.py <i
 - Bookings carry `campaign`, `campaign_type`, `first_campaign`, `first_seen`, `town`, `zip`, `county`
   and `est_value` (cents) in Stripe; the webhook counts `booked` and `gift` per channel and town.
 - `api/_channels.js` lists placements with a label, print date, quantity and cost.
-- `GET /api/channel-report?key=REPORT_KEY` joins it all: channels (scans, starts, bookings, value,
+- `GET /api/channel-report` joins it all: channels (scans, starts, bookings, value,
   conversion, cost per booking), towns, scan places, bookings (no names or contact details) and a
   daily funnel. Opened in a browser it is a page to read (`api/_report-page.js`, styled by
   `report.css`, with Last 7/30/90 days and a year); `&days=30` or `&since=&until=` set the dates,
   `&format=csv&table=channels|towns|places|bookings|daily` downloads one table, `&format=json` all.
 
-Vercel environment variables for it: `REPORT_KEY` (Sensitive, any long random string), and Upstash
+In a browser it opens to a passcode screen (`api/_report-auth.js`); the right passcode signs that
+device in for 30 days with an HttpOnly cookie for that page only, and "Sign out of this device" ends it.
+Five wrong tries from one connection lock it for 15 minutes, twenty from anywhere for an hour, and the
+owner's phone gets a push. Scripts can still send `Authorization: Bearer REPORT_KEY`, and an old link
+with `?key=` signs the browser in and drops the key from the address bar.
+
+Vercel environment variables for it: `REPORT_KEY` (Sensitive, any long random string; signs the
+sign-in cookie), `REPORT_PASSCODE` (Sensitive, 6+ characters, what you type; without it the key is the
+passcode; changing either signs every device out), and Upstash
 Redis from the Vercel Marketplace (free plan), which adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
 Without Redis, bookings are still tracked by channel; only scan and start counts wait for it.
 

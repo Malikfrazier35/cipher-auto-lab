@@ -37,7 +37,22 @@ tr:last-child td{border-bottom:0}
 .n{text-align:right;white-space:nowrap}
 td small{display:block;color:var(--dim);font-size:12px}
 .r-empty{color:var(--mute);font-size:14px;padding:14px;border:1px dashed var(--line);border-radius:12px}
-.r-foot{color:var(--dim);font-size:12px;margin-top:40px}
+.r-foot{color:var(--dim);font-size:12px;margin-top:40px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+.r-foot p{max-width:70ch}
+.r-out{background:none;border:1px solid var(--line);color:var(--mute);font:500 13px/1 Inter,system-ui,sans-serif;padding:9px 14px;border-radius:999px;cursor:pointer}
+.r-out:hover{color:var(--ink);border-color:var(--dim)}
+/* passcode screen */
+.r-login{min-height:100vh;display:grid;place-items:center;padding-top:40px}
+.r-card{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 22px;display:grid;gap:12px}
+.r-card h1{font-size:22px;margin-bottom:4px}
+.r-card label{font-size:13px;color:var(--mute)}
+.r-card input[type=password]{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);font:16px/1.2 Inter,system-ui,sans-serif;padding:13px 14px;border-radius:10px;margin-top:-6px}
+.r-card input[type=password]:focus{outline:2px solid var(--acc);outline-offset:1px;border-color:transparent}
+.r-card .r-check{display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+.r-card .r-check input{margin-top:2px;accent-color:var(--acc);width:16px;height:16px;flex:none}
+.r-card button{background:var(--acc);color:#08090B;border:0;font:700 15px/1 Inter,system-ui,sans-serif;padding:14px;border-radius:10px;cursor:pointer;margin-top:4px}
+.r-card button:hover{filter:brightness(1.08)}
+.r-msg{background:#2a1416;border:1px solid #5c2328;color:#ffb4b9;font-size:14px;padding:10px 12px;border-radius:10px}
 @media (max-width:700px){
   table{min-width:680px}
   th:first-child,td:first-child{min-width:172px}
