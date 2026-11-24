@@ -9,9 +9,15 @@
 <meta name="theme-color" content="#08090B">
 <link rel="preload" href="fonts/inter-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="menu.css">
+<link rel="stylesheet" href="promo.css">
 <script src="js/va.js" defer></script>
 </head>
 <body>
+<a class="bf-strip" href="/gift" data-promo="bf" hidden>
+  <b>Black Friday to Cyber Monday</b>
+  <span>Every gift card comes with a 20% bonus card for you.<em class="bf-more"> Plus $100 off a spring ceramic coating.</em></span>
+  <i class="bf-prev">Preview</i>
+</a>
 <!-- ===== LOGO SYMBOL ===== -->
 <svg class="u-1" width="0" height="0" aria-hidden="true"><defs>
   <linearGradient id="bgrad" x1="6%" y1="0%" x2="94%" y2="100%">
@@ -92,7 +98,7 @@
   </section>
 
   <!-- Holidays: shown November and December (js/season.js) -->
-  <a class="m-giftband" href="gift.html" data-season="holiday" hidden><span class="m-giftband-k">Holiday gift cards</span><b>Give a detail.</b><span>From $50. Never expire. Sent to your email in a minute.</span><span class="m-giftband-go" aria-hidden="true">→</span></a>
+  <a class="m-giftband" href="gift.html" data-season="holiday" hidden><span class="m-giftband-k"><span data-promo-off="bf">Holiday gift cards</span><span data-promo="bf" hidden>Black Friday to Cyber Monday</span></span><b><span data-promo-off="bf">Give a detail.</span><span data-promo="bf" hidden>Give one, get one for yourself.</span></b><span><span data-promo-off="bf">From $50. Never expire. Sent to your email in a minute.</span><span data-promo="bf" hidden>Every gift card comes with a 20% bonus card for you.</span></span><span class="m-giftband-go" aria-hidden="true">→</span></a>
 
   <section class="m-sec" aria-labelledby="h-pkg">
     <h2 id="h-pkg"><span class="m-step">01</span> Choose a package</h2>
@@ -449,6 +455,7 @@
   </div>
 </footer>
 <script src="js/season.js" defer></script>
+<script src="js/promo.js" defer></script>
 <script src="js/menu.js" defer></script>
 <script src="js/source.js" defer></script>
 <script src="js/giftcode.js" defer></script>

@@ -18,7 +18,8 @@ import Stripe from 'stripe';
 import { SVC, PAINT, TIER, OFFERS, invoiceLines, bookingMetadata, json } from './_booking.js';
 import { channel } from './_channels.js';
 import { bump } from './_metrics.js';
-import { findGift, spendGift, dollars, GIFTS } from './_gift.js';
+import { findGift, spendGift, usedOf, cardName, dollars, GIFTS } from './_gift.js';
+import { BF, CERAMIC_PROMO } from './_promo.js';
 import { AREAS, forecast, windowLine } from './_weather.js';
 import { push, NUMBERS_LINE } from './_notify.js';
 import { sendSms, confirmationText, configured as smsOn } from './_sms.js';
@@ -56,6 +57,7 @@ export async function confirmBooking(session, stripe, topic) {
   const bk = {
     packageKey: md.package_key, paintKey: md.paint_key || '', tier: md.tier,
     adds: (md.addons || '').split(',').filter(Boolean),
+    promo: md.promo || '',   // set by our server at booking (api/_promo.js), e.g. the spring ceramic lock-in
   };
   if (!SVC[bk.packageKey] || !TIER[bk.tier] || (bk.paintKey && !PAINT[bk.paintKey])) {
     console.error('deposit with unreadable booking', ref, session.id);
@@ -143,11 +145,11 @@ async function addLines(stripe, customer, invoiceId, lines, key) {
 async function applyGift(stripe, customer, code, ref, maxCents, key) {
   const g = await findGift(stripe, code);
   if (!g) return { code, failed: true };
-  const already = (g.pi.metadata.gift_used || '').split(',').find((u) => u.startsWith(ref + ':'));
+  const already = usedOf(g).split(',').find((u) => u.startsWith(ref + ':'));
   const cents = already ? +already.split(':')[1] : Math.max(0, Math.min(g.balance, maxCents));
   if (cents > 0) {
     await stripe.customers.createBalanceTransaction(customer, {
-      amount: -cents, currency: 'usd', description: `Gift card ${g.code} (${ref})`, metadata: { booking_ref: ref, gift_code: g.code },
+      amount: -cents, currency: 'usd', description: `${cardName(g.code)} ${g.code} (${ref})`, metadata: { booking_ref: ref, gift_code: g.code },
     }, { idempotencyKey: key });
   }
   const left = already ? g.balance : await spendGift(stripe, g, cents, ref);
@@ -174,7 +176,7 @@ export async function bookWithGift(bk, gift, stripe, topic) {
     pending_invoice_items_behavior: 'exclude',
     automatic_tax: { enabled: !!zip },
     description: `Balance for booking ${ref} on ${md.date || 'the booked day'}${md.town ? ' in ' + md.town : ''}. ` +
-      `Gift card ${gift.code} is credited against this invoice. The final amount is confirmed at the walk-around; ` +
+      `${cardName(gift.code)} ${gift.code} is credited against this invoice. The final amount is confirmed at the walk-around; ` +
       'any travel fee for your town is added before this is sent. Prices include Connecticut sales tax.',
     metadata: { ...md, booking_status: 'deposit_received', paid_with: 'gift card', forecast_at_booking: fc },
   }, { idempotencyKey: key });
@@ -208,7 +210,9 @@ async function giftSold(session, topic) {
       message: `${md.gift_code} · ${(GIFTS[md.gift_kind] || {}).name || 'Gift card'}
 For ${md.gift_to || '?'}, from ${md.gift_from || '?'}` +
         (md.gift_message ? `
-"${md.gift_message}"` : ''),
+"${md.gift_message}"` : '') +
+        (md.bonus_code ? `
+Black Friday bonus for the buyer: ${md.bonus_code} (${dollars(parseInt(md.bonus_amount, 10) || 0)}, ${md.bonus_from} to ${md.bonus_until})` : ''),
       priority: 3, tags: 'gift',
       actions: [{ action: 'view', label: 'Payment', url: `https://dashboard.stripe.com/payments/${session.payment_intent}` }],
     }, deps.fetch).catch((e) => console.warn('gift push failed', e && e.message));
@@ -264,7 +268,8 @@ export async function notifyBooking(topic, b) {
       title: `New booking · ${md.service || 'Detail'}`,
       message: `${b.ref} · ${md.customer_name || ''} · ${md.town || ''}\n${when}\n` +
         (b.deposit ? `$${b.deposit} deposit paid` : 'No deposit: gift card') + ` · est. $${b.total.toLocaleString('en-US')} total` +
-        (b.gift ? (b.gift.failed ? `\nGift card ${b.gift.code} NOT applied: check it in Stripe` : `\nGift card ${b.gift.code}: ${dollars(b.gift.applied)} applied, ${dollars(b.gift.left)} left on it`) : '') +
+        (b.gift ? (b.gift.failed ? `\n${cardName(b.gift.code)} ${b.gift.code} NOT applied: check it in Stripe` : `\n${cardName(b.gift.code)} ${b.gift.code}: ${dollars(b.gift.applied)} applied, ${dollars(b.gift.left)} left on it`) : '') +
+        (md.promo === CERAMIC_PROMO ? `\nBlack Friday ceramic lock-in: $${BF.ceramicOff} off (on the invoice)` : '') +
         (md.vehicle ? `\n${md.vehicle}` : '') + (job ? `\n${job}` : '') + (b.forecast ? `\nForecast: ${b.forecast}` : '') +
         (md.booking_source === 'menu' ? '\nFrom the Detail Menu' : '') +
         (channel(md.campaign) ? `\nQR: ${channel(md.campaign).label}` : '') +

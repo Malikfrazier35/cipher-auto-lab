@@ -57,6 +57,6 @@ export function reminderText({ service, date, window }) {
 export function confirmationText({ first, service, date, window, ref, deposit, giftCode }) {
   const day = dayOf(date);
   return gsm(`Cipher Auto Lab: you're booked${first ? ', ' + first : ''}! ${service}, ${day}, ${window}. Ref ${ref}. ` +
-    (giftCode ? `Gift card ${giftCode} applied. ` : `$${deposit} deposit received. `) +
+    (giftCode ? `${/^BF-/.test(giftCode) ? 'Bonus card' : 'Gift card'} ${giftCode} applied. ` : `$${deposit} deposit received. `) +
     `We'll text your arrival time the day before. Questions? Text or call ${MAIN_LINE}. Reply STOP to opt out.`);
 }

@@ -9,9 +9,10 @@
 import Stripe from 'stripe';
 import { parseBooking, depositFor, serviceLabel, bookingMetadata, json } from './_booking.js';
 import { findGift } from './_gift.js';
+import { ceramicLockIn, bonusUsableOn, CERAMIC_PROMO, BONUS_RANGE } from './_promo.js';
 import { bookWithGift } from './stripe-webhook.js';
 
-export const deps = { topic: () => process.env.NTFY_TOPIC };   // tests swap this
+export const deps = { topic: () => process.env.NTFY_TOPIC, now: () => Date.now() };   // tests swap these
 
 // A fixed label so these sessions can be told apart in the Stripe Dashboard.
 const INTEGRATION_ID = 'cipher_booking_deposit_qhxwmtzr';
@@ -50,6 +51,8 @@ export async function createCheckout(request, stripe) {
   if (error) return json({ error }, 400);
 
   const deposit = depositFor(booking);
+  // Black Friday spring ceramic lock-in: decided here, by the server's clock, never by the page
+  if (ceramicLockIn(booking, deps.now())) booking.promo = CERAMIC_PROMO;
 
   // A gift card: if it covers the deposit, the booking is made now with no payment, and the card
   // pays on the final invoice. If not, the deposit is taken as usual and the card comes off later.
@@ -57,6 +60,9 @@ export async function createCheckout(request, stripe) {
     let gift = null;
     try { gift = await findGift(stripe, booking.giftCode); } catch (e) { console.error('gift lookup failed', e && e.type, e && e.code); }
     if (!gift || !gift.balance) return json({ error: "That gift card can't be used: it wasn't found or has been used up. Remove it to pay the deposit, or call (203) 560-3572." }, 400);
+    if (gift.bonus && !bonusUsableOn(gift, booking.date)) {
+      return json({ error: `That's a Black Friday bonus card: it works on details done ${BONUS_RANGE}. Pick a day in that range, or remove the code to book this day.` }, 400);
+    }
     if (gift.balance >= deposit * 100) {
       try {
         const r = await bookWithGift(booking, gift, stripe, deps.topic());

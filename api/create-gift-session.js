@@ -3,10 +3,15 @@
 // same Apple Pay / Google Pay / card form as the booking deposit). The amount comes from GIFTS, never
 // from the browser. The code is made here and printed on the Stripe receipt, and it only works once
 // the payment has gone through (api/_gift.js checks that).
+// Thanksgiving to Cyber Monday 2026 (api/_promo.js) the buyer also gets a bonus card: its code is made
+// here too, printed on the same receipt, and shown on /gift once the payment has gone through.
 import Stripe from 'stripe';
 import { json } from './_booking.js';
 import { GIFTS, newCode } from './_gift.js';
 import { channel } from './_channels.js';
+import { BF, BONUS_RANGE, bfOn, bonusFor } from './_promo.js';
+
+export const deps = { now: () => Date.now() };   // tests swap this
 
 const ALLOWED_ORIGINS = ['https://cipherautolab.com', 'https://www.cipherautolab.com'];
 const allowedOrigin = (o) => ALLOWED_ORIGINS.includes(o) || /^https:\/\/cipher-auto-lab[a-z0-9-]*\.vercel\.app$/.test(o);
@@ -42,11 +47,19 @@ export async function createGift(request, stripe, makeCode = newCode) {
   const { gift, error } = parseGift(body);
   if (error) return json({ error }, 400);
 
-  const g = GIFTS[gift.kind], code = makeCode(), cents = g.amount * 100;
+  const g = GIFTS[gift.kind], code = makeCode('GC'), cents = g.amount * 100;
   const metadata = {
     kind: 'gift', gift_code: code, gift_kind: gift.kind, gift_amount: String(cents), gift_balance: String(cents),
     gift_to: gift.to, gift_from: gift.from, gift_message: gift.message, gift_status: 'active', campaign: gift.campaign,
   };
+  // Black Friday: a bonus card for the buyer, on the same payment
+  const bonus = bfOn(deps.now()) ? bonusFor(g.amount) : 0;
+  const bonusCode = bonus ? makeCode('BF') : '';
+  if (bonus) {
+    Object.assign(metadata, { promo: BF.id, bonus_code: bonusCode, bonus_amount: String(bonus * 100), bonus_balance: String(bonus * 100),
+      bonus_from: BF.bonusFrom, bonus_until: BF.bonusUntil });
+  }
+  const bonusLine = bonus ? ` Black Friday bonus for you: card ${bonusCode}, worth $${bonus}, good on any detail done ${BONUS_RANGE}.` : '';
   try {
     const session = await stripe.checkout.sessions.create({
       ui_mode: 'elements',
@@ -59,7 +72,7 @@ export async function createGift(request, stripe, makeCode = newCode) {
           product_data: {
             name: `Cipher Auto Lab ${g.name}: code ${code}`,
             description: `For ${gift.to}, from ${gift.from}. Use code ${code} when booking at cipherautolab.com. ` +
-              `${g.note ? g.note + ' ' : ''}Never expires, no fees.`,
+              `${g.note ? g.note + ' ' : ''}Never expires, no fees.${bonusLine}`,
           },
         },
       }],
@@ -71,7 +84,7 @@ export async function createGift(request, stripe, makeCode = newCode) {
       excluded_payment_method_types: ['klarna', 'amazon_pay', 'pay_by_bank', 'afterpay_clearpay'],
       return_url: `${origin}/gift?paid=1&session_id={CHECKOUT_SESSION_ID}`,
     });
-    return json({ clientSecret: session.client_secret, sessionId: session.id, amount: g.amount });
+    return json({ clientSecret: session.client_secret, sessionId: session.id, amount: g.amount, ...(bonus ? { bonus } : {}) });
   } catch (e) {
     console.error('gift session failed', e && e.type, e && e.code, e && e.requestId);
     return json({ error: 'Card payments are having a moment. Call or text (203) 560-3572.' }, 502);

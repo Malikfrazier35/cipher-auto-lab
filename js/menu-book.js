@@ -536,7 +536,9 @@
       source: 'menu', area: wxArea(), packageKey: b.pkgKey, paintKey: '', tier: b.tier, addons: b.serverAdds.join(','), ref: B.ref,
       name: $('qbName').value, phone: $('qbPhone').value, email: $('qbEmail').value.trim(),
       vehicle: $('qbCar').value, size: b.sizeLabel, condition: '', parked: B.garage ? 'Garage' : '', garage: B.garage ? 'yes' : 'no', smsOptIn: $('qbSmsOk').checked ? 'yes' : 'no',
-      campaign: window.CALSource ? window.CALSource.get() : '', giftCode: B.gift ? B.gift.code : '',
+      campaign: window.CALSource ? window.CALSource.get() : '',
+      // a bonus card only goes with a booking on its dates (the server checks again)
+      giftCode: B.gift && window.CALGift && window.CALGift.usable(B.gift, B.ymd) ? B.gift.code : '',
       firstCampaign: window.CALSource ? window.CALSource.first().src : '', firstSeen: window.CALSource ? window.CALSource.first().day : '',
       date: B.date, window: B.win, address: $('qbStreet').value, town: $('qbTown').value, zip: $('qbZip').value,
       notes: notes(), estTotal: money(b.total) + (b.plus ? '+' : ''),
@@ -545,11 +547,12 @@
     };
     remember(b);
     $('qbGiftPay').hidden = true;
-    if (B.gift && window.CALGift && window.CALGift.covers(B.gift, b.dep)) {   // nothing to pay: book on the card
+    if (B.gift && window.CALGift && window.CALGift.covers(B.gift, b.dep, B.ymd)) {   // nothing to pay: book on the card
       $('qbPayWait').hidden = true; $('qbPayCard').hidden = true; $('qbGiftPay').hidden = false;
-      $('qbPayAmt').textContent = 'Gift card';
+      $('qbPayAmt').textContent = B.gift.bonus ? 'Bonus card' : 'Gift card';
       $('qbPayBal').textContent = money(Math.max(0, b.total - B.gift.balance));
-      $('qbGiftPayTxt').textContent = window.CALGift.words(B.gift, b.dep);
+      $('qbGiftPayTxt').textContent = window.CALGift.words(B.gift, b.dep, B.ymd);
+      $('qbGiftBook').textContent = B.gift.bonus ? 'Book with my bonus card' : 'Book with my gift card';
       payUI = { gift: true, body: body, b: b };
       return;
     }
@@ -584,12 +587,12 @@
         if (!x[0].ok || !x[1].booked) throw new Error(x[1].error || "We couldn't finish the booking. Nothing was charged. Call or text (203) 560-3572.");
         B.paid = true;
         fillDone({ ref: B.ref, what: job.b.pkgName + ' · ' + job.b.sizeLabel, day: B.dateLabel || B.date, win: B.win,
-                   paid: 'Gift card', where: where(), sms: smsBody(job.b) });
+                   paid: B.gift && B.gift.bonus ? 'Bonus card' : 'Gift card', where: where(), sms: smsBody(job.b) });
         history.replaceState({ qb: 6 }, '', '#book');
         show(6);
       })
       .catch(function (e) { payError(e && e.message); })
-      .then(function () { paying = false; btn.disabled = false; btn.textContent = 'Book with my gift card'; });
+      .then(function () { paying = false; btn.disabled = false; btn.textContent = B.gift && B.gift.bonus ? 'Book with my bonus card' : 'Book with my gift card'; });
   });
 
   /* gift card code, on the "you" screen */
@@ -603,7 +606,11 @@
     if (!code.trim()) { B.gift = null; msg.hidden = true; return; }
     msg.hidden = false; msg.className = 'qb-giftmsg'; msg.textContent = 'Checking…';
     window.CALGift.check(code).then(function (d) {
-      if (d.ok) { B.gift = { code: d.code, balance: d.balance }; $('qbGift').value = d.code; msg.textContent = window.CALGift.words(B.gift, build().dep); msg.className = 'qb-giftmsg ok'; }
+      if (d.ok) {
+        B.gift = window.CALGift.card(d); $('qbGift').value = d.code;
+        msg.textContent = window.CALGift.words(B.gift, build().dep, B.ymd);
+        msg.className = 'qb-giftmsg ' + (window.CALGift.usable(B.gift, B.ymd) ? 'ok' : 'bad');
+      }
       else { B.gift = null; msg.textContent = d.error; msg.className = 'qb-giftmsg bad'; }
     });
   }

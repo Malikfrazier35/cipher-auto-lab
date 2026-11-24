@@ -8,6 +8,7 @@
 <link rel="canonical" href="https://cipherautolab.com/quote.html">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="campaign.css">
+<link rel="stylesheet" href="promo.css">
 
 <script src="js/va.js" defer></script>
 </head>
@@ -456,6 +457,7 @@
                   already in good shape and you want to keep that way.</span>
                 <span class="pcno">A coating locks in whatever is under it. If your paint is swirled, this seals the swirls in — take the one below instead.</span>
                 <span class="pchr">About 6 hours</span>
+                <span class="pcbf" data-promo="bf" hidden>Black Friday: $100 off a spring install</span>
               </button>
 
               <button type="button" class="pcard" data-paint="corrceramic">
@@ -464,6 +466,7 @@
                   Correct, then protect — the only order that makes sense.</span>
                 <span class="pcno">Two days. We take the car through it properly or we don't take it on.</span>
                 <span class="pchr">Two days · coating cures overnight</span>
+                <span class="pcbf" data-promo="bf" hidden>Black Friday: $100 off a spring install</span>
               </button>
 
               <button type="button" class="pcard" data-paint="show">
@@ -499,6 +502,15 @@
           <div class="qs" id="leadnote">Mon–Sat, from two days out. Sundays by request only. The windows are built around your detail, so it's finished before dark.</div>
           <div class="dates" id="dates"></div>
           <button type="button" class="more-dates" id="moreDates" hidden>Show later dates</button>
+          <div class="springbox" id="springBox" hidden>
+            <p class="springhead"><b>Black Friday ceramic lock-in: $100 off.</b> Book by Cyber Monday for a day between March 1 and May 31, 2027, when it's warm enough for the coating to cure.</p>
+            <div class="springmons" id="springMons" role="group" aria-label="Spring months">
+              <button type="button" data-mon="2027-03" aria-pressed="true">March</button>
+              <button type="button" data-mon="2027-04" aria-pressed="false">April</button>
+              <button type="button" data-mon="2027-05" aria-pressed="false">May</button>
+            </div>
+            <div class="dates" id="springDates"></div>
+          </div>
 
           <div class="qh u-16">And a window.</div>
           <div class="qs">We'll confirm an arrival time the day before.</div>
@@ -844,6 +856,7 @@
 <script src="config.js"></script>
 <script src="vehicles.js"></script>
 <script src="js/source.js" defer></script>
+<script src="js/promo.js" defer></script>
 <script src="js/giftcode.js" defer></script>
 <script src="js/weather.js" defer></script>
 <script src="js/schedule.js" defer></script>

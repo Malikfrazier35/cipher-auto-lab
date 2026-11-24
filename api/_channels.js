@@ -30,6 +30,10 @@ export const REGISTRY = {
   dash:   { label: 'Dash cards' },
   postcard: { label: 'Postcards' },
   fb:     { label: 'Facebook posts' },
+  // Black Friday 2026 (api/_promo.js): the links in the posts and texts for the sale
+  'fb-bf':     { label: 'Facebook · Black Friday post' },
+  'google-bf': { label: 'Google profile · Black Friday post' },
+  'sms-bf':    { label: 'Texts · Black Friday' },
 };
 
 export const ID_RE = /^[a-z]{2,8}(?:-[a-z0-9]{1,24}){0,4}$/;

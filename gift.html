@@ -9,10 +9,16 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="campaign.css">
 <link rel="stylesheet" href="gift.css">
+<link rel="stylesheet" href="promo.css">
 
 <script src="js/va.js" defer></script>
 </head>
 <body>
+<a class="bf-strip" href="#buy" data-promo="bf" hidden>
+  <b>Black Friday to Cyber Monday</b>
+  <span>Every gift card comes with a 20% bonus card for you.<em class="bf-more"> Plus $100 off a spring ceramic coating.</em></span>
+  <i class="bf-prev">Preview</i>
+</a>
 <!-- ===== LOGO SYMBOL ===== -->
 <svg class="u-1" width="0" height="0" aria-hidden="true"><defs>
   <linearGradient id="bgrad" x1="6%" y1="0%" x2="94%" y2="100%">
@@ -74,6 +80,7 @@
     <div class="g-copy">
       <div class="c-eyebrow"><span class="dot"></span>Cipher Auto Lab · Gift cards</div>
       <h1 class="g-h1">Give a <em>detail.</em></h1>
+      <p class="g-bf" data-promo="bf" hidden><b>Black Friday to Cyber Monday: give one, get one for yourself.</b> Every gift card comes with a bonus card for you, worth 20% of it. Use yours on any detail done January 1 to March 31, 2027.</p>
       <p class="g-lede">A gift card for a mobile detail anywhere we go in Connecticut, done in their driveway or at their work. Good for any package, add-on or ceramic work. It never expires.</p>
       <ul class="g-facts">
         <li><b>Code in a minute.</b> On screen and in your receipt email, ready to print or forward.</li>
@@ -97,10 +104,10 @@
       <h2 id="buy-h" class="g-h2">1. Pick the card</h2>
       <fieldset class="g-amts">
         <legend class="g-sr">Gift card amount</legend>
-        <label class="g-amt"><input type="radio" name="gift" value="g50"><span><b>$50</b><small>Goes toward any detail or add-on</small></span></label>
-        <label class="g-amt"><input type="radio" name="gift" value="g100" checked><span><b>$100</b><small>Most of an Exterior Detail</small></span></label>
-        <label class="g-amt"><input type="radio" name="gift" value="g150"><span><b>$150</b><small>An Exterior Detail, and then some</small></span></label>
-        <label class="g-amt g-amt-full"><input type="radio" name="gift" value="full"><span><b>Full Detail</b><small>$259 · inside and out, on a sedan or coupe. Bigger vehicles pay the difference.</small></span></label>
+        <label class="g-amt"><input type="radio" name="gift" value="g50"><span><b>$50</b><small>Goes toward any detail or add-on</small><em class="g-bonus" data-promo="bf" hidden>+ $10 bonus card for you</em></span></label>
+        <label class="g-amt"><input type="radio" name="gift" value="g100" checked><span><b>$100</b><small>Most of an Exterior Detail</small><em class="g-bonus" data-promo="bf" hidden>+ $20 bonus card for you</em></span></label>
+        <label class="g-amt"><input type="radio" name="gift" value="g150"><span><b>$150</b><small>An Exterior Detail, and then some</small><em class="g-bonus" data-promo="bf" hidden>+ $30 bonus card for you</em></span></label>
+        <label class="g-amt g-amt-full"><input type="radio" name="gift" value="full"><span><b>Full Detail</b><small>$259 · inside and out, on a sedan or coupe. Bigger vehicles pay the difference.</small><em class="g-bonus" data-promo="bf" hidden>+ $50 bonus card for you</em></span></label>
       </fieldset>
 
       <h2 class="g-h2">2. Who it's from and for</h2>
@@ -116,6 +123,7 @@
       <div class="g-pay" id="gPay" hidden>
         <h2 class="g-h2">3. Pay</h2>
         <div class="g-total"><span>Gift card</span><b id="gAmt">$100</b></div>
+        <div class="g-total g-total-bonus" id="gBonusRow" hidden><span>Black Friday bonus card for you, free</span><b id="gBonusAmt">+$20</b></div>
         <div class="paywait" id="gWait"><span class="spin"></span> Setting up secure payment…</div>
         <div id="gExpress"></div>
         <div class="paysep" id="gSep" hidden><span>or pay with card</span></div>
@@ -135,6 +143,7 @@
         <li>A balance under $5 is paid back in cash on request.</li>
         <li>Lost the code? Call or text (203) 560-3572 or email hello@cipherautolab.com and we'll find it from the buyer's email.</li>
         <li>A travel fee for their town, if any, is texted before the slot is confirmed, like any booking.</li>
+        <li data-promo="bf" hidden>Black Friday bonus cards come free with gift cards bought Thanksgiving to Cyber Monday 2026. They are a promotional extra for the buyer, not a gift card: good on any detail done January 1 to March 31, 2027, not for cash, and they don't change the gift card in any way. <a href="terms.html#gift">Terms</a>.</li>
       </ul>
     </aside>
   </div>
@@ -151,6 +160,12 @@
         <button type="button" class="btn btn-o" id="gCopy">Copy the code</button>
       </div>
       <p class="g-copied" id="gCopied" role="status" hidden>Code copied.</p>
+      <div class="g-mybonus" id="gBonus" hidden>
+        <p class="g-mybonus-k">And one for you: your Black Friday bonus card</p>
+        <p class="g-mybonus-amt" id="bAmt">$20</p>
+        <p class="g-mybonus-code" id="bCode">BF-XXXX-XXXX</p>
+        <p class="g-mybonus-how">Good on any detail done <b id="bRange">January 1 to March 31, 2027</b>. Enter it when you book, like a gift card. It's in your receipt email too, and it isn't on the card you print.</p>
+      </div>
     </div>
     <div class="g-card g-card-real" id="gCard">
       <div class="g-card-top"><svg><use href="#bead"/></svg><span>CIPHER <i>AUTO LAB</i></span></div>
@@ -212,6 +227,7 @@
 <script src="config.js"></script>
 <script src="js/source.js" defer></script>
 <script src="js/deposit.js" defer></script>
+<script src="js/promo.js" defer></script>
 <script src="js/gift.js" defer></script>
 </body>
 </html>

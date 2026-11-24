@@ -172,3 +172,20 @@ serves `menu.html` there. If the menu ever moves, change the rewrite's destinati
 
 © Cipher Auto Lab LLC. All rights reserved. Not open source — published for version
 control and deployment.
+
+## Black Friday 2026 (Thanksgiving to Cyber Monday)
+
+`api/_promo.js` holds the dates and rules; `js/promo.js` is the page's copy (a test checks they match).
+Nothing needs switching on or off: the server and the pages follow the dates, Connecticut time.
+
+- **Give one, get one for yourself.** A gift card bought Nov 26-30 comes with a bonus card for the buyer,
+  20% of the card rounded to $5. Its code (`BF-XXXX-XXXX`) is made with the gift card, printed on the same
+  Stripe receipt, kept on the gift card's payment (`bonus_*` metadata) and shown on /gift after paying.
+  It pays for details done Jan 1 - Mar 31, 2027 only (server-checked); the gift card itself is unchanged.
+- **Spring ceramic lock-in.** Ceramic (or correction + ceramic) booked Nov 26-30 for a day Mar 1 - May 31,
+  2027 is $100 off: the booking page shows a March-May picker for it, and the server adds a credit line to
+  the balance invoice (`promo: bf2026-ceramic` on the booking).
+- Banner, gift page and booking page pieces carry `data-promo="bf"`. See them early with `?preview=bf`
+  (looks only: the server still gives nothing before Thanksgiving).
+- Links for the posts: `/gift?src=fb-bf`, `?src=google-bf`, `?src=sms-bf` (in `api/_channels.js`).
+- Terms section 16 states the bonus card and lock-in terms.

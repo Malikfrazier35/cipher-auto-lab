@@ -783,3 +783,121 @@ assert.equal(chm.channel('evil'), null); assert.equal(chm.channel('door hanger')
   rep.deps.fetch = (...a) => fetch(...a);
 }
 console.log('channel engine tests passed');
+
+// ---- Black Friday 2026 (api/_promo.js): bonus cards on gift sales, bonus redemption, spring ceramic lock-in
+{
+  const promo = await import('../api/_promo.js');
+  const gsMod = await import('../api/create-gift-session.js');
+  const T = (iso) => () => Date.parse(iso);
+  deps.env = {};
+  deps.fetch = async (url, o) => { if (String(url).startsWith('https://ntfy.sh')) { gpush.push(JSON.parse(o.body)); return { ok: true, status: 200 }; } return fakeNws(url); };
+  // the window: Thanksgiving midnight to the end of Cyber Monday, Connecticut time
+  assert.equal(promo.bfOn(Date.parse('2026-11-26T04:59:59Z')), false, 'Wednesday 11:59pm ET');
+  assert.equal(promo.bfOn(Date.parse('2026-11-26T05:00:00Z')), true, 'Thanksgiving midnight ET');
+  assert.equal(promo.bfOn(Date.parse('2026-12-01T04:59:59Z')), true, 'Cyber Monday 11:59pm ET');
+  assert.equal(promo.bfOn(Date.parse('2026-12-01T05:00:00Z')), false);
+  assert.deepEqual([50, 100, 150, 259].map(promo.bonusFor), [10, 20, 30, 50]);
+  // the page's copy of the dates matches the server's
+  const fs = await import('node:fs');
+  const pageJs = fs.readFileSync(new URL('../js/promo.js', import.meta.url), 'utf8');
+  for (const k of ['start', 'end', 'bonusFrom', 'bonusUntil', 'ceramicFrom', 'ceramicUntil']) assert.ok(pageJs.includes(`'${promo.BF[k]}'`), `js/promo.js has ${k} ${promo.BF[k]}`);
+  assert.ok(pageJs.includes(`ceramicOff: ${promo.BF.ceramicOff}`) && pageJs.includes(`bonusPct: ${promo.BF.bonusPct}`));
+  // codes
+  assert.match(giftMod.newCode('BF'), /^BF-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/);
+  assert.equal(giftMod.cleanCode('bf 7kq2 mx9p'), 'BF-7KQ2-MX9P');
+  assert.equal(giftMod.cleanCode('GC-BF7K-Q2MX'), 'GC-BF7K-Q2MX', 'a gift code whose letters start BF stays a gift code');
+  assert.equal(giftMod.cardName('BF-7KQ2-MX9P'), 'Bonus card'); assert.equal(giftMod.cardName('GC-7KQ2-MX9P'), 'Gift card');
+
+  // buying a gift card in the window: a bonus code on the same payment and receipt; outside it, none
+  const mk = (p) => (p === 'BF' ? 'BF-BONU-S001' : 'GC-TEST-0002');
+  gsMod.deps.now = T('2026-11-27T15:00:00Z');
+  s = fake();
+  r = await createGift(greq({ ...buy, gift: 'full', campaign: 'fb-bf' }), s, mk);
+  assert.deepEqual(Object.fromEntries(Object.entries(await r.json()).filter(([k]) => k !== 'clientSecret' && k !== 'sessionId')), { amount: 259, bonus: 50 });
+  const bfs = s.calls[0][1];
+  assert.deepEqual(Object.fromEntries(['promo', 'bonus_code', 'bonus_amount', 'bonus_balance', 'bonus_from', 'bonus_until', 'campaign'].map((k) => [k, bfs.payment_intent_data.metadata[k]])),
+    { promo: 'bf2026', bonus_code: 'BF-BONU-S001', bonus_amount: '5000', bonus_balance: '5000', bonus_from: '2027-01-01', bonus_until: '2027-03-31', campaign: 'fb-bf' });
+  assert.match(bfs.line_items[0].price_data.product_data.description, /Never expires, no fees\. Black Friday bonus for you: card BF-BONU-S001, worth \$50, good on any detail done Jan 1 to Mar 31, 2027\.$/);
+  assert.equal(bfs.line_items[0].price_data.unit_amount, 25900, 'the gift card is full price');
+  gsMod.deps.now = T('2026-12-01T05:00:01Z');
+  s = fake(); r = await createGift(greq(buy), s, mk);
+  assert.equal((await r.json()).bonus, undefined); assert.equal(s.calls[0][1].metadata.bonus_code, undefined, 'after Cyber Monday: no bonus');
+  gsMod.deps.now = () => Date.now();
+  // the success page gets the bonus card once paid
+  s = fake();
+  s.checkout.sessions.retrieve = async () => ({ status: 'complete', payment_status: 'paid', client_reference_id: 'GC-TEST-0002', amount_total: 25900, metadata: bfs.metadata });
+  r = await checkoutStatus(new Request('https://x/api/checkout-status?session_id=cs_live_abcdefghijkl'), s);
+  assert.deepEqual((await r.json()).gift.bonus, { code: 'BF-BONU-S001', amount: 50, from: '2027-01-01', until: '2027-03-31' });
+  // the owner's push names the bonus
+  s = fake();
+  const bsold = { id: 'evt_bs', type: 'checkout.session.completed', data: { object: { id: 'cs_bs', payment_status: 'paid', payment_intent: 'pi_bs', amount_total: 25900, metadata: bfs.metadata } } };
+  const bspl = JSON.stringify(bsold);
+  r = await webhook(hook(bspl, real.webhooks.generateTestHeaderString({ payload: bspl, secret })), s, secret, 'topic-g');
+  assert.match(gpush.at(-1).message, /\nBlack Friday bonus for the buyer: BF-BONU-S001 \(\$50, 2027-01-01 to 2027-03-31\)$/);
+
+  // a bonus card in Stripe: found by its own code, spent from its own balance, only on Jan 1 - Mar 31 details
+  const bonusPI = (bal, extra = {}) => ({ id: 'pi_gift2', status: 'succeeded', metadata: { kind: 'gift', gift_code: 'GC-TEST-0002', gift_amount: '25900', gift_balance: '25900', gift_from: 'Malik',
+    bonus_code: 'BF-BONU-S001', bonus_amount: '5000', bonus_balance: String(bal), bonus_from: '2027-01-01', bonus_until: '2027-03-31', ...extra } });
+  const withBonus = (bal, extra) => { const f = fake(); f.paymentIntents.search = async (q) => { f.calls.push(['pi.search', q]); return { data: [bonusPI(bal, extra)] }; }; return f; };
+  s = withBonus(5000);
+  r = await giftCheck(chk('bf-bonu-s001'), s);
+  assert.deepEqual(await r.json(), { ok: true, code: 'BF-BONU-S001', balance: 50, bonus: true, from: '2027-01-01', until: '2027-03-31', range: 'Jan 1 to Mar 31, 2027' });
+  assert.equal(s.calls[0][1].query, "metadata['bonus_code']:'BF-BONU-S001'");
+  assert.equal((await (await giftCheck(chk('BF-BONU-S001'), withBonus(0))).json()).error, 'That bonus card has been used up.');
+  { const f = fake(); f.paymentIntents.search = async () => ({ data: [bonusPI(5000, { bonus_code: 'BF-OTHE-R001' })] });
+    assert.equal((await giftCheck(chk('BF-BONU-S001'), f)).status, 404, 'the code must match exactly'); }
+  const bonusBooking = { ...booking, paintKey: '', packageKey: 'exterior', tier: 'sedan', addons: '', giftCode: 'BF-BONU-S001', ref: 'CAL-BONUS1' };
+  // a December day: refused, nothing booked or charged
+  s = withBonus(5000);
+  r = await cc.createCheckout(req({ ...bonusBooking, date: 'Sat Dec 12 2026' }), s);
+  assert.equal(r.status, 400); assert.match((await r.json()).error, /bonus card: it works on details done Jan 1 to Mar 31, 2027/);
+  assert.ok(!s.calls.some((c) => ['sessions.create', 'invoices.create', 'customers.create'].includes(c[0])));
+  r = await cc.createCheckout(req({ ...bonusBooking, date: 'Thu Apr 01 2027' }), withBonus(5000));
+  assert.equal(r.status, 400, 'April 1 is past the end');
+  // January: $50 covers the $25 deposit, so it books with no payment; the bonus balance is what's spent
+  s = withBonus(5000);
+  r = await cc.createCheckout(req({ ...bonusBooking, date: 'Sat Jan 16 2027' }), s);
+  assert.deepEqual(await r.json(), { booked: true, ref: 'CAL-BONUS1', giftApplied: 50, giftLeft: 0 });
+  assert.deepEqual(s.calls.find((c) => c[0] === 'pi.update').slice(1), ['pi_gift2', { metadata: { bonus_balance: '0', bonus_used: 'CAL-BONUS1:5000' } }]);
+  assert.equal(s.calls.find((c) => c[0] === 'customers.credit')[2].description, 'Bonus card BF-BONU-S001 (CAL-BONUS1)');
+  assert.match(s.calls.find((c) => c[0] === 'invoices.create')[1].description, /Bonus card BF-BONU-S001 is credited/);
+  assert.match(gpush.at(-1).message, /Bonus card BF-BONU-S001: \$50 applied, \$0 left on it/);
+  // a $10 bonus doesn't cover a deposit: the deposit is taken, the bonus comes off when it lands
+  s = withBonus(1000);
+  r = await cc.createCheckout(req({ ...bonusBooking, date: 'Sat Mar 27 2027', ref: 'CAL-BONUS2' }), s);
+  assert.ok((await r.json()).clientSecret);
+  assert.equal(s.calls.find((c) => c[0] === 'sessions.create')[1].metadata.gift_code, 'BF-BONU-S001');
+  // the gift card itself works any day, Black Friday or not
+  assert.ok((await (await cc.createCheckout(req({ ...giftBooking, giftCode: 'GC-TEST-0001', date: 'Sat Dec 12 2026', ref: 'CAL-GIFT09' }), withGift(10000))).json()).booked);
+
+  // spring ceramic lock-in: booked in the window for Mar 1 - May 31: $100 off on the invoice
+  const cer = { ...booking, packageKey: 'exterior', paintKey: 'ceramic', tier: 'sedan', addons: '', giftCode: '', ref: 'CAL-CERA01', date: 'Sat Apr 10 2027' };
+  cc.deps.now = T('2026-11-28T16:00:00Z');
+  s = fake(); r = await cc.createCheckout(req(cer), s);
+  const cmd = s.calls.find((c) => c[0] === 'sessions.create')[1].metadata;
+  assert.equal(cmd.promo, 'bf2026-ceramic');
+  assert.equal(cmd.est_value, String(94900 - 10000), 'ceramic $949 (exterior wash folded in), less $100');
+  assert.equal(s.calls.find((c) => c[0] === 'sessions.create')[1].line_items[0].price_data.unit_amount, 10000, 'the $100 deposit is unchanged');
+  const lines = invoiceLines({ ...parseBooking(cer).booking, promo: 'bf2026-ceramic' });
+  assert.deepEqual(lines.at(-1), { tax_code: 'txcd_20080003', description: 'Black Friday ceramic lock-in (spring install)', amount: -10000 });
+  for (const [why, b, now] of [['a December day', { ...cer, date: 'Sat Dec 12 2026' }, '2026-11-28T16:00:00Z'], ['June', { ...cer, date: 'Tue Jun 01 2027' }, '2026-11-28T16:00:00Z'],
+    ['not ceramic', { ...cer, paintKey: 'gloss' }, '2026-11-28T16:00:00Z'], ['booked after Cyber Monday', cer, '2026-12-01T06:00:00Z'], ['booked before Thanksgiving', cer, '2026-11-25T12:00:00Z']]) {
+    cc.deps.now = T(now); s = fake(); await cc.createCheckout(req({ ...b, ref: 'CAL-CERA0' + why.length }), s);
+    assert.equal(s.calls.find((c) => c[0] === 'sessions.create')[1].metadata.promo, '', `no lock-in: ${why}`);
+  }
+  assert.equal(parseBooking({ ...cer, promo: 'bf2026-ceramic' }).booking.promo, '', 'the page cannot claim it');
+  // when the deposit lands, the invoice carries the credit and the push says so
+  cc.deps.now = T('2026-11-28T16:00:00Z');
+  s = fake(); await cc.createCheckout(req(cer), s);
+  const cmeta = s.calls.find((c) => c[0] === 'sessions.create')[1].metadata;
+  s = fake(); s.paymentIntents.retrieve = async () => ({ id: 'pi_cer', metadata: {} });
+  const cev = { id: 'evt_c', type: 'checkout.session.completed', data: { object: { id: 'cs_c', payment_status: 'paid', payment_intent: 'pi_cer', customer: 'cus_1', amount_total: 10000, client_reference_id: 'CAL-CERA01', metadata: cmeta } } };
+  const cpl = JSON.stringify(cev);
+  r = await webhook(hook(cpl, real.webhooks.generateTestHeaderString({ payload: cpl, secret })), s, secret, 'topic-g');
+  assert.equal((await r.json()).result, 'confirmed');
+  const items = s.calls.filter((c) => c[0] === 'invoiceItems.create').map((c) => c[1]);
+  assert.deepEqual(items.at(-1), { customer: 'cus_1', invoice: items.at(-1).invoice, description: 'Black Friday ceramic lock-in (spring install)', currency: 'usd', amount: -10000, tax_code: 'txcd_20080003', tax_behavior: 'inclusive' });
+  assert.match(gpush.at(-1).message, /\nBlack Friday ceramic lock-in: \$100 off \(on the invoice\)/);
+  cc.deps.now = () => Date.now();
+}
+console.log('black friday tests passed');

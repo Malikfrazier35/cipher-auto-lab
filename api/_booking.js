@@ -43,6 +43,7 @@ export function saltSeason(dateText) { const d = new Date(dateText || ''); const
 export const TIER = { sedan: 'sedan or coupe', suv5: '5-seat SUV', suv7: '7-seat SUV', truck: 'truck or van' };
 
 // Where a booking came from (printed QR codes and links, ?src=): see api/_channels.js
+import { BF, CERAMIC_PROMO } from './_promo.js';
 import { channel } from './_channels.js';
 import { AREAS } from './_weather.js';
 export { OFFERS } from './_channels.js';
@@ -94,8 +95,11 @@ export function parseBooking(b) {
       campaign: (channel(b.campaign) || {}).id || '',
       firstCampaign: (channel(b.firstCampaign) || {}).id || '',
       firstSeen: /^20\d\d-\d\d-\d\d$/.test(String(b.firstSeen || '')) ? String(b.firstSeen) : '',
-      // a gift card code typed at booking (checked against Stripe by the server, never trusted as is)
-      giftCode: /^GC-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(String(b.giftCode || '')) ? String(b.giftCode) : '',
+      // a gift card (GC-) or Black Friday bonus card (BF-) code typed at booking (checked against
+      // Stripe by the server, never trusted as is)
+      giftCode: /^(GC|BF)-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(String(b.giftCode || '')) ? String(b.giftCode) : '',
+      // set by the server, never by the page: a promotion this booking qualified for (api/_promo.js)
+      promo: '',
     },
   };
 }
@@ -134,6 +138,10 @@ export function invoiceLines(bk) {
     lines.push({ product: `cal_addon_${k}`, description: ADDONS[k].name, amount: ADDONS[k].price * 100 });
   }
   if (both) lines.push({ product: 'cal_addon_decon_bundle', description: 'Iron decon + clay bar together', amount: DECON_BUNDLE * 100 });
+  // Black Friday spring ceramic lock-in (api/_promo.js), decided by the server when the booking was made
+  if (bk.promo === CERAMIC_PROMO && bk.paintKey) {
+    lines.push({ tax_code: TAX.repair, description: 'Black Friday ceramic lock-in (spring install)', amount: -BF.ceramicOff * 100 });
+  }
   return lines;
 }
 
@@ -146,7 +154,7 @@ export function bookingMetadata(bk) {
     address: bk.address, town: bk.town, zip: bk.zip, notes: bk.notes, agreement_version: bk.agreementVersion,
     signed_name: bk.signature, signed_at: bk.signedAt, photo_consent: bk.photoConsent,
     booking_source: bk.source || 'site', area: bk.area || '', garage: bk.garage || 'no',
-    job_minutes: jobMinutes(bk) || '', sms_opt_in: bk.smsOptIn || 'no', gift_code: bk.giftCode || '',
+    job_minutes: jobMinutes(bk) || '', sms_opt_in: bk.smsOptIn || 'no', gift_code: bk.giftCode || '', promo: bk.promo || '',
     // for the channel report: where it came from, where it is, what it is worth (cents, tax included)
     campaign: bk.campaign || '', campaign_type: bk.campaign ? channel(bk.campaign).type : '',
     first_campaign: bk.firstCampaign || '', first_seen: bk.firstSeen || '',

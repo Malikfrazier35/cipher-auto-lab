@@ -10,6 +10,7 @@
 <link rel="preload" href="fonts/inter-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="campaign.css">
+<link rel="stylesheet" href="promo.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -48,6 +49,11 @@
 <script src="js/va.js" defer></script>
 </head>
 <body>
+<a class="bf-strip" href="/gift" data-promo="bf" hidden>
+  <b>Black Friday to Cyber Monday</b>
+  <span>Every gift card comes with a 20% bonus card for you.<em class="bf-more"> Plus $100 off a spring ceramic coating.</em></span>
+  <i class="bf-prev">Preview</i>
+</a>
 <!-- ===== LOGO SYMBOL ===== -->
 <svg class="u-1" width="0" height="0" aria-hidden="true"><defs>
   <linearGradient id="bgrad" x1="6%" y1="0%" x2="94%" y2="100%">
@@ -158,11 +164,12 @@
 <section class="c-giftband" data-season="holiday" hidden aria-label="Holiday gift cards">
   <div class="wrap">
     <a class="c-giftband-in" href="/gift">
-      <span class="eyebrow mono">Holiday gift cards</span>
-      <b>Give a detail.</b>
-      <span class="c-giftband-t">From $50, or a whole Full Detail. Never expires, and the code arrives in a minute.</span>
+      <span class="eyebrow mono"><span data-promo-off="bf">Holiday gift cards</span><span data-promo="bf" hidden>Black Friday to Cyber Monday</span></span>
+      <b><span data-promo-off="bf">Give a detail.</span><span data-promo="bf" hidden>Give one, get one for yourself.</span></b>
+      <span class="c-giftband-t"><span data-promo-off="bf">From $50, or a whole Full Detail. Never expires, and the code arrives in a minute.</span><span data-promo="bf" hidden>Every gift card comes with a bonus card for you, worth 20%: $20 with a $100 card, $50 with a Full Detail card. Yours is good on any detail January to March.</span></span>
       <span class="btn btn-p">Buy a gift card</span>
     </a>
+    <a class="bf-ceramic" href="quote.html#quote" data-promo="bf" hidden><b>Ceramic coating: $100 off a spring install.</b> Book by Cyber Monday for a day in March, April or May. <span aria-hidden="true">→</span></a>
   </div>
 </section>
 
@@ -375,6 +382,7 @@
   <a class="btn btn-p" href="quote.html#quote">Book</a>
 </div>
 <script src="js/season.js" defer></script>
+<script src="js/promo.js" defer></script>
 <script src="js/sizes.js" defer></script>
 </body>
 </html>

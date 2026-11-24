@@ -55,6 +55,8 @@
       .then(function (x) {
         if (!x[0].ok || !x[1].clientSecret) throw new Error(x[1].error || 'Payment could not start. Call or text (203) 560-3572.');
         sessionId = x[1].sessionId;
+        // Black Friday: the server says whether this purchase comes with a bonus card (api/_promo.js)
+        $('gBonusRow').hidden = !x[1].bonus; if (x[1].bonus) $('gBonusAmt').textContent = '+$' + x[1].bonus;
         try { sessionStorage.setItem('cal_gift_email', buyerEmail); } catch (e) { /* private mode */ }
         payUI = window.CALDeposit.mount({
           clientSecret: x[1].clientSecret, express: '#gExpress', payment: '#gPayment', theme: 'dark', buttonType: 'buy',
@@ -91,6 +93,13 @@
         $('cTo').textContent = g.to; $('cFrom').textContent = g.from;
         $('cMsg').hidden = !g.message; $('cMsg').textContent = g.message ? '“' + g.message + '”' : '';
         $('cCode').textContent = g.code;
+        if (g.bonus) {
+          var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          var day = function (ymd) { var p = String(ymd).split('-'); return M[+p[1] - 1] + ' ' + (+p[2]); };
+          $('bAmt').textContent = '$' + g.bonus.amount; $('bCode').textContent = g.bonus.code;
+          $('bRange').textContent = day(g.bonus.from) + ' to ' + day(g.bonus.until) + ', ' + String(g.bonus.until).slice(0, 4);
+          $('gBonus').hidden = false;
+        }
         var email = buyerEmail; try { email = email || sessionStorage.getItem('cal_gift_email') || ''; } catch (e) { /* private mode */ }
         $('gDoneTxt').textContent = 'Print it, save it as a PDF, or forward the code. ' + (email ? 'It is also in the receipt we emailed to ' + email + '.' : 'It is also in your receipt email.');
         document.querySelector('.g-hero').hidden = true; $('buy').hidden = true; $('done').hidden = false;

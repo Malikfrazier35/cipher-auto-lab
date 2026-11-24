@@ -65,7 +65,9 @@
   function paintPrice(){ return S.paint ? PAINT[S.paint].p[S.tier] : 0 }
   // Paint work covers the wash and decon an exterior service would have done.
   function overlap(){ return (S.paint && svc().ext) ? SVC.exterior.p[S.tier] : 0 }
-  function total(){ return svc().p[S.tier] + paintPrice() - overlap() + addTotal() }
+  // Black Friday spring ceramic lock-in (js/promo.js; the server decides it again when booking)
+  function lockIn(){ var P=window.CALPromo; return P && P.ceramicOn(S.paint) && P.inCeramic(S.ymd) ? P.ceramic.off : 0 }
+  function total(){ return svc().p[S.tier] + paintPrice() - overlap() + addTotal() - lockIn() }
   function deposit(){ return Math.max(svc().dep, S.paint?PAINT[S.paint].dep:0) }
   function bal(){ return Math.max(0, total()-deposit()) }
   function isQuote(){ return !!(S.paint && PAINT[S.paint].quote) }
@@ -86,6 +88,7 @@
       out.push('<span>'+PAINT[S.paint].name+'<i>+'+money(paintPrice())+'</i></span>');
       if(overlap()) out.push('<span>Exterior wash already in the paint work<i>&minus;'
         +money(overlap())+'</i></span>');
+      if(lockIn()) out.push('<span>Black Friday ceramic lock-in<i>&minus;'+money(lockIn())+'</i></span>');
     }
     return out.join('');
   }
@@ -98,6 +101,7 @@
     setText('depVal','$'+deposit());
     setText('balVal',money(bal()));
     var it=$('pitems3'); if(it) it.innerHTML=itemLines();
+    springUI();
     // the two singles exist to sell the bundle — show the arithmetic, not the word "value"
     var bl=$('bundleLine');
     if(bl){
@@ -451,10 +455,46 @@
     }
     box.addEventListener('click',function(ev){
       var b=ev.target.closest('.dt'); if(!b) return;
-      box.querySelectorAll('.dt').forEach(function(o){o.classList.remove('sel')});
-      b.classList.add('sel'); S.date=b.dataset.iso; S.ymd=b.dataset.ymd; box.classList.remove('bad'); recheckWhere(); paintWeather();
+      $$('#dates .dt, #springDates .dt').forEach(function(o){o.classList.remove('sel')});
+      b.classList.add('sel'); S.date=b.dataset.iso; S.ymd=b.dataset.ymd; box.classList.remove('bad'); recheckWhere(); paintWeather(); paint();
     });
   })();
+
+  /* Black Friday spring ceramic lock-in: ceramic coating gets a March-May picker, $100 off on those days.
+     Spring because a coating needs warm, dry days to cure. Shown only in the sale (js/promo.js). */
+  (function(){
+    var wrap=$('springBox'), box=$('springDates'), mons=$('springMons'), P=window.CALPromo;
+    if(!wrap || !box || !mons || !P) return;
+    var d=new Date(P.ceramic.from+'T00:00:00'), end=new Date(P.ceramic.until+'T00:00:00'), first=P.ceramic.from.slice(0,7);
+    while(d<=end){
+      if(d.getDay()!==0){
+        var b=document.createElement('button'), ymd=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        b.type='button'; b.className='dt'; b.dataset.iso=d.toDateString(); b.dataset.ymd=ymd; b.dataset.mon=ymd.slice(0,7);
+        b.hidden = b.dataset.mon!==first;
+        b.innerHTML='<em>'+DAY[d.getDay()]+'</em><b>'+d.getDate()+'</b><i>'+MON[d.getMonth()]+'</i>';
+        box.appendChild(b);
+      }
+      d.setDate(d.getDate()+1);
+    }
+    mons.addEventListener('click',function(ev){
+      var t=ev.target.closest('button[data-mon]'); if(!t) return;
+      mons.querySelectorAll('button').forEach(function(o){ o.setAttribute('aria-pressed', String(o===t)) });
+      box.querySelectorAll('.dt').forEach(function(o){ o.hidden = o.dataset.mon!==t.dataset.mon });
+    });
+    box.addEventListener('click',function(ev){
+      var b=ev.target.closest('.dt'); if(!b) return;
+      $$('#dates .dt, #springDates .dt').forEach(function(o){o.classList.remove('sel')});
+      b.classList.add('sel'); S.date=b.dataset.iso; S.ymd=b.dataset.ymd; $('dates').classList.remove('bad'); recheckWhere(); paintWeather(); paint();
+    });
+  })();
+  function springUI(){
+    var wrap=$('springBox'), P=window.CALPromo; if(!wrap || !P) return;
+    var on=P.ceramicOn(S.paint); wrap.hidden=!on;
+    // a spring day picked for ceramic, then the paint work changed: pick again from the usual days
+    if(!on && document.querySelector('#springDates .dt.sel')){
+      S.date=null; S.ymd=null; $$('#springDates .dt').forEach(function(o){o.classList.remove('sel')});
+    }
+  }
 
   /* -------------------------------------------------------------- navigation */
   function show(n){
@@ -607,6 +647,7 @@
       +(adds ? 'Add-ons: '+adds+' — +'+money(addTotal())+NL : '')
       +(S.paint ? 'Paint work: '+PAINT[S.paint].name+' — +'+money(paintPrice())
                   +(overlap()?' (less '+money(overlap())+' exterior already included)':'')+NL : '')
+      +(lockIn() ? 'Black Friday ceramic lock-in (spring install): -'+money(lockIn())+NL : '')
       +'Vehicle: '+S.size+($('bv').value?' — '+esc($('bv').value):'')+NL
       +'Condition: '+$('bc').value+NL
       +'Parked: '+$('bk2').value+NL
@@ -684,7 +725,7 @@
       ref:S.ref,
       name:$('bnm').value, phone:$('bph').value, email:$('bem').value,
       vehicle:$('bv').value, size:S.size, condition:$('bc').value, parked:$('bk2').value, garage:S.garage?'yes':'no', smsOptIn:$('smsOk')&&$('smsOk').checked?'yes':'no',
-      campaign:window.CALSource?window.CALSource.get():'', giftCode:S.gift?S.gift.code:'',
+      campaign:window.CALSource?window.CALSource.get():'', giftCode:S.gift && window.CALGift && window.CALGift.usable(S.gift, S.ymd)?S.gift.code:'',
       firstCampaign:window.CALSource?window.CALSource.first().src:'', firstSeen:window.CALSource?window.CALSource.first().day:'',
       area:wxArea(), date:S.date, window:S.win, address:$('bad').value, town:$('btw').value, zip:$('bzip').value,
       notes:$('bn').value, estTotal:totalText(),
@@ -699,13 +740,13 @@
     $('e6').style.display='none';
     $('giftPay').hidden=true; $('payWrap').hidden=false;
     $('payBtn').textContent='Pay deposit & book';
-    if(S.gift && window.CALGift && window.CALGift.covers(S.gift, deposit())){   // nothing to pay: book on the card
+    if(S.gift && window.CALGift && window.CALGift.covers(S.gift, deposit(), S.ymd)){   // nothing to pay: book on the card
       $('payLoading').style.display='none';
       $('payWrap').hidden=true; $('giftPay').hidden=false;
-      $('payAmt').textContent='Gift card';
+      $('payAmt').textContent=S.gift.bonus?'Bonus card':'Gift card';
       $('payBal').textContent=money(Math.max(0, total()-S.gift.balance));
-      $('giftPayTxt').textContent=window.CALGift.words(S.gift, deposit());
-      $('payBtn').textContent='Book with my gift card'; $('payBtn').disabled=false;
+      $('giftPayTxt').textContent=window.CALGift.words(S.gift, deposit(), S.ymd);
+      $('payBtn').textContent=S.gift.bonus?'Book with my bonus card':'Book with my gift card'; $('payBtn').disabled=false;
       payUI={ gift:true };
       return;
     }
@@ -754,7 +795,8 @@
       if(!input.value.trim()){ S.gift=null; msg.hidden=true; return }
       msg.hidden=false; msg.className='fldnote giftmsg'; msg.textContent='Checking…';
       window.CALGift.check(input.value).then(function(d){
-        if(d.ok){ S.gift={code:d.code, balance:d.balance}; input.value=d.code; msg.textContent=window.CALGift.words(S.gift, deposit()); msg.className='fldnote giftmsg ok' }
+        if(d.ok){ S.gift=window.CALGift.card(d); input.value=d.code; msg.textContent=window.CALGift.words(S.gift, deposit(), S.ymd);
+          msg.className='fldnote giftmsg '+(window.CALGift.usable(S.gift, S.ymd)?'ok':'bad') }
         else { S.gift=null; msg.textContent=d.error; msg.className='fldnote giftmsg bad' }
       });
     }
@@ -772,10 +814,10 @@
         var d={}; try{ d=await r.json() }catch(e){}
         if(!r.ok || !d.booked) throw new Error(d.error||'We couldn’t finish the booking. Nothing was charged. Call or text (203) 560-3572.');
         fill('f'); remember();
-        var f6=$('f6'); if(f6) f6.textContent='Gift card';
+        var f6=$('f6'); if(f6) f6.textContent=S.gift && S.gift.bonus?'Bonus card':'Gift card';
         show(7);
       }catch(err){ payFail(err && err.message) }
-      finally{ paying=false; btn.textContent='Book with my gift card' }
+      finally{ paying=false; btn.textContent=S.gift && S.gift.bonus?'Book with my bonus card':'Book with my gift card' }
       return;
     }
     paying=true; btn.textContent='Processing…'; $('e6').style.display='none';

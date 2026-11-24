@@ -15,7 +15,9 @@ export async function checkoutStatus(request, stripe) {
     const md = s.metadata || {};
     // a paid gift card: what the printable card on /gift needs (the code is on the receipt too)
     const gift = md.kind === 'gift' && s.payment_status === 'paid'
-      ? { code: md.gift_code, amount: (parseInt(md.gift_amount, 10) || 0) / 100, kind: md.gift_kind, to: md.gift_to, from: md.gift_from, message: md.gift_message || '' }
+      ? { code: md.gift_code, amount: (parseInt(md.gift_amount, 10) || 0) / 100, kind: md.gift_kind, to: md.gift_to, from: md.gift_from, message: md.gift_message || '',
+          // Black Friday: the buyer's own bonus card (api/_promo.js)
+          ...(md.bonus_code ? { bonus: { code: md.bonus_code, amount: (parseInt(md.bonus_amount, 10) || 0) / 100, from: md.bonus_from, until: md.bonus_until } } : {}) }
       : undefined;
     return json({
       status: s.status,
