@@ -10,7 +10,7 @@
 
 export const TYPES = {
   door: 'Door hanger', magnet: 'Magnet', card: 'Business card', dash: 'Dash card', postcard: 'Postcard',
-  flyer: 'Flyer', work: 'Workplace flyer', fleet: 'Fleet leave-behind', fb: 'Facebook', ig: 'Instagram',
+  flyer: 'Flyer', work: 'Workplace flyer', fleet: 'Fleet leave-behind', van: 'Van sign', fb: 'Facebook', ig: 'Instagram',
   google: 'Google profile', gift: 'Gift card page', sms: 'Text message', email: 'Email',
 };
 
@@ -29,6 +29,7 @@ export const REGISTRY = {
   card:   { label: 'Business cards' },
   dash:   { label: 'Dash cards' },
   postcard: { label: 'Postcards' },
+  van:    { label: 'Van rear window sign', note: 'The Odyssey rear window cling (Nov 2026)' },
   fb:     { label: 'Facebook posts' },
   // Black Friday 2026 (api/_promo.js): the links in the posts and texts for the sale
   'fb-bf':     { label: 'Facebook · Black Friday post' },

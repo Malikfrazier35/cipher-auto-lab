@@ -6,7 +6,7 @@
    - A printed offer for that channel's type ([data-offer="door"] etc.) is shown on the page.
    CALSource.get() -> latest channel, .first() -> {src, day}, .type() -> its type, .mark('start')  */
 (function () {
-  var TYPES = ['door', 'magnet', 'card', 'dash', 'postcard', 'flyer', 'work', 'fleet', 'fb', 'ig', 'google', 'gift', 'sms', 'email'];
+  var TYPES = ['door', 'magnet', 'card', 'dash', 'postcard', 'flyer', 'work', 'fleet', 'van', 'fb', 'ig', 'google', 'gift', 'sms', 'email'];
   var RE = /^[a-z]{2,8}(?:-[a-z0-9]{1,24}){0,4}$/;
   var KEY = 'cal_src2', LAST_DAYS = 7, FIRST_DAYS = 30;
   function valid(s) { return RE.test(s || '') && TYPES.indexOf(s.split('-')[0]) > -1; }

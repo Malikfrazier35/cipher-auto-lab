@@ -900,4 +900,7 @@ console.log('channel engine tests passed');
   assert.match(gpush.at(-1).message, /\nBlack Friday ceramic lock-in: \$100 off \(on the invoice\)/);
   cc.deps.now = () => Date.now();
 }
+{ const ch = await import('../api/_channels.js');
+  assert.equal(ch.channel('van').label, 'Van rear window sign', 'the Odyssey rear window QR');
+  assert.equal(ch.channel('van-odyssey').typeLabel, 'Van sign'); }
 console.log('black friday tests passed');

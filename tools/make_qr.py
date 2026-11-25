@@ -5,7 +5,7 @@
     python3 tools/make_qr.py fleet-ace-plumbing --page fleet   # opens /fleet
     python3 tools/make_qr.py fb --page gift                    # a link for a gift card post
 
-The id is the channel: its type (door, magnet, card, dash, postcard, flyer, work, fleet, fb, ig,
+The id is the channel: its type (door, magnet, card, dash, postcard, flyer, work, fleet, van, fb, ig,
 google, gift, sms, email), then optionally where it went. Writes qr/<id>.svg and qr/<id>.png and
 prints the link. Add the placement to REGISTRY in api/_channels.js to give it a name and a cost.
 Needs:  pip install qrcode pillow
@@ -13,7 +13,7 @@ Needs:  pip install qrcode pillow
 import argparse, os, re, sys
 import qrcode, qrcode.image.svg
 
-TYPES = ['door', 'magnet', 'card', 'dash', 'postcard', 'flyer', 'work', 'fleet', 'fb', 'ig', 'google', 'gift', 'sms', 'email']
+TYPES = ['door', 'magnet', 'card', 'dash', 'postcard', 'flyer', 'work', 'fleet', 'van', 'fb', 'ig', 'google', 'gift', 'sms', 'email']
 ap = argparse.ArgumentParser()
 ap.add_argument('id'); ap.add_argument('--page', default='menu', choices=['menu', 'quote', 'gift', 'fleet', ''])
 ap.add_argument('--out', default='qr')
